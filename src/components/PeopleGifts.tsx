@@ -38,8 +38,7 @@ function PeopleGifts() {
                                         👤
                                     </>
                                 )
-                            }
-                            {person?.ownerLoginId} - {
+                            } {person?.ownerLoginId} - {
                                 gift ? (
                                     <>
                                         🎁 {gift.attribute_1} {gift.attribute_2} {gift.attribute_3}

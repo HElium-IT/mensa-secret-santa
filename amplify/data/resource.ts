@@ -7,7 +7,7 @@ const schema = a.schema({
       attribute_1: a.string().required(),
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
-      number: a.integer().required()
+      number: a.integer().required(),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
@@ -15,7 +15,6 @@ const schema = a.schema({
     .model({
       ownerLoginId: a.id().required(),
       isAdmin: a.boolean().default(false).required(),
-      gift: a.belongsTo("Gift", "ownerLoginId"),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
