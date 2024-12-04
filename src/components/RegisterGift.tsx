@@ -47,29 +47,38 @@ function RegisterGift() {
 			alert('Please fix the validation errors before submitting.');
 			return;
 		}
+		while (true) {
+			const newNumber = await client.models.Gift.list().then(({ data }) => data.length + 1)
+			const { data: gift, errors: giftErrors } = await client.models.Gift.create({
+				...giftData,
+				number: newNumber,
+				ownerLoginId: user.signInDetails.loginId
+			});
 
-		const newNumber = gifts.length + 1;
+			if (!gift) {
+				if (giftErrors)
+					console.error('Errore nella creazione del regalo: ' + giftErrors.map((e) => e.message).join('; '));
+				continue;
+			} else {
+				const giftsWithSameNumber = gifts.filter(g => g.number === newNumber);
+				if (giftsWithSameNumber.length > 1) {
+					console.error('Errore nella creazione del regalo: ci sono più regali con lo stesso numero');
+					client.models.Gift.delete({ ownerLoginId: user.signInDetails.loginId });
+					continue
+				}
+			}
 
-		const { data: gift, errors: giftErrors } = await client.models.Gift.create({
-			...giftData,
-			number: newNumber,
-			ownerLoginId: user.signInDetails.loginId
-		});
-		if (!gift) {
-			if (giftErrors)
-				alert('Errore nella creazione del regalo: ' + giftErrors.map((e) => e.message).join('; '));
-			return;
-		}
+			const { data: person, errors: personErrors } = await client.models.Person.create({
+				isAdmin: false,
+				ownerLoginId: user.signInDetails.loginId,
+			});
+			if (!person) {
+				if (personErrors)
+					console.error('Errore nella creazione della persona: ' + personErrors.map((e) => e.message).join('; '));
+				continue;
+			}
 
-		const { data: person, errors: personErrors } = await client.models.Person.create({
-			isAdmin: false,
-			ownerLoginId: user.signInDetails.loginId,
-			giftNumber: newNumber
-		});
-		if (!person) {
-			if (personErrors)
-				alert('Errore nella creazione della persona: ' + personErrors.map((e) => e.message).join('; '));
-			return;
+			break;
 		}
 	}
 

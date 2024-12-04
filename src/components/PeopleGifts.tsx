@@ -25,7 +25,7 @@ function PeopleGifts() {
             <h2>Persone registrate</h2>
             <ul>
                 {people.map((person) => {
-                    const gift = gifts?.find((gift) => gift?.number === person?.giftNumber);
+                    const gift = gifts?.find((gift) => gift?.ownerLoginId === person?.ownerLoginId);
                     return (
                         <li key={person?.ownerLoginId}>
                             {
