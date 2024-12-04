@@ -15,8 +15,7 @@ const schema = a.schema({
     .model({
       ownerLoginId: a.id().required(),
       isAdmin: a.boolean().default(false).required(),
-      giftNumber: a.integer(),
-      gift: a.belongsTo("Gift", "giftNumber"),
+      gift: a.belongsTo("Gift", "ownerLoginId"),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
