@@ -17,25 +17,25 @@ function PeopleGifts() {
         });
     }, []);
 
-    async function assignNumbersToGifts() {
-        const { data: giftsList } = await client.models.Gift.list();
-        giftsList.forEach((gift, index) => {
-            client.models.Gift.update({
-                ...gift,
-                number: index + 1,
-            });
-        });
-    }
+    // async function assignNumbersToGifts() {
+    //     const { data: giftsList } = await client.models.Gift.list();
+    //     giftsList.forEach((gift, index) => {
+    //         client.models.Gift.update({
+    //             ...gift,
+    //             number: index + 1,
+    //         });
+    //     });
+    // }
 
-    async function resetGiftsNumbers() {
-        const { data: giftsList } = await client.models.Gift.list();
-        giftsList.forEach((gift) => {
-            client.models.Gift.update({
-                ...gift,
-                number: null,
-            });
-        });
-    }
+    // async function resetGiftsNumbers() {
+    //     const { data: giftsList } = await client.models.Gift.list();
+    //     giftsList.forEach((gift) => {
+    //         client.models.Gift.update({
+    //             ...gift,
+    //             number: null,
+    //         });
+    //     });
+    // }
 
     if (!gifts)
         return <></>;
@@ -43,8 +43,8 @@ function PeopleGifts() {
     return (
         <>
             <h2> Persone registrate: {people.length}</h2>
-            <button onClick={assignNumbersToGifts}>Assegna numeri ai regali</button>
-            <button onClick={resetGiftsNumbers}>Resetta numeri regali</button>
+            {/* <button onClick={assignNumbersToGifts}>Assegna numeri ai regali</button>
+            <button onClick={resetGiftsNumbers}>Resetta numeri regali</button> */}
             <ul>
                 {people.sort(
                     (a, b) => {

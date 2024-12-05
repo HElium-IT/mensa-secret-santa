@@ -48,7 +48,8 @@ function RegisterGift() {
 		while (currentRetries < maxRetries) {
 			const { data: gift, errors: giftErrors } = await client.models.Gift.create({
 				...giftData,
-				ownerLoginId: user.signInDetails.loginId
+				ownerLoginId: user.signInDetails.loginId,
+				number: (await client.models.Gift.list()).data.length + 1,
 			});
 
 			if (!gift) {
