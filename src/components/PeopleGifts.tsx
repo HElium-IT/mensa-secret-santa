@@ -33,7 +33,7 @@ function PeopleGifts() {
 
     return (
         <>
-            <h2>Persone registrate: {people.length}</h2>
+            <h2> Persone registrate: {people.length}</h2>
             <button onClick={assignNumbersToGifts}>Assegna numeri ai regali</button>
             <ul>
                 {people.sort(

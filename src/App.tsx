@@ -15,18 +15,26 @@ function App() {
 
 	const [appLoading, setAppLoading] = useState(true);
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [isRegistered, setIsRegistered] = useState(false);
+	const [hasGift, setHasGift] = useState(false);
 
 	useEffect(() => {
-		client.models.Person.observeQuery().subscribe({
-			next: async (data) => {
-				setIsRegistered(Boolean(data.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)));
-				setIsAdmin(Boolean(data.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)?.isAdmin));
-				setTimeout(() => setAppLoading(false), 1000);
+		// Observe Gifts to check if the user has a gift
+		client.models.Gift.observeQuery().subscribe({
+			next: async (giftData) => {
+				setHasGift(Boolean(giftData.items.find((gift) => gift?.ownerLoginId === user?.signInDetails?.loginId)));
 			},
 		});
-	}, []);
 
+		// Observe Persons to check if the user is admin
+		client.models.Person.observeQuery().subscribe({
+			next: async (personData) => {
+				const person = personData.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId);
+				setIsAdmin(Boolean(person?.isAdmin));
+			},
+		});
+
+		setTimeout(() => setAppLoading(false), 1000);
+	}, []);
 
 	if (appLoading)
 		return (
@@ -40,7 +48,7 @@ function App() {
 		<main>
 			<h1> Ciao {user?.signInDetails?.loginId} </h1>
 			{
-				isRegistered ? (
+				hasGift ? (
 					<PersonGift />
 				) : (
 					<RegisterGift />
