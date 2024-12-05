@@ -50,13 +50,11 @@ function RegisterGift() {
 			alert('Please fix the validation errors before submitting.');
 			return;
 		}
-		const maxRetries = 5;
+		const maxRetries = 1;
 		let currentRetries = 0;
 		while (currentRetries < maxRetries) {
-			const newNumber = await client.models.Gift.list().then(({ data }) => data.length + 1)
 			const { data: gift, errors: giftErrors } = await client.models.Gift.create({
 				...giftData,
-				number: newNumber,
 				ownerLoginId: user.signInDetails.loginId
 			});
 
@@ -66,14 +64,6 @@ function RegisterGift() {
 
 				currentRetries++;
 				continue;
-			} else {
-				const giftsWithSameNumber = gifts.filter(g => g.number === newNumber);
-				if (giftsWithSameNumber.length > 1) {
-					console.error('Errore nella creazione del regalo: ci sono più regali con lo stesso numero');
-					client.models.Gift.delete({ ownerLoginId: user.signInDetails.loginId });
-					currentRetries++;
-					continue
-				}
 			}
 
 			const { data: person, errors: personErrors } = await client.models.Person.create({
