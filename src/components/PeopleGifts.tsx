@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+
 const client = generateClient<Schema>();
 
 function PeopleGifts() {
@@ -16,12 +17,24 @@ function PeopleGifts() {
         });
     }, []);
 
+    async function assignNumbersToGifts() {
+        const { data: giftsList } = await client.models.Gift.list();
+        giftsList.forEach((gift, index) => {
+            client.models.Gift.update({
+                ...gift,
+                number: index + 1,
+            });
+        });
+        setGifts(giftsList);
+    }
+
     if (!gifts)
         return <></>;
 
     return (
         <>
-            <h2>Persone registrate</h2>
+            <h2>Persone registrate: {people.length}</h2>
+            <button onClick={assignNumbersToGifts}>Assegna numeri ai regali</button>
             <ul>
                 {people.sort(
                     (a, b) => {
@@ -64,10 +77,10 @@ function PeopleGifts() {
                                         👤
                                     </>
                                 )
-                            } {person?.ownerLoginId} - {
+                            } {person?.ownerLoginId} {
                                 gift ? (
                                     <>
-                                        🎁 {gift.attribute_1} {gift.attribute_2} {gift.attribute_3}
+                                        🎁 {gift.number ? `[${gift.number}]` : ''} {gift.name ? `(${gift.name})` : ''} {gift.attribute_1}  {gift.attribute_2} {gift.attribute_3}
                                     </>
                                 ) : (
                                     <>
@@ -78,7 +91,7 @@ function PeopleGifts() {
                         </li>
                     )
                 })}
-            </ul>
+            </ul >
         </>
 
     );

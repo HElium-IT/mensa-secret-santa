@@ -10,12 +10,14 @@ function RegisterGift() {
 	const { user } = useAuthenticator();
 
 	const [giftData, setGiftData] = useState({
+		name: '',
 		attribute_1: '',
 		attribute_2: '',
 		attribute_3: '',
 	});
 
 	const [errors, setErrors] = useState({
+		name: '',
 		attribute_1: '',
 		attribute_2: '',
 		attribute_3: '',
@@ -29,6 +31,7 @@ function RegisterGift() {
 
 	function validateInputs() {
 		const newErrors = {
+			name: giftData.name.length < 3 ? 'At least 3 characters required' : '',
 			attribute_1: giftData.attribute_1.length < 3 ? 'At least 3 characters required' : '',
 			attribute_2: giftData.attribute_2.length < 3 ? 'At least 3 characters required' : '',
 			attribute_3: giftData.attribute_3.length < 3 ? 'At least 3 characters required' : '',
@@ -85,6 +88,13 @@ function RegisterGift() {
 	return (
 		<>
 			<form>
+				<input
+					type="text"
+					placeholder="Name"
+					value={giftData.name}
+					onChange={(e) => setGiftData({ ...giftData, name: e.target.value })}
+				/>
+				{errors.name && <span>{errors.name}</span>}
 				<input
 					type="text"
 					placeholder="Attribute 1"

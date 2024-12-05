@@ -11,39 +11,43 @@ import PersonGift from "./components/PersonGift";
 const client = generateClient<Schema>();
 
 function App() {
-	const [people, setPeople] = useState<Array<Schema["Person"]["type"] | null>>([]);
 	const { user } = useAuthenticator();
 
+	const [appLoading, setAppLoading] = useState(true);
+	const [isAdmin, setIsAdmin] = useState(false);
+	const [isRegistered, setIsRegistered] = useState(false);
 
 	useEffect(() => {
 		client.models.Person.observeQuery().subscribe({
-			next: (data) => setPeople([...data.items]),
+			next: async (data) => {
+				setIsRegistered(Boolean(data.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)));
+				setIsAdmin(Boolean(data.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)?.isAdmin));
+				setTimeout(() => setAppLoading(false), 1000);
+			},
 		});
 	}, []);
 
-	function amAdmin() {
-		return people?.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)?.isAdmin;
-	}
 
-	function amRegistered() {
-		return people?.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId);
-	}
-
-	if (!people)
-		return <p>Loading...</p>;
+	if (appLoading)
+		return (
+			<main>
+				<h1> Ciao {user?.signInDetails?.loginId} </h1>
+				<h2> Sto caricando i dati necessari...</h2>
+			</main>
+		)
 
 	return (
 		<main>
 			<h1> Ciao {user?.signInDetails?.loginId} </h1>
 			{
-				amRegistered() ? (
+				isRegistered ? (
 					<PersonGift />
 				) : (
 					<RegisterGift />
 				)
 			}
 			{
-				amAdmin() ? (
+				isAdmin ? (
 					<PeopleGifts />
 				) : (
 					<BecomeAdmin />

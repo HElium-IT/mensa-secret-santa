@@ -4,10 +4,11 @@ const schema = a.schema({
   Gift: a
     .model({
       ownerLoginId: a.id().required(),
+      name: a.string().required(),
       attribute_1: a.string().required(),
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
-      number: a.integer().required(),
+      number: a.integer(),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
