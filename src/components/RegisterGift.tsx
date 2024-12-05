@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
@@ -6,7 +6,6 @@ import { generateClient } from "aws-amplify/data";
 const client = generateClient<Schema>();
 
 function RegisterGift() {
-	const [gifts, setGifts] = useState<Array<Schema["Gift"]["type"]>>([]);
 	const { user } = useAuthenticator();
 
 	const [giftData, setGiftData] = useState({
@@ -22,12 +21,6 @@ function RegisterGift() {
 		attribute_2: '',
 		attribute_3: '',
 	});
-
-	useEffect(() => {
-		client.models.Gift.observeQuery().subscribe({
-			next: (data) => setGifts([...data.items]),
-		});
-	}, []);
 
 	function validateInputs() {
 		const newErrors = {
