@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { getAuthenticatedData, type Schema } from "../../amplify/data/resource";
+import { type Schema } from "../../amplify/data/resource";
+import { getAuthenticatedData } from "../utils";
 
 
 function PersonGift() {

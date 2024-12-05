@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { getAuthenticatedData, type Schema } from "../../amplify/data/resource";
+import { type Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { getAuthenticatedData } from "../utils";
 
 const ADMIN_SECRET_KEY = "test";
 
