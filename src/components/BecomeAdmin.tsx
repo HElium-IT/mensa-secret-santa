@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import type { Schema } from "../../amplify/data/resource";
+import { getAuthenticatedData, type Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
-import { ADMIN_SECRET_KEY } from "../vite-env";
+const ADMIN_SECRET_KEY = "test";
 
 const client = generateClient<Schema>();
 
@@ -12,17 +12,35 @@ function BecomeAdmin() {
 
     const [secretKey, setSecretKey] = useState('');
 
-    function becomeAdmin() {
+    async function becomeAdmin() {
         if (!user.signInDetails?.loginId) {
             alert('Devi effettuare il login per diventare admin');
             return;
         }
-        if (secretKey === ADMIN_SECRET_KEY) {
+
+        if (secretKey !== ADMIN_SECRET_KEY) {
+            alert('Segreto non valido');
+            return;
+        }
+
+        const { person } = await getAuthenticatedData({});
+        if (person) {
+            if (person.isAdmin) {
+                alert('Sei già admin');
+                return;
+            }
+            client.models.Person.update({
+                ...person,
+                isAdmin: true,
+            });
+
+        } else {
             client.models.Person.create({
                 isAdmin: true,
                 ownerLoginId: user.signInDetails.loginId,
             });
         }
+
     }
 
     return (

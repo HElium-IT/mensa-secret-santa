@@ -1,27 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import type { Schema } from "../../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { getAuthenticatedData, type Schema } from "../../amplify/data/resource";
 
-const client = generateClient<Schema>();
 
 function PersonGift() {
     const [gift, setGift] = useState<Schema["Gift"]["type"] | null>(null);
     const { user } = useAuthenticator();
 
     useEffect(() => {
-        async function fetchGift() {
-            const ownerLoginId = user.signInDetails?.loginId;
-            if (!ownerLoginId) return;
-
-            // Fetch the gift associated with the person
-            const { data: gift } = await client.models.Gift.get({
-                ownerLoginId
-            });
-            if (gift) setGift(gift);
-        }
-
-        fetchGift();
+        getAuthenticatedData({ setGift });
     }, [user]);
 
     if (!gift) {
