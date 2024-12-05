@@ -9,9 +9,10 @@ export function createPersonMockup(ownerLoginId: string, isAdmin: boolean) {
     };
 }
 
-export function createGiftMockup(ownerLoginId: string, number: number) {
+export function createGiftMockup(ownerLoginId: string, name: string, number?: number) {
     return {
         ownerLoginId,
+        name,
         number,
         attribute_1: "attribute_1",
         attribute_2: "attribute_2",
@@ -30,9 +31,9 @@ export const mockedPeople: Schema["Person"]["type"][] = [
 ];
 
 export const mockedGifts: Schema["Gift"]["type"][] = [
-    createGiftMockup("admin1", 1),
-    createGiftMockup("admin2", 2),
-    createGiftMockup("user1", 3),
-    createGiftMockup("user2", 4),
-    createGiftMockup("user3", 5),
+    createGiftMockup("admin1", "gift1"),
+    createGiftMockup("admin2", "gift2"),
+    createGiftMockup("user1", "gift3"),
+    createGiftMockup("user2", "gift4"),
+    createGiftMockup("user3", "gift5"),
 ];
