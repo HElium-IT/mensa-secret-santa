@@ -24,7 +24,7 @@ function BecomeAdmin() {
             return;
         }
 
-        const { person } = await getAuthenticatedData({});
+        const { person } = await getAuthenticatedData({ user });
         if (person) {
             if (person.isAdmin) {
                 alert('Sei già admin');

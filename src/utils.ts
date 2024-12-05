@@ -3,10 +3,10 @@ import type { Schema } from "../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 
-const { user } = useAuthenticator();
 const client = generateClient<Schema>();
 
-export async function getAuthenticatedData({ setGift, setPerson }: {
+export async function getAuthenticatedData({ user, setGift, setPerson }: {
+    user: ReturnType<typeof useAuthenticator>["user"],
     setGift?: (gift: Schema["Gift"]["type"]) => void,
     setPerson?: (person: Schema["Person"]["type"]) => void,
 }) {

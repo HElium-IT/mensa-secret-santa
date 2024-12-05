@@ -34,6 +34,7 @@ function App() {
 
 	return (
 		<main>
+			<h1> Ciao {user?.signInDetails?.loginId} </h1>
 			{
 				amRegistered() ? (
 					<PersonGift />

@@ -9,7 +9,7 @@ function PersonGift() {
     const { user } = useAuthenticator();
 
     useEffect(() => {
-        getAuthenticatedData({ setGift });
+        getAuthenticatedData({ user, setGift });
     }, [user]);
 
     if (!gift) {
