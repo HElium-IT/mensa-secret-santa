@@ -13,12 +13,54 @@ function PeopleGifts() {
             next: (data) => setGifts([...data.items]),
         });
         client.models.Person.observeQuery().subscribe({
-            next: (data) => setPeople([...data.items]),
+            next: (data) => setPeople([...data.items].sort((a, b) => peopleSorter(a, b))),
         });
     }, []);
 
+    // async function assignNumbersToGifts() {
+    //     const { data: giftsList } = await client.models.Gift.list();
+    //     giftsList.forEach((gift, index) => {
+    //         client.models.Gift.update({
+    //             ...gift,
+    //             number: index + 1,
+    //         });
+    //     });
+    // }
+
+    // async function resetGiftsNumbers() {
+    //     const { data: giftsList } = await client.models.Gift.list();
+    //     giftsList.forEach((gift) => {
+    //         client.models.Gift.update({
+    //             ...gift,
+    //             number: null,
+    //         });
+    //     });
+    // }
+
+    function peopleSorter(a: Schema["Person"]["type"], b: Schema["Person"]["type"]) {
+        const aHasGift = gifts.some(gift => gift?.ownerLoginId === a?.ownerLoginId);
+        const bHasGift = gifts.some(gift => gift?.ownerLoginId === b?.ownerLoginId);
+
+        if (a?.isAdmin && !b?.isAdmin) {
+            return -1;
+        } else if (!a?.isAdmin && b?.isAdmin) {
+            return 1;
+        } else if ((a?.isAdmin && b?.isAdmin) || (!a?.isAdmin && !b?.isAdmin)) {
+            if (aHasGift && !bHasGift) {
+                return -1;
+            } else if (!aHasGift && bHasGift) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
     if (!gifts)
         return <></>;
+
 
     return (
         <>

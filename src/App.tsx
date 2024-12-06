@@ -7,43 +7,60 @@ import BecomeAdmin from "./components/BecomeAdmin";
 import RegisterGift from "./components/RegisterGift";
 import PeopleGifts from "./components/PeopleGifts";
 import PersonGift from "./components/PersonGift";
+import GameAdminPanel from "./components/GameAdminPanel";
 
 const client = generateClient<Schema>();
 
 function App() {
-	const [people, setPeople] = useState<Array<Schema["Person"]["type"] | null>>([]);
+	const [hasGift, setHasGift] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(false);
 	const { user } = useAuthenticator();
+	const [loading, setLoading] = useState(true);
 
 
 	useEffect(() => {
-		client.models.Person.observeQuery().subscribe({
-			next: (data) => setPeople([...data.items]),
+		// Observe Gifts to check if the user has a gift
+		client.models.Gift.observeQuery().subscribe({
+			next: (giftData) => {
+				setHasGift(Boolean(giftData.items.find((gift) => gift?.ownerLoginId === user?.signInDetails?.loginId)));
+			},
 		});
+
+		// Observe Persons to check if the user is admin
+		client.models.Person.observeQuery().subscribe({
+			next: (personData) => {
+				const person = personData.items.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId);
+				setIsAdmin(Boolean(person?.isAdmin));
+			},
+		});
+
+		setTimeout(() => {
+			setLoading(false);
+		}, 1000);
+
 	}, []);
 
-	function amAdmin() {
-		return people?.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId)?.isAdmin;
+	if (loading) {
+		return (
+			<div className="loading">Loading...</div>
+		);
 	}
-
-	function amRegistered() {
-		return people?.find((person) => person?.ownerLoginId === user?.signInDetails?.loginId);
-	}
-
-	if (!people)
-		return <p>Loading...</p>;
 
 	return (
 		<main>
 			{
-				amRegistered() ? (
+				hasGift ? (
 					<PersonGift />
 				) : (
 					<RegisterGift />
 				)
 			}
 			{
-				amAdmin() ? (
-					<PeopleGifts />
+				isAdmin ? (
+					<>
+						<PeopleGifts />
+						<GameAdminPanel />
+					</>
 				) : (
 					<BecomeAdmin />
 				)
