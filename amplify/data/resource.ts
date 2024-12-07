@@ -3,45 +3,40 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 const schema = a.schema({
   Gift: a
     .model({
-      ownerLoginId: a.id().required(),
+      gamePersonId: a.id(),
+      gamePerson: a.belongsTo("GamePerson", "gamePersonId"),
+      name: a.string().required(),
       attribute_1: a.string().required(),
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
-      number: a.integer().required()
+      number: a.integer(),
     })
-    .authorization((allow) => [allow.publicApiKey()])
-    .identifier(["ownerLoginId"]),
-  GamePlayer: a.model({
-    playerLoginId: a.id().required(),
-    gameId: a.id().required(),
-    person: a.belongsTo("Person", "playerLoginId"),
-    game: a.belongsTo("Game", "gameId"),
-  }),
-  GameAdmin: a.model({
-    adminLoginId: a.id().required(),
-    gameId: a.id().required(),
-    person: a.belongsTo("Person", "adminLoginId"),
-    game: a.belongsTo("Game", "gameId"),
-  }),
+    .authorization((allow) => [allow.publicApiKey()]),
+  GamePerson: a
+    .model({
+      gameId: a.id().required(),
+      personId: a.id().required(),
+      game: a.belongsTo("Game", "gameId"),
+      person: a.belongsTo("Person", "personId"),
+      gift: a.hasOne("Gift", "gamePersonId"),
+      role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
+      acceptedInvitation: a.boolean().required().default(false),
+    }).authorization((allow) => [allow.publicApiKey()]),
   Person: a
     .model({
       ownerLoginId: a.id().required(),
-      isAdmin: a.boolean().default(false).required(),
-      gift: a.belongsTo("Gift", "ownerLoginId"),
-      games: a.hasMany("GamePlayer", "playerLoginId"),
+      games: a.hasMany("GamePerson", "personId"),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
   Game: a
     .model({
-      creatorLoginId: a.id().required(),
       name: a.string().required(),
       description: a.string().required(),
-      admins: a.hasMany("GameAdmin", "gameId"),
-      people: a.hasMany("GamePlayer", "gameId"),
+      people: a.hasMany("GamePerson", "gameId"),
       joinQrCode: a.string(),
       phase: a.enum(["LOBBY", "REGISTRATION_OPEN", "STARTED", "FINISHED"]),
-    }),
+    }).authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -55,3 +50,4 @@ export const data = defineData({
     },
   },
 });
+
