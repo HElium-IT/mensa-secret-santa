@@ -4,7 +4,9 @@ import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getPersonGames } from "../utils";
 import Game from './Game';
-import GameCreate from './GameCreate';
+import type { GameCreateFormInputValues } from "../ui-components/GameCreateForm";
+import GameCreateForm from "../ui-components/GameCreateForm";
+
 
 const client = generateClient<Schema>();
 
@@ -27,14 +29,44 @@ function GamesList() {
         return () => subscription.unsubscribe();
     }, [user]);
 
+    async function createGame(fields: GameCreateFormInputValues) {
+        if (!fields.name || !fields.description) {
+            console.error("Name and description are required");
+            return;
+        }
+
+        const game = await client.models.Game.create({
+            name: fields.name,
+            description: fields.description,
+            joinQrCode: fields.joinQrCode ?? "",
+            phase: (fields.phase ?? "LOBBY") as Schema["Game"]["type"]["phase"],
+        });
+        if (!game.data) return;
+
+        await client.models.GamePerson.create({
+            gameId: game.data.id,
+            personId: user?.signInDetails?.loginId ?? '',
+            role: "CREATOR",
+            acceptedInvitation: true,
+        });
+    }
+
     return (
         <>
             <h2>La tua lista di giochi</h2>
             {<button onClick={() => setShowCreateForm(true)}>Crea Nuovo Gioco</button>}
             {showCreateForm &&
-                <GameCreate
-                    onCreated={() => setShowCreateForm(false)}
-                    onCancel={() => setShowCreateForm(false)}
+                <GameCreateForm
+                    overrides={{
+                        joinQrCode: { display: 'none', value: "" },
+                        phase: { display: 'none', value: "LOBBY" },
+
+                    }}
+                    onSuccess={(fields) => {
+                        createGame(fields).then(() => {
+                            setShowCreateForm(false);
+                        }, alert);
+                    }}
                 />
             }
             <ul style={{ height: '400px', overflowY: 'scroll' }}>
