@@ -1,57 +1,41 @@
-
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
+import GamePeople from './GamePeople';
+
+import { gamePhaseToText, gamePersonRoleToText } from "../utils";
 
 const client = generateClient<Schema>();
 
-function Game({ game, compact = false }: { game: Schema["Game"]["type"], compact?: boolean }) {
+function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"], readonly compact?: boolean }) {
     const { user } = useAuthenticator();
-
-    const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
+    const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
 
-    const [creators, setCreators] = useState<Schema["GamePerson"]["type"][]>([]);
-    const [admins, setAdmins] = useState<Schema["GamePerson"]["type"][]>([]);
-    const [players, setPlayers] = useState<Schema["GamePerson"]["type"][]>([]);
+    const [gamePhaseText, setGamePhaseText] = useState<string>("");
+    const [gameRoleText, setGameRoleText] = useState<string>("");
 
     useEffect(() => {
-        async function getGamePeople() {
-            const { data: gamePeople } = await game.people();
-            if (gamePeople) {
-                setGamePeople(gamePeople);
-            }
-        }
-
-        getGamePeople();
+        game.people().then(({ data: gamePeopleData }) => {
+            if (!gamePeopleData) return;
+            setGamePeople(gamePeopleData);
+            gamePeopleData.forEach(gp => {
+                if (gp.personId === user.signInDetails?.loginId) {
+                    setGamePerson(gp);
+                }
+            });
+        });
     }, [game]);
 
     useEffect(() => {
-        if (gamePeople.length) {
-            gamePeople.forEach(gamePerson => {
-                if (gamePerson.personId === user.signInDetails?.loginId) {
-                    setGamePerson(gamePerson);
-                }
-                switch (gamePerson.role) {
-                    case "CREATOR":
-                        setCreators([...creators, gamePerson]);
-                        break;
-                    case "ADMIN":
-                        setAdmins([...admins, gamePerson]);
-                        break;
-                    case "PLAYER":
-                        setPlayers([...players, gamePerson]);
-                        break;
-                }
-            });
-        } else {
-            setGamePerson(undefined);
-            setCreators([]);
-            setAdmins([]);
-            setPlayers([]);
-        }
-    }, [gamePeople]);
+        setGamePhaseText(gamePhaseToText(game));
+    }, [game.phase]);
+
+    useEffect(() => {
+        if (gamePerson)
+            setGameRoleText(gamePersonRoleToText(gamePerson));
+    }, [gamePerson]);
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
@@ -74,57 +58,26 @@ function Game({ game, compact = false }: { game: Schema["Game"]["type"], compact
         );
     }
 
+    const gameHeader = (
+        <h3>
+            <span>{gameRoleText}</span> {game.name} - <span>{gamePhaseText}</span>
+        </h3>
+    )
+
     if (compact) {
-        return (
-            <>
-                <h3>
-                    <span>{gamePerson.role && gamePerson.role === "CREATOR" ? "👑" : gamePerson.role === "ADMIN" ? "🛡️" : "🎮"} </span>
-                    {game.name} - <span>{
-                        game.phase === "LOBBY" ? "🟢"
-                            : game.phase === "REGISTRATION_OPEN" ? "🟡"
-                                : game.phase === "STARTED" ? "🔵"
-                                    : "🔴"
-                    }</span> {game.phase?.toLowerCase()}
-                </h3>
-            </>
-        )
+        return gameHeader;
     }
 
     return (
-
         <>
-            <h3>
-                <span>{gamePerson.role && gamePerson.role === "CREATOR" ? "👑" : gamePerson.role === "ADMIN" ? "🛡️" : "🎮"} </span>
-                {game.name}
-            </h3>
-            <p>Fase: {game.phase?.toLowerCase()}</p>
+            {gameHeader}
             <p>Descrizione: {game.description}</p>
-            <ul>
-                <li>
-                    <h4>Creators</h4>
-                    <ul>
-                        {creators.map(creator => (
-                            <li key={creator.id}>{creator.personId}</li>
-                        ))}
-                    </ul>
-                </li>
-                <li>
-                    <h4>Admins</h4>
-                    <ul>
-                        {admins.map(admin => (
-                            <li key={admin.id}>{admin.personId}</li>
-                        ))}
-                    </ul>
-                </li>
-                <li>
-                    <h4>Players</h4>
-                    <ul>
-                        {players.map(player => (
-                            <li key={player.id}>{player.personId}</li>
-                        ))}
-                    </ul>
-                </li>
-            </ul>
+            <h3>Creators</h3>
+            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" />
+            <h3>Admins</h3>
+            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" />
+            <h3>Players</h3>
+            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" />
         </>
     );
 }

@@ -3,7 +3,6 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 
 import GamesList from "./components/GamesList";
 
-
 function App() {
 
 	const { user } = useAuthenticator();
@@ -25,6 +24,7 @@ function App() {
 
 	return (
 		<main>
+			{/* <DevelToolbox /> */}
 			<h1> Ciao {user?.signInDetails?.loginId} </h1>
 			<GamesList />
 		</main>

@@ -6,7 +6,7 @@ import type { Schema } from "../../amplify/data/resource";
 
 const client = generateClient<Schema>();
 
-function GameCreate({ onGameCreated }: { onGameCreated: () => void }) {
+function GameCreate({ onCreated, onCancel }: { readonly onCreated: () => void, readonly onCancel: () => void }) {
     const { user } = useAuthenticator();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -22,24 +22,27 @@ function GameCreate({ onGameCreated }: { onGameCreated: () => void }) {
 
         await client.models.GamePerson.create({
             gameId: game.data.id,
-            personId: user?.signInDetails?.loginId || '',
+            personId: user?.signInDetails?.loginId ?? '',
             role: "CREATOR",
             acceptedInvitation: true,
         });
-        onGameCreated();
+        onCreated();
     }
 
     return (
         <form onSubmit={createGame}>
-            <h2>Crea un nuovo gioco</h2>
             <label>
                 Nome del gioco:
                 <input type="text" value={name} onChange={e => setName(e.target.value)} required />
             </label>
+            <br />
             <label>
                 Descrizione:
                 <input type="text" value={description} onChange={e => setDescription(e.target.value)} required />
             </label>
+            <br />
+
+            <button type="button" onClick={onCancel}>Annulla</button>
             <button type="submit">Crea</button>
         </form>
     );
