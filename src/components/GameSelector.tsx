@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import Game from "./Game";
 
 const client = generateClient<Schema>();
 
@@ -18,7 +17,7 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
 
 
     useEffect(() => {
-        if (searchTerm.length < 1) {
+        if (searchTerm.length < 3) {
             setGames([]);
             return;
         }
@@ -26,7 +25,12 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
             // This is the worst way to do this, but it's fine for now.
             // The filtering should be done server-side but I don't know
             // how to do it, docs are shamefully lacking.
-            const gamesData = (await client.models.Game.list()).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            const gamesData = (await client.models.Game.list({
+                filter: {
+                    // name: { contains: searchTerm }
+                    phase: { eq: "LOBBY" }
+                }
+            })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
             setGames(gamesData.length > 0 ? gamesData : []);
         }
         fetchGames(searchTerm);
@@ -75,7 +79,7 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
             <ul>
                 {games.map(game => (
                     <li key={game.id} onClick={() => setSelectedGame(game)}>
-                        <Game game={game} />
+                        {game.name}
                     </li>
                 ))}
             </ul>

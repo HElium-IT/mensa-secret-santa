@@ -63,18 +63,21 @@ function App() {
 			{selectedGame ? (
 				<>
 					<ul>
-						<li><Game game={selectedGame} onDelete={() => setSelectedGame(undefined)} /></li>
+						<li style={{ textOverflow: 'ellipsis' }}><Game game={selectedGame} onDelete={() => setSelectedGame(undefined)} /></li>
 					</ul>
 					<button onClick={() => setSelectedGame(undefined)}>Back</button>
 				</>
 			) : (
 				<>
-						<h1> Ciao {user?.signInDetails?.loginId} </h1>
+						<h1 style={{ textAlign: "center" }}>
+							{user?.signInDetails?.loginId?.split('@')[0]}
+						</h1>
 					{person?.isAdmin && <GameCreate />}
 					<GameSelector setGame={setSelectedGame} />
 					<GamesList setGame={setSelectedGame} />
 				</>
-			)}
+			)
+			}
 		</main>
 	);
 }

@@ -70,7 +70,7 @@ function Game({ game, compact = false, onDelete }: {
     if (!gamePerson.acceptedInvitation) {
         return (
             <>
-                <h3>{game.name}</h3>
+                <h3 >{game.name}</h3>
                 <button onClick={acceptGameInvitation}>Accetta invito come {gamePerson.role?.toLowerCase()}</button>
             </>
         );
@@ -78,7 +78,7 @@ function Game({ game, compact = false, onDelete }: {
 
     if (compact) {
         return (
-            <h3>
+            <h3 >
                 <span>{gameRoleText}</span><span>{gamePhaseToText(game.phase)}</span> - {game.name}
             </h3>
         );
