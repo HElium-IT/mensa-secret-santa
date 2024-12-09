@@ -31,8 +31,7 @@ function GamesList() {
 
     async function createGame(fields: GameCreateFormInputValues) {
         if (!fields.name || !fields.description) {
-            console.error("Name and description are required");
-            return;
+            throw new Error("Name and description are required");
         }
 
         const game = await client.models.Game.create({
@@ -41,14 +40,17 @@ function GamesList() {
             joinQrCode: fields.joinQrCode ?? "",
             phase: (fields.phase ?? "LOBBY") as Schema["Game"]["type"]["phase"],
         });
-        if (!game.data) return;
+        if (!game.data)
+            throw new Error(game.errors?.join(", ") ?? "Failed to create game");
 
-        await client.models.GamePerson.create({
+        const gamePerson = await client.models.GamePerson.create({
             gameId: game.data.id,
             personId: user?.signInDetails?.loginId ?? '',
             role: "CREATOR",
             acceptedInvitation: true,
         });
+        if (!gamePerson.data)
+            throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
     }
 
     return (
@@ -59,8 +61,7 @@ function GamesList() {
                 <GameCreateForm
                     overrides={{
                         joinQrCode: { display: 'none', value: "" },
-                        phase: { display: 'none', value: "LOBBY" },
-
+                    phase: { display: 'none', value: "LOBBY" },
                     }}
                     onSuccess={(fields) => {
                         createGame(fields).then(() => {
@@ -69,13 +70,15 @@ function GamesList() {
                     }}
                 />
             }
-            <ul style={{ height: '400px', overflowY: 'scroll' }}>
+            {
+                <ul className='fancy-bg' style={{ height: '400px', width: '600px', overflowY: 'auto' }}>
                 {games.map(game => (
                     <li key={game.id}>
                         <Game game={game} />
                     </li>
                 ))}
             </ul>
+            }
         </>
     );
 }

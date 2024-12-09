@@ -58,19 +58,18 @@ function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"]
         );
     }
 
-    const gameHeader = (
-        <h3>
-            <span>{gameRoleText}</span> {game.name} - <span>{gamePhaseText}</span>
-        </h3>
-    )
-
     if (compact) {
-        return gameHeader;
+        return (
+            <h3>
+                <span>{gameRoleText}</span> {game.name} - <span>{gamePhaseText}</span>
+            </h3>
+        );
     }
 
     return (
         <>
-            {gameHeader}
+            <h2><span>{gameRoleText}</span>{game.name}</h2>
+            <p>Fase: {gamePhaseText}</p>
             <p>Descrizione: {game.description}</p>
             <h3>Creators</h3>
             <GamePeople gamePeople={gamePeople} filterRole="CREATOR" />

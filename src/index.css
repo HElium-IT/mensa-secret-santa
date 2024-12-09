@@ -9,6 +9,9 @@ body {
   align-items: center;
 }
 
+.fancy-bg {
+  background: linear-gradient(180deg, rgb(117, 81, 194), rgb(255, 255, 255));
+}
 main {
   display: flex;
   flex-direction: column;
