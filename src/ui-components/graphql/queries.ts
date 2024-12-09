@@ -15,6 +15,7 @@ export const getGame = /* GraphQL */ `
         __typename
       }
       phase
+      secret
       updatedAt
       __typename
     }
@@ -32,6 +33,7 @@ export const getGamePerson = /* GraphQL */ `
         joinQrCode
         name
         phase
+        secret
         updatedAt
         __typename
       }
@@ -198,6 +200,7 @@ export const listGames = /* GraphQL */ `
         joinQrCode
         name
         phase
+        secret
         updatedAt
         __typename
       }

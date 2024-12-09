@@ -18,12 +18,14 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type GameCreateFormInputValues = {
     name?: string;
     description?: string;
+    secret?: string;
     joinQrCode?: string;
     phase?: string;
 };
 export declare type GameCreateFormValidationValues = {
     name?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
+    secret?: ValidationFunction<string>;
     joinQrCode?: ValidationFunction<string>;
     phase?: ValidationFunction<string>;
 };
@@ -32,6 +34,7 @@ export declare type GameCreateFormOverridesProps = {
     GameCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
+    secret?: PrimitiveOverrideProps<TextFieldProps>;
     joinQrCode?: PrimitiveOverrideProps<TextFieldProps>;
     phase?: PrimitiveOverrideProps<SelectFieldProps>;
 } & EscapeHatchProps;

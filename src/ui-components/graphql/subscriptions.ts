@@ -15,6 +15,7 @@ export const onCreateGame = /* GraphQL */ `
         __typename
       }
       phase
+      secret
       updatedAt
       __typename
     }
@@ -34,6 +35,7 @@ export const onCreateGamePerson = /* GraphQL */ `
         joinQrCode
         name
         phase
+        secret
         updatedAt
         __typename
       }
@@ -117,6 +119,7 @@ export const onDeleteGame = /* GraphQL */ `
         __typename
       }
       phase
+      secret
       updatedAt
       __typename
     }
@@ -136,6 +139,7 @@ export const onDeleteGamePerson = /* GraphQL */ `
         joinQrCode
         name
         phase
+        secret
         updatedAt
         __typename
       }
@@ -219,6 +223,7 @@ export const onUpdateGame = /* GraphQL */ `
         __typename
       }
       phase
+      secret
       updatedAt
       __typename
     }
@@ -238,6 +243,7 @@ export const onUpdateGamePerson = /* GraphQL */ `
         joinQrCode
         name
         phase
+        secret
         updatedAt
         __typename
       }

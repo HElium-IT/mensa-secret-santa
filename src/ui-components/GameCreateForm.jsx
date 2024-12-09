@@ -26,6 +26,7 @@ export default function GameCreateForm(props) {
   const initialValues = {
     name: "",
     description: "",
+    secret: "",
     joinQrCode: "",
     phase: "",
   };
@@ -33,12 +34,14 @@ export default function GameCreateForm(props) {
   const [description, setDescription] = React.useState(
     initialValues.description
   );
+  const [secret, setSecret] = React.useState(initialValues.secret);
   const [joinQrCode, setJoinQrCode] = React.useState(initialValues.joinQrCode);
   const [phase, setPhase] = React.useState(initialValues.phase);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setDescription(initialValues.description);
+    setSecret(initialValues.secret);
     setJoinQrCode(initialValues.joinQrCode);
     setPhase(initialValues.phase);
     setErrors({});
@@ -46,6 +49,7 @@ export default function GameCreateForm(props) {
   const validations = {
     name: [{ type: "Required" }],
     description: [{ type: "Required" }],
+    secret: [{ type: "Required" }],
     joinQrCode: [],
     phase: [],
   };
@@ -77,6 +81,7 @@ export default function GameCreateForm(props) {
         let modelFields = {
           name,
           description,
+          secret,
           joinQrCode,
           phase,
         };
@@ -143,6 +148,7 @@ export default function GameCreateForm(props) {
             const modelFields = {
               name: value,
               description,
+              secret,
               joinQrCode,
               phase,
             };
@@ -170,6 +176,7 @@ export default function GameCreateForm(props) {
             const modelFields = {
               name,
               description: value,
+              secret,
               joinQrCode,
               phase,
             };
@@ -187,6 +194,34 @@ export default function GameCreateForm(props) {
         {...getOverrideProps(overrides, "description")}
       ></TextField>
       <TextField
+        label="Secret"
+        isRequired={true}
+        isReadOnly={false}
+        value={secret}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              description,
+              secret: value,
+              joinQrCode,
+              phase,
+            };
+            const result = onChange(modelFields);
+            value = result?.secret ?? value;
+          }
+          if (errors.secret?.hasError) {
+            runValidationTasks("secret", value);
+          }
+          setSecret(value);
+        }}
+        onBlur={() => runValidationTasks("secret", secret)}
+        errorMessage={errors.secret?.errorMessage}
+        hasError={errors.secret?.hasError}
+        {...getOverrideProps(overrides, "secret")}
+      ></TextField>
+      <TextField
         label="Join qr code"
         isRequired={false}
         isReadOnly={false}
@@ -197,6 +232,7 @@ export default function GameCreateForm(props) {
             const modelFields = {
               name,
               description,
+              secret,
               joinQrCode: value,
               phase,
             };
@@ -224,6 +260,7 @@ export default function GameCreateForm(props) {
             const modelFields = {
               name,
               description,
+              secret,
               joinQrCode,
               phase: value,
             };
