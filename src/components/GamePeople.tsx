@@ -1,12 +1,16 @@
 
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
-import { getUserPerson } from '../utils';
+import { gamePersonRoleToText, getUserPerson } from '../utils';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { generateClient } from "aws-amplify/data";
 
-function GamePeople({ gamePeople, filterRole }: {
+const client = generateClient<Schema>();
+
+function GamePeople({ gamePeople, filterRole, userRole }: {
     readonly gamePeople: Schema["GamePerson"]["type"][],
     readonly filterRole: Schema["GamePerson"]["type"]["role"],
+    readonly userRole: Schema["GamePerson"]["type"]["role"],
 }) {
     const { user } = useAuthenticator();
     const [person, setPerson] = useState<Schema["Person"]["type"]>();
@@ -24,6 +28,17 @@ function GamePeople({ gamePeople, filterRole }: {
 
     }, [user]);
 
+    async function upgradeToAdmin(gamePerson: Schema["GamePerson"]["type"]) {
+        if (!person?.isAdmin) return;
+        const { errors } = await client.models.GamePerson.update({
+            ...gamePerson,
+            role: 'ADMIN',
+        })
+        if (errors) {
+            alert(errors);
+        }
+    }
+
     return (
         <ul>
             {filteredGamePeople.map(gamePerson => (
@@ -31,6 +46,12 @@ function GamePeople({ gamePeople, filterRole }: {
                     {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : ''}
                     {hasGift[gamePerson.id] ? '🎁' : ''}
                     {gamePerson.personId}
+                    {
+                        userRole === 'CREATOR' && gamePerson.role !== 'CREATOR' &&
+                        <button onClick={() => upgradeToAdmin(gamePerson)}>
+                            {gamePersonRoleToText("ADMIN")}
+                        </button>
+                    }
                 </li>
             ))}
         </ul>

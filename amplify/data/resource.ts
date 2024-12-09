@@ -32,14 +32,14 @@ const schema = a.schema({
     .authorization((allow) => [allow.publicApiKey()])
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
-      index("personId").name("byPerson")
+      index("personId").name("byPerson"),
     ]),
 
   Person: a
     .model({
       ownerLoginId: a.id().required(),
       games: a.hasMany("GamePerson", "personId"),
-      isAdmin: a.boolean().required().default(false),
+      isAdmin: a.boolean().default(false),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["ownerLoginId"]),
@@ -48,11 +48,12 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       description: a.string().required(),
+      secret: a.string().required(),
       people: a.hasMany("GamePerson", "gameId"),
       joinQrCode: a.string(),
       phase: a.enum(["LOBBY", "REGISTRATION_OPEN", "STARTED", "FINISHED"]),
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [allow.publicApiKey()])
 });
 
 export type Schema = ClientSchema<typeof schema>;

@@ -8,12 +8,16 @@ import { gamePhaseToText, gamePersonRoleToText } from "../utils";
 
 const client = generateClient<Schema>();
 
-function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"], readonly compact?: boolean }) {
+function Game({ game, compact = false, onDelete }: {
+    readonly game: Schema["Game"]["type"],
+    readonly compact?: boolean
+    readonly onDelete?: () => void
+}) {
     const { user } = useAuthenticator();
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
+    const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
-    const [gamePhaseText, setGamePhaseText] = useState<string>("");
     const [gameRoleText, setGameRoleText] = useState<string>("");
 
     useEffect(() => {
@@ -29,12 +33,8 @@ function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"]
     }, [game]);
 
     useEffect(() => {
-        setGamePhaseText(gamePhaseToText(game));
-    }, [game.phase]);
-
-    useEffect(() => {
         if (gamePerson)
-            setGameRoleText(gamePersonRoleToText(gamePerson));
+            setGameRoleText(gamePersonRoleToText(gamePerson.role));
     }, [gamePerson]);
 
     async function acceptGameInvitation() {
@@ -43,6 +43,24 @@ function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"]
             ...gamePerson,
             acceptedInvitation: true
         })
+    }
+
+    async function deleteGame() {
+        if (!gamePerson) return
+        const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id });
+        if (gamePeople) {
+            await Promise.all(gamePeople.map(async gp => {
+                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id });
+                console.log(resultGamePerson.errors ?? resultGamePerson.data);
+            }));
+        }
+        const resultGame = await client.models.Game.delete({ id: game.id });
+        console.log(resultGame.errors ?? resultGame.data);
+        if (onDelete) {
+            console.log("calling onDelete");
+            onDelete();
+            console.log("called onDelete");
+        }
     }
 
     if (gamePerson === undefined) {
@@ -61,7 +79,7 @@ function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"]
     if (compact) {
         return (
             <h3>
-                <span>{gameRoleText}</span> {game.name} - <span>{gamePhaseText}</span>
+                <span>{gameRoleText}</span><span>{gamePhaseToText(game.phase)}</span> - {game.name}
             </h3>
         );
     }
@@ -69,14 +87,20 @@ function Game({ game, compact = false }: { readonly game: Schema["Game"]["type"]
     return (
         <>
             <h2><span>{gameRoleText}</span>{game.name}</h2>
-            <p>Fase: {gamePhaseText}</p>
+            <p>Fase: {gamePhaseToText(game.phase)}</p>
             <p>Descrizione: {game.description}</p>
             <h3>Creators</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" />
+            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
             <h3>Admins</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" />
+            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
             <h3>Players</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" />
+            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
+            {gamePerson.role === "CREATOR" &&
+                <button onClick={() => setPromptDeleteConfirmation(true)}>Delete Game</button>
+            }
+            {promptDeleteConfirmation &&
+                <button style={{ background: 'red' }} onClick={deleteGame}>Confirm Delete</button >
+            }
         </>
     );
 }

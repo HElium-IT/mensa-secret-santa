@@ -14,23 +14,23 @@ export async function getPersonGames(gamePeople: Schema["GamePerson"]["type"][],
     return games.filter(game => game !== null);
 }
 
-export function gamePhaseToText(game: Schema["Game"]["type"]): string {
-    switch (game.phase) {
+export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"]): string {
+    switch (phase) {
         case "LOBBY":
-            return "🟢 lobby";
+            return "🟢 Lobby";
         case "REGISTRATION_OPEN":
-            return "🟡 registrazione aperta";
+            return "🟡 Aperto";
         case "STARTED":
-            return "🔵 iniziato";
+            return "🔵 Iniziato";
         case "FINISHED":
-            return "🔴 finito";
+            return "🔴 Finito";
         default:
             return "";
     }
 }
 
-export function gamePersonRoleToText(gamePerson: Schema["GamePerson"]["type"]): string {
-    switch (gamePerson.role) {
+export function gamePersonRoleToText(role: Schema["GamePerson"]["type"]["role"]): string {
+    switch (role) {
         case "CREATOR":
             return "👑";
         case "ADMIN":
