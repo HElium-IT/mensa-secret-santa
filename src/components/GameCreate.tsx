@@ -22,7 +22,7 @@ function GamesList() {
             description: fields.description,
             secret: fields.secret,
             joinQrCode: fields.joinQrCode ?? "",
-            phase: (fields.phase ?? "LOBBY") as Schema["Game"]["type"]["phase"],
+            phase: (fields.phase ?? "REGISTRATION_OPEN") as Schema["Game"]["type"]["phase"],
         });
         if (!game.data)
             throw new Error(game.errors?.join(", ") ?? "Failed to create game");

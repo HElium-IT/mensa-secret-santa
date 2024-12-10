@@ -51,7 +51,7 @@ const schema = a.schema({
       secret: a.string().required(),
       people: a.hasMany("GamePerson", "gameId"),
       joinQrCode: a.string(),
-      phase: a.enum(["LOBBY", "REGISTRATION_OPEN", "STARTED", "FINISHED"]),
+      phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "FINISHED"]),
     })
     .authorization((allow) => [allow.publicApiKey()])
 });

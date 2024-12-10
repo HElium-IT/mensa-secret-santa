@@ -57,27 +57,28 @@ function App() {
 		);
 	}
 
+	if (selectedGame) {
+		return (
+			<main>
+				<ul>
+					<li style={{ textOverflow: 'ellipsis' }}>
+						<Game game={selectedGame} onDelete={() => setSelectedGame(undefined)} />
+					</li>
+				</ul>
+				<button onClick={() => setSelectedGame(undefined)}>Back</button>
+			</main>
+		)
+	}
+
 
 	return (
 		<main>
-			{selectedGame ? (
-				<>
-					<ul>
-						<li style={{ textOverflow: 'ellipsis' }}><Game game={selectedGame} onDelete={() => setSelectedGame(undefined)} /></li>
-					</ul>
-					<button onClick={() => setSelectedGame(undefined)}>Back</button>
-				</>
-			) : (
-				<>
-						<h1 style={{ textAlign: "center" }}>
-							{user?.signInDetails?.loginId?.split('@')[0]}
-						</h1>
-					{person?.isAdmin && <GameCreate />}
-					<GameSelector setGame={setSelectedGame} />
-					<GamesList setGame={setSelectedGame} />
-				</>
-			)
-			}
+			<h1 style={{ textAlign: "center" }}>
+				{user?.signInDetails?.loginId?.split('@')[0]}
+			</h1>
+			{person?.isAdmin && <GameCreate />}
+			<GameSelector setGame={setSelectedGame} />
+			<GamesList setGame={setSelectedGame} />
 		</main>
 	);
 }

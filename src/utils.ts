@@ -14,22 +14,35 @@ export async function getPersonGames(gamePeople: Schema["GamePerson"]["type"][],
     return games.filter(game => game !== null);
 }
 
-export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"]): string {
-    switch (phase) {
-        case "LOBBY":
-            return "🟢 Lobby";
-        case "REGISTRATION_OPEN":
-            return "🟡 Aperto";
-        case "STARTED":
-            return "🔵 Iniziato";
-        case "FINISHED":
-            return "🔴 Finito";
-        default:
-            return "";
+
+
+
+export function gamePhaseToIcon(phase: Schema["Game"]["type"]["phase"]): string {
+    const gamePhaseIcons = {
+        "REGISTRATION_OPEN": "🟢",
+        "LOBBY": "🟡",
+        "STARTED": "🔵",
+        "FINISHED": "🔴",
     }
+    if (phase)
+        return gamePhaseIcons[phase];
+    return "";
 }
 
-export function gamePersonRoleToText(role: Schema["GamePerson"]["type"]["role"]): string {
+export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"]): string {
+    const gamePhaseText = {
+        "REGISTRATION_OPEN": "Registra il tuo regalo in attesa che l'evento cominci!",
+        "LOBBY": "Consegna il tuo regalo e ottieni il numero!",
+        "STARTED": "La partita è iniziata!",
+        "FINISHED": "La partita è finita!",
+    }
+    if (phase)
+        return gamePhaseText[phase];
+    return "";
+}
+
+
+export function gamePersonRoleToIcon(role: Schema["GamePerson"]["type"]["role"]): string {
     switch (role) {
         case "CREATOR":
             return "👑";

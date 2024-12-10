@@ -4,7 +4,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 import GamePeople from './GamePeople';
 
-import { gamePhaseToText, gamePersonRoleToText } from "../utils";
+import { gamePhaseToIcon, gamePersonRoleToIcon, gamePhaseToText } from "../utils";
 
 const client = generateClient<Schema>();
 
@@ -16,9 +16,12 @@ function Game({ game, compact = false, onDelete }: {
     const { user } = useAuthenticator();
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
+    const [promptUpgradePhaseConfirmation, setPromptUpgradePhaseConfirmation] = useState(false);
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
     const [gameRoleText, setGameRoleText] = useState<string>("");
+    const [gamePhaseText, setGamePhaseText] = useState<string>(gamePhaseToText(game.phase));
+    const [gamePhaseIcon, setGamePhaseIcon] = useState<string>(gamePhaseToIcon(game.phase));
 
     useEffect(() => {
         game.people().then(({ data: gamePeopleData }) => {
@@ -34,8 +37,9 @@ function Game({ game, compact = false, onDelete }: {
 
     useEffect(() => {
         if (gamePerson)
-            setGameRoleText(gamePersonRoleToText(gamePerson.role));
+            setGameRoleText(gamePersonRoleToIcon(gamePerson.role));
     }, [gamePerson]);
+
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
@@ -63,6 +67,22 @@ function Game({ game, compact = false, onDelete }: {
         }
     }
 
+    async function upgradeGamePhase() {
+        if (!gamePerson || !game.phase) return
+        const nextPhase = {
+            "REGISTRATION_OPEN": "LOBBY",
+            "LOBBY": "STARTED",
+            "STARTED": "FINISHED",
+            "FINISHED": "REGISTRATION_OPEN"
+        }[game.phase] as Schema["Game"]["type"]["phase"];
+
+        client.models.Game.update({ ...game, phase: nextPhase });
+        game.phase = nextPhase;
+        setGamePhaseText(gamePhaseToText(nextPhase));
+        setGamePhaseIcon(gamePhaseToIcon(nextPhase));
+        setPromptUpgradePhaseConfirmation(false);
+    }
+
     if (gamePerson === undefined) {
         return <></>
     }
@@ -79,27 +99,47 @@ function Game({ game, compact = false, onDelete }: {
     if (compact) {
         return (
             <h3 >
-                <span>{gameRoleText}</span><span>{gamePhaseToText(game.phase)}</span> - {game.name}
+                <span>{gameRoleText}</span><span>{gamePhaseIcon}</span> {game.name}
             </h3>
         );
+    }
+
+    if (gamePerson.role === "PLAYER") {
+        return (
+            <>
+                <h2><span>{gameRoleText}</span>{game.name}</h2>
+                <p><span>{gamePhaseIcon}</span> {gamePhaseText}</p>
+                <p>Descrizione: {game.description}</p>
+                <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}
+                </p>
+            </>
+        )
     }
 
     return (
         <>
             <h2><span>{gameRoleText}</span>{game.name}</h2>
-            <p>Fase: {gamePhaseToText(game.phase)}</p>
+            <p>
+                <span>{gamePhaseIcon}</span> {gamePhaseText}
+            </p>
             <p>Descrizione: {game.description}</p>
-            <h3>Creators</h3>
+            <h3>Creatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
-            <h3>Admins</h3>
+            <h3>Admin</h3>
             <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
-            <h3>Players</h3>
+            <h3>Giocatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
             {gamePerson.role === "CREATOR" &&
-                <button onClick={() => setPromptDeleteConfirmation(true)}>Delete Game</button>
+                <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
             }
             {promptDeleteConfirmation &&
-                <button style={{ background: 'red' }} onClick={deleteGame}>Confirm Delete</button >
+                <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
+            }
+            {game.phase !== "FINISHED" &&
+                <button onClick={() => setPromptUpgradePhaseConfirmation(true)}>Avanza</button>
+            }
+            {promptUpgradePhaseConfirmation &&
+                <button onClick={upgradeGamePhase}>Conferma</button>
             }
         </>
     );

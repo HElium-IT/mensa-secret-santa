@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
-import { gamePersonRoleToText, getUserPerson } from '../utils';
+import { gamePersonRoleToIcon, getUserPerson } from '../utils';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 
@@ -49,7 +49,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
                     {
                         userRole === 'CREATOR' && gamePerson.role !== 'CREATOR' &&
                         <button onClick={() => upgradeToAdmin(gamePerson)}>
-                            {gamePersonRoleToText("ADMIN")}
+                            {gamePersonRoleToIcon("ADMIN")}
                         </button>
                     }
                 </li>
