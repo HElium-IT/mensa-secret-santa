@@ -58,14 +58,15 @@ function Game({ game, compact = false, onDelete }: {
     }, [gamePerson]);
 
     useEffect(() => {
+        if (!phase) return;
         setPhaseIcon(gamePhaseToIcon(phase));
-        setPhaseText(gamePhaseToText(phase));
+        setPhaseText(gamePhaseToText(phase, !!gift, (gift?.number ?? -1) > 0));
     }, [phase, gift]);
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
         client.models.GamePerson.update({
-            ...gamePerson,
+            id: gamePerson.id,
             acceptedInvitation: true
         })
     }

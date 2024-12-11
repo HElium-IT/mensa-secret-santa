@@ -31,7 +31,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     async function upgradeToAdmin(gamePerson: Schema["GamePerson"]["type"]) {
         if (!person?.isAdmin) return;
         const { errors } = await client.models.GamePerson.update({
-            ...gamePerson,
+            id: gamePerson.id,
             role: 'ADMIN',
         })
         if (errors) {
