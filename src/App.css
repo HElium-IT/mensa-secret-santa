@@ -6,7 +6,7 @@
   text-align: center;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 100vh;
+  max-height: 100dvh;
 }
 
 .logo {

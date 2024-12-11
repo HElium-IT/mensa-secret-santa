@@ -31,7 +31,7 @@ function App() {
 					client.models.Person.create({
 						ownerLoginId: user.signInDetails?.loginId as string,
 						isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
-					}, { authMode: 'none' });
+					}, { authMode: 'identityPool' });
 				} else if (items.length > 1) {
 					throw new Error("More than one person with the same ownerLoginId");
 				} else {
@@ -41,7 +41,7 @@ function App() {
 						client.models.Person.update({
 							...items[0],
 							isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
-						}, { authMode: 'none' })
+						}, { authMode: 'identityPool' })
 					}
 				}
 			}

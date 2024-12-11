@@ -21,7 +21,7 @@ function GiftCreate({ gamePerson }: {
             ownedGamePersonId: gamePerson.id,
             number: null,
 
-        }, { authMode: 'none' });
+        }, { authMode: 'identityPool' });
         if (!gift.data)
             throw new Error(gift.errors?.join(", ") ?? "Failed to create gift");
         console.debug("Gift created", gift.data);
