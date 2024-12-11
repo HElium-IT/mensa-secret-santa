@@ -66,12 +66,8 @@ function App() {
 	if (selectedGame) {
 		return (
 			<main>
-				<ul>
-					<li style={{ textOverflow: 'ellipsis' }}>
-						<Game game={selectedGame} onDelete={() => selectGame()} />
-					</li>
-				</ul>
-				<button onClick={() => selectGame()}>Back</button>
+				<Game game={selectedGame} onDelete={() => selectGame()} />
+				<button style={{ margin: "1rem" }} onClick={() => selectGame()}>Back</button>
 			</main>
 		)
 	}

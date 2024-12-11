@@ -1,8 +1,9 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 .logo {
@@ -48,19 +49,22 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  /* Added to align inputs to the left */
   gap: 1rem;
 }
 
-/* Add styles for the input elements if necessary */
 .input-container input {
   width: 100%;
-  /* Ensure inputs take full width */
   padding: 0.5rem;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.25s;
 }
 
-/* Optional: Style the error messages */
+.input-container input:focus {
+  border-color: #646cff;
+}
+
 .input-container span {
   color: red;
   font-size: 0.875rem;

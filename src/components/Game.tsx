@@ -132,16 +132,16 @@ function Game({ game, compact = false, onDelete }: {
 
     if (gamePerson.role === "PLAYER") {
         return (
-            <>
+            <div className="game-card">
                 {gameBaseDetails}
                 <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p>
                 {giftDetails}
-            </>
+            </div>
         )
     }
 
     return (
-        <>
+        <div className="game-card">
             {gameBaseDetails}
             {giftDetails}
             <h3>Creatori</h3>
@@ -150,7 +150,7 @@ function Game({ game, compact = false, onDelete }: {
             <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
             <h3>Giocatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
-            {gamePerson.role === "CREATOR" || (gamePerson.role === "ADMIN") && (
+            {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
                 <InviteGamePerson gameId={game.id} userRole={gamePerson.role} />
             )}
             <p>
@@ -167,8 +167,7 @@ function Game({ game, compact = false, onDelete }: {
                 phase={phase}
                 setPhase={setPhase}
             />
-
-        </>
+        </div>
     );
 }
 
