@@ -144,11 +144,11 @@ function Game({ game, compact = false, onDelete }: {
             {gameBaseDetails}
             {giftDetails}
             <h3>Creatori</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
+            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} gameId={game.id} />
             <h3>Admin</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
+            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} gameId={game.id} />
             <h3>Giocatori</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
+            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} gameId={game.id} />
             <p>
                 {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
                     <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>

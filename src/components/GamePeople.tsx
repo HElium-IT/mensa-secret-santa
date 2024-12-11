@@ -1,16 +1,17 @@
-
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
 import { gamePersonRoleToIcon, getUserPerson } from '../utils';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
+import InviteGamePerson from "./InviteGamePerson";
 
 const client = generateClient<Schema>();
 
-function GamePeople({ gamePeople, filterRole, userRole }: {
+function GamePeople({ gamePeople, filterRole, userRole, gameId }: {
     readonly gamePeople: Schema["GamePerson"]["type"][],
     readonly filterRole: Schema["GamePerson"]["type"]["role"],
     readonly userRole: Schema["GamePerson"]["type"]["role"],
+    readonly gameId: string,
 }) {
     const { user } = useAuthenticator();
     const [person, setPerson] = useState<Schema["Person"]["type"]>();
@@ -40,21 +41,26 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     }
 
     return (
-        <ul>
-            {filteredGamePeople.map(gamePerson => (
-                <li key={gamePerson.id}>
-                    {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : ''}
-                    {hasGift[gamePerson.id] ? '🎁' : ''}
-                    {gamePerson.personId}
-                    {
-                        userRole === 'CREATOR' && gamePerson.role !== 'CREATOR' &&
-                        <button onClick={() => upgradeToAdmin(gamePerson)}>
-                            {gamePersonRoleToIcon("ADMIN")}
-                        </button>
-                    }
-                </li>
-            ))}
-        </ul>
+        <>
+            <ul>
+                {filteredGamePeople.map(gamePerson => (
+                    <li key={gamePerson.id}>
+                        {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : ''}
+                        {hasGift[gamePerson.id] ? '🎁' : ''}
+                        {gamePerson.personId}
+                        {
+                            userRole === 'CREATOR' && gamePerson.role !== 'CREATOR' &&
+                            <button onClick={() => upgradeToAdmin(gamePerson)}>
+                                {gamePersonRoleToIcon("ADMIN")}
+                            </button>
+                        }
+                    </li>
+                ))}
+            </ul>
+            {(userRole === "CREATOR" || (userRole === "ADMIN" && filterRole === "PLAYER")) && (
+                <InviteGamePerson gameId={gameId} userRole={userRole} />
+            )}
+        </>
     );
 }
 
