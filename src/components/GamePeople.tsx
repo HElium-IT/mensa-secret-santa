@@ -22,7 +22,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
         getUserPerson(user).then(setPerson);
 
         gamePeople.forEach(async gamePerson => {
-            const { data: gift } = await gamePerson.gift();
+            const { data: gift } = await gamePerson.ownedGift();
             setHasGift(prevHasGift => ({ ...prevHasGift, [gamePerson.id]: !!gift }));
         });
 

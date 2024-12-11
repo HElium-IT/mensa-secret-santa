@@ -15,16 +15,19 @@ function GiftCreate({ gamePerson }: {
         }
 
         const gift = await client.models.Gift.create({
-            gamePersonId: gamePerson.id,
             name: fields.name,
             attribute_1: fields.attribute_1,
             attribute_2: fields.attribute_2,
             attribute_3: fields.attribute_3,
-        });
+            ownedGamePersonId: gamePerson.id,
+            number: null,
 
+        });
         if (!gift.data)
             throw new Error(gift.errors?.join(", ") ?? "Failed to create gift");
         console.debug("Gift created", gift.data);
+
+
     }
 
     return (
@@ -32,11 +35,10 @@ function GiftCreate({ gamePerson }: {
             <GiftCreateForm
                 overrides={{
                     number: { display: 'none', isRequired: false },
-                    winnerGamePersonId: { display: 'none', value: "" },
+                    ownedGamePersonId: { display: 'none', value: gamePerson.id },
+                    winnerGamePersonId: { display: 'none', isRequired: false },
                 }}
                 onSubmit={(fields) => {
-                    fields.number = -1;
-                    fields.winnerGamePersonId = "";
                     console.debug("GiftCreateForm submit", fields);
                     return fields;
                 }}

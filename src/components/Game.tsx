@@ -47,7 +47,7 @@ function Game({ game, compact = false, onDelete }: {
 
     useEffect(() => {
         if (!gamePerson) return;
-        const subscription = client.models.Gift.observeQuery({ filter: { gamePersonId: { eq: gamePerson?.id } } }).subscribe({
+        const subscription = client.models.Gift.observeQuery({ filter: { ownedGamePersonId: { eq: gamePerson?.id } } }).subscribe({
             next: ({ items: gifts }) => {
                 if (gifts && gifts.length > 0) {
                     setGift(gifts[0]);

@@ -56,10 +56,16 @@ function App() {
 		return () => subscription.unsubscribe();
 	}, [user]);
 
+
 	if (loading) {
 		return (
 			<div className="loading">Loading...</div>
 		);
+	}
+
+	async function selectGame(game?: Schema["Game"]["type"]) {
+		console.debug("Game", game);
+		setSelectedGame(game);
 	}
 
 	if (selectedGame) {
@@ -67,10 +73,10 @@ function App() {
 			<main>
 				<ul>
 					<li style={{ textOverflow: 'ellipsis' }}>
-						<Game game={selectedGame} onDelete={() => setSelectedGame(undefined)} />
+						<Game game={selectedGame} onDelete={() => selectGame()} />
 					</li>
 				</ul>
-				<button onClick={() => setSelectedGame(undefined)}>Back</button>
+				<button onClick={() => selectGame()}>Back</button>
 			</main>
 		)
 	}
@@ -82,8 +88,8 @@ function App() {
 				{user?.signInDetails?.loginId?.split('@')[0]}
 			</h1>
 			{person?.isAdmin && <GameCreate />}
-			<GameSelector setGame={setSelectedGame} />
-			<GamesList setGame={setSelectedGame} />
+			<GameSelector setGame={selectGame} />
+			<GamesList setGame={selectGame} />
 		</main>
 	);
 }

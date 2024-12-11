@@ -3,20 +3,24 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 const schema = a.schema({
   Gift: a
     .model({
-      gamePersonId: a.id().required(),
-      gamePerson: a.belongsTo("GamePerson", "gamePersonId"),
-
       name: a.string().required(),
+      number: a.integer(),
+
       attribute_1: a.string().required(),
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
 
-      number: a.integer().default(-1),
-      winnerGamePersonId: a.string().default(""),
+      ownedGamePersonId: a.id(),
+      ownedGamePerson: a.belongsTo("GamePerson", "ownedGamePersonId"),
+
+      winnerGamePersonId: a.id(),
+      winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
     .authorization((allow) => [allow.publicApiKey()])
-    .identifier(["gamePersonId"]),
-
+    .secondaryIndexes((index) => [
+      index("ownedGamePersonId").name("byOwnedGamePerson"),
+      index("winnerGamePersonId").name("byWinnerGamePerson"),
+    ]),
   GamePerson: a
     .model({
       gameId: a.id().required(),
@@ -25,7 +29,8 @@ const schema = a.schema({
       personId: a.id().required(),
       person: a.belongsTo("Person", "personId"),
 
-      gift: a.hasOne("Gift", "gamePersonId"),
+      ownedGift: a.hasOne("Gift", "ownedGamePersonId"),
+      wonGift: a.hasOne("Gift", "winnerGamePersonId"),
 
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),

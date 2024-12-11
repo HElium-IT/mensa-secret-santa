@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { Schema } from "../../amplify/data/resource";
 
-import { generateClient } from "aws-amplify/data";
-
-const client = generateClient<Schema>();
-
 function Gift({ gift }: {
     readonly gift: Schema["Gift"]["type"]
 }) {
     const [giftWinner, setGiftWinner] = useState<Schema["GamePerson"]["type"]["personId"]>();
 
     useEffect(() => {
-        if (!gift?.winnerGamePersonId || gift.winnerGamePersonId === "") return;
-
-        client.models.GamePerson.get({ id: gift.winnerGamePersonId })
-            .then(({ data: gamePerson }) => {
-                if (!gamePerson) return;
-                setGiftWinner(gamePerson.personId);
-            });
+        if (!gift) return;
+        async function getGiftWinner() {
+            const { data: gamePerson } = await gift.winnerGamePerson();
+            setGiftWinner(gamePerson?.personId);
+        }
+        getGiftWinner();
     }, [gift]);
 
     return (
