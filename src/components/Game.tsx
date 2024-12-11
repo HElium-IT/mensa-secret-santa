@@ -11,7 +11,6 @@ import GiftCreate from "./GiftCreate";
 import GamePhaseUpdater from "./GamePhaseUpdater";
 import InviteGamePerson from "./InviteGamePerson";
 
-const client = generateClient<Schema>();
 
 function Game({ game, compact = false, onDelete }: {
     readonly game: Schema["Game"]["type"],
