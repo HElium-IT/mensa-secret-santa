@@ -1,6 +1,5 @@
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { AuthUser } from "aws-amplify/auth";
 
 const client = generateClient<Schema>();
