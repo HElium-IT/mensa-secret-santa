@@ -138,7 +138,7 @@ function Game({ game, compact = false, onDelete }: {
         <>
             {phase !== "FINISHED" && (
                 gift ?
-                    <Gift gift={gift} gamePerson={gamePerson} />
+                    <Gift gift={gift} />
                     :
                     <GiftCreate gamePerson={gamePerson} />
             )}

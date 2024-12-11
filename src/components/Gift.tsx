@@ -5,9 +5,8 @@ import { generateClient } from "aws-amplify/data";
 
 const client = generateClient<Schema>();
 
-function Gift({ gift, gamePerson }: {
+function Gift({ gift }: {
     readonly gift: Schema["Gift"]["type"]
-    readonly gamePerson: Schema["GamePerson"]["type"]
 }) {
     const [giftWinner, setGiftWinner] = useState<Schema["GamePerson"]["type"]["personId"]>();
 
@@ -19,8 +18,6 @@ function Gift({ gift, gamePerson }: {
                 if (!gamePerson) return;
                 setGiftWinner(gamePerson.personId);
             });
-
-
     }, [gift]);
 
     return (
