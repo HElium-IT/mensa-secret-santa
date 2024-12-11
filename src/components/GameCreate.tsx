@@ -4,6 +4,7 @@ import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import type { GameCreateFormInputValues } from "../ui-components/GameCreateForm";
 import GameCreateForm from "../ui-components/GameCreateForm";
+import Game from './Game';
 
 
 const client = generateClient<Schema>();
@@ -16,34 +17,25 @@ function GamesList({
     const { user } = useAuthenticator();
     const [showCreateForm, setShowCreateForm] = useState(false);
 
-    async function createGame(fields: GameCreateFormInputValues) {
-        if (!fields.name || !fields.description || !fields.secret) {
-            throw new Error("Name, description, and secret are required");
-        }
-
-        const game = await client.models.Game.create({
-            name: fields.name,
-            description: fields.description,
-            secret: fields.secret,
-            joinQrCode: "",
-            phase: "REGISTRATION_OPEN" as Schema["Game"]["type"]["phase"],
-        }, { authMode: 'userPool' });
-        if (!game.data)
-            throw new Error(game.errors?.join(", ") ?? "Failed to create game");
-        console.debug("Game created", game.data);
-
+    async function createGamePerson(gameValues: GameCreateFormInputValues) {
+        console.debug("Game created", gameValues);
         const gamePerson = await client.models.GamePerson.create({
-            gameId: game.data.id,
+            gameId: game.id,
             personId: user?.signInDetails?.loginId ?? '',
             role: "CREATOR",
             acceptedInvitation: true,
         }, { authMode: 'userPool' });
         if (!gamePerson.data) {
-            client.models.Game.delete({ id: game.data.id }, { authMode: 'userPool' });
+            client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
             throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
         }
         console.debug("GamePerson created", gamePerson.data);
     }
+
+    useEffect(() => {
+        // TODO only one creator per game, saved in Game.creatorId.
+        // TODO client.models.Game.onCreate => client.models.GamePerson.create ["CREATOR"]
+    }, []);
 
     useEffect(() => {
         setIsCreatingGame(showCreateForm);
@@ -64,7 +56,7 @@ function GamesList({
                             phase: { display: 'none', isRequired: false },
                         }}
                         onSuccess={(fields) => {
-                            createGame(fields)
+                            createGamePerson(fields)
                                 .then(() => { setShowCreateForm(false); })
                                 .catch(alert);
                         }}
