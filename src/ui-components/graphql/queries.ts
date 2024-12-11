@@ -38,19 +38,20 @@ export const getGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      gift {
+      id
+      ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        gamePersonId
+        id
         name
         number
+        ownedGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
       }
-      id
       person {
         createdAt
         isAdmin
@@ -61,18 +62,34 @@ export const getGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
 `;
 export const getGift = /* GraphQL */ `
-  query GetGift($gamePersonId: ID!) {
-    getGift(gamePersonId: $gamePersonId) {
+  query GetGift($id: ID!) {
+    getGift(id: $id) {
       attribute_1
       attribute_2
       attribute_3
       createdAt
-      gamePerson {
+      id
+      name
+      number
+      ownedGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -82,10 +99,18 @@ export const getGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      gamePersonId
-      name
-      number
+      ownedGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -211,19 +236,19 @@ export const listGames = /* GraphQL */ `
     }
   }
 `;
-export const listGifts = /* GraphQL */ `
-  query ListGifts(
+export const listGiftByOwnedGamePersonId = /* GraphQL */ `
+  query ListGiftByOwnedGamePersonId(
     $filter: ModelGiftFilterInput
-    $gamePersonId: ID
     $limit: Int
     $nextToken: String
+    $ownedGamePersonId: ID!
     $sortDirection: ModelSortDirection
   ) {
-    listGifts(
+    listGiftByOwnedGamePersonId(
       filter: $filter
-      gamePersonId: $gamePersonId
       limit: $limit
       nextToken: $nextToken
+      ownedGamePersonId: $ownedGamePersonId
       sortDirection: $sortDirection
     ) {
       items {
@@ -231,9 +256,68 @@ export const listGifts = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        gamePersonId
+        id
         name
         number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const listGiftByWinnerGamePersonId = /* GraphQL */ `
+  query ListGiftByWinnerGamePersonId(
+    $filter: ModelGiftFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+    $winnerGamePersonId: ID!
+  ) {
+    listGiftByWinnerGamePersonId(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+      winnerGamePersonId: $winnerGamePersonId
+    ) {
+      items {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const listGifts = /* GraphQL */ `
+  query ListGifts(
+    $filter: ModelGiftFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listGifts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
         updatedAt
         winnerGamePersonId
         __typename

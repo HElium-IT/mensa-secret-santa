@@ -19,13 +19,13 @@ export default function GiftCreateForm(props) {
   } = props;
   const initialValues = {
     name: "",
+    number: "",
     attribute_1: "",
     attribute_2: "",
     attribute_3: "",
-    number: "",
-    winnerGamePersonId: "",
   };
   const [name, setName] = React.useState(initialValues.name);
+  const [number, setNumber] = React.useState(initialValues.number);
   const [attribute_1, setAttribute_1] = React.useState(
     initialValues.attribute_1
   );
@@ -35,27 +35,21 @@ export default function GiftCreateForm(props) {
   const [attribute_3, setAttribute_3] = React.useState(
     initialValues.attribute_3
   );
-  const [number, setNumber] = React.useState(initialValues.number);
-  const [winnerGamePersonId, setWinnerGamePersonId] = React.useState(
-    initialValues.winnerGamePersonId
-  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
+    setNumber(initialValues.number);
     setAttribute_1(initialValues.attribute_1);
     setAttribute_2(initialValues.attribute_2);
     setAttribute_3(initialValues.attribute_3);
-    setNumber(initialValues.number);
-    setWinnerGamePersonId(initialValues.winnerGamePersonId);
     setErrors({});
   };
   const validations = {
     name: [{ type: "Required" }],
+    number: [],
     attribute_1: [{ type: "Required" }],
     attribute_2: [{ type: "Required" }],
     attribute_3: [{ type: "Required" }],
-    number: [],
-    winnerGamePersonId: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -84,11 +78,10 @@ export default function GiftCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           name,
+          number,
           attribute_1,
           attribute_2,
           attribute_3,
-          number,
-          winnerGamePersonId,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -152,11 +145,10 @@ export default function GiftCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name: value,
+              number,
               attribute_1,
               attribute_2,
               attribute_3,
-              number,
-              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -172,6 +164,38 @@ export default function GiftCreateForm(props) {
         {...getOverrideProps(overrides, "name")}
       ></TextField>
       <TextField
+        label="Number"
+        isRequired={false}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={number}
+        onChange={(e) => {
+          let value = isNaN(parseInt(e.target.value))
+            ? e.target.value
+            : parseInt(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              name,
+              number: value,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+            };
+            const result = onChange(modelFields);
+            value = result?.number ?? value;
+          }
+          if (errors.number?.hasError) {
+            runValidationTasks("number", value);
+          }
+          setNumber(value);
+        }}
+        onBlur={() => runValidationTasks("number", number)}
+        errorMessage={errors.number?.errorMessage}
+        hasError={errors.number?.hasError}
+        {...getOverrideProps(overrides, "number")}
+      ></TextField>
+      <TextField
         label="Attribute 1"
         isRequired={true}
         isReadOnly={false}
@@ -181,11 +205,10 @@ export default function GiftCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
+              number,
               attribute_1: value,
               attribute_2,
               attribute_3,
-              number,
-              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_1 ?? value;
@@ -210,11 +233,10 @@ export default function GiftCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
+              number,
               attribute_1,
               attribute_2: value,
               attribute_3,
-              number,
-              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_2 ?? value;
@@ -239,11 +261,10 @@ export default function GiftCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
+              number,
               attribute_1,
               attribute_2,
               attribute_3: value,
-              number,
-              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_3 ?? value;
@@ -257,70 +278,6 @@ export default function GiftCreateForm(props) {
         errorMessage={errors.attribute_3?.errorMessage}
         hasError={errors.attribute_3?.hasError}
         {...getOverrideProps(overrides, "attribute_3")}
-      ></TextField>
-      <TextField
-        label="Number"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={number}
-        onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              name,
-              attribute_1,
-              attribute_2,
-              attribute_3,
-              number: value,
-              winnerGamePersonId,
-            };
-            const result = onChange(modelFields);
-            value = result?.number ?? value;
-          }
-          if (errors.number?.hasError) {
-            runValidationTasks("number", value);
-          }
-          setNumber(value);
-        }}
-        onBlur={() => runValidationTasks("number", number)}
-        errorMessage={errors.number?.errorMessage}
-        hasError={errors.number?.hasError}
-        {...getOverrideProps(overrides, "number")}
-      ></TextField>
-      <TextField
-        label="Winner game person id"
-        isRequired={false}
-        isReadOnly={false}
-        value={winnerGamePersonId}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              name,
-              attribute_1,
-              attribute_2,
-              attribute_3,
-              number,
-              winnerGamePersonId: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.winnerGamePersonId ?? value;
-          }
-          if (errors.winnerGamePersonId?.hasError) {
-            runValidationTasks("winnerGamePersonId", value);
-          }
-          setWinnerGamePersonId(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("winnerGamePersonId", winnerGamePersonId)
-        }
-        errorMessage={errors.winnerGamePersonId?.errorMessage}
-        hasError={errors.winnerGamePersonId?.hasError}
-        {...getOverrideProps(overrides, "winnerGamePersonId")}
       ></TextField>
       <Flex
         justifyContent="space-between"

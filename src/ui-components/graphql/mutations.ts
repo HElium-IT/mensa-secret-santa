@@ -44,19 +44,20 @@ export const createGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      gift {
+      id
+      ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        gamePersonId
+        id
         name
         number
+        ownedGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
       }
-      id
       person {
         createdAt
         isAdmin
@@ -67,6 +68,19 @@ export const createGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -81,7 +95,10 @@ export const createGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      gamePerson {
+      id
+      name
+      number
+      ownedGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -91,10 +108,18 @@ export const createGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      gamePersonId
-      name
-      number
+      ownedGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -160,19 +185,20 @@ export const deleteGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      gift {
+      id
+      ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        gamePersonId
+        id
         name
         number
+        ownedGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
       }
-      id
       person {
         createdAt
         isAdmin
@@ -183,6 +209,19 @@ export const deleteGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -197,7 +236,10 @@ export const deleteGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      gamePerson {
+      id
+      name
+      number
+      ownedGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -207,10 +249,18 @@ export const deleteGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      gamePersonId
-      name
-      number
+      ownedGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -276,19 +326,20 @@ export const updateGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      gift {
+      id
+      ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        gamePersonId
+        id
         name
         number
+        ownedGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
       }
-      id
       person {
         createdAt
         isAdmin
@@ -299,6 +350,19 @@ export const updateGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownedGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -313,7 +377,10 @@ export const updateGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      gamePerson {
+      id
+      name
+      number
+      ownedGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -323,10 +390,18 @@ export const updateGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      gamePersonId
-      name
-      number
+      ownedGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }

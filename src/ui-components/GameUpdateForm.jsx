@@ -312,9 +312,14 @@ export default function GameUpdateForm(props) {
           {...getOverrideProps(overrides, "phaseoption2")}
         ></option>
         <option
+          children="Paused"
+          value="PAUSED"
+          {...getOverrideProps(overrides, "phaseoption3")}
+        ></option>
+        <option
           children="Finished"
           value="FINISHED"
-          {...getOverrideProps(overrides, "phaseoption3")}
+          {...getOverrideProps(overrides, "phaseoption4")}
         ></option>
       </SelectField>
       <Flex
