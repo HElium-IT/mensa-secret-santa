@@ -9,7 +9,6 @@ function GiftCreate({ gamePerson }: {
     readonly gamePerson: Schema["GamePerson"]["type"]
 }) {
     async function createGift(fields: GiftCreateFormInputValues) {
-        console.debug("Gift Create call", fields);
         if (!fields.name || !fields.attribute_1 || !fields.attribute_2 || !fields.attribute_3) {
             throw new Error("All fields are required");
         }
@@ -26,7 +25,6 @@ function GiftCreate({ gamePerson }: {
         if (!gift.data)
             throw new Error(gift.errors?.join(", ") ?? "Failed to create gift");
         console.debug("Gift created", gift.data);
-
 
     }
 
