@@ -16,7 +16,7 @@ const schema = a.schema({
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization((allow) => [allow.authenticated('userPools')])
     .secondaryIndexes((index) => [
       index("ownedGamePersonId").name("byOwnedGamePerson"),
       index("winnerGamePersonId").name("byWinnerGamePerson"),
@@ -35,7 +35,7 @@ const schema = a.schema({
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization((allow) => [allow.authenticated('userPools')])
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
       index("personId").name("byPerson"),
@@ -47,7 +47,7 @@ const schema = a.schema({
       games: a.hasMany("GamePerson", "personId"),
       isAdmin: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization((allow) => [allow.authenticated('userPools')])
     .identifier(["ownerLoginId"]),
 
   Game: a
@@ -59,7 +59,7 @@ const schema = a.schema({
       joinQrCode: a.string(),
       phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization((allow) => [allow.authenticated('userPools')])
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -67,10 +67,10 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
-    apiKeyAuthorizationMode: {
-      expiresInDays: 30,
-    },
+    defaultAuthorizationMode: "userPool",
+    // apiKeyAuthorizationMode: {
+    //   expiresInDays: 30,
+    // },
   },
 });
 
