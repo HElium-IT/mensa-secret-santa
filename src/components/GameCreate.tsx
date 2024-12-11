@@ -43,19 +43,25 @@ function GamesList() {
 
     return (
         <>
-            {<button onClick={() => setShowCreateForm(true)}>Crea Nuovo Partita</button>}
+            {!showCreateForm && <button onClick={() => setShowCreateForm(true)}>Crea Nuovo Partita</button>}
             {showCreateForm &&
-                <GameCreateForm
-                    overrides={{
-                        joinQrCode: { display: 'none', isRequired: false },
-                        phase: { display: 'none', isRequired: false },
-                    }}
-                    onSuccess={(fields) => {
-                        createGame(fields)
-                            .then(() => { setShowCreateForm(false); })
-                            .catch(alert);
-                    }}
-                />
+                <>
+                    <button onClick={() => setShowCreateForm(false)}>Annulla</button>
+                    <GameCreateForm
+                        overrides={{
+                            name: { label: "Nome", placeholder: "Cenone di natale" },
+                            description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
+                            secret: { label: "Segreto", placeholder: "Ciccio2024" },
+                            joinQrCode: { display: 'none', isRequired: false },
+                            phase: { display: 'none', isRequired: false },
+                        }}
+                        onSuccess={(fields) => {
+                            createGame(fields)
+                                .then(() => { setShowCreateForm(false); })
+                                .catch(alert);
+                        }}
+                    />
+                </>
             }
 
         </>

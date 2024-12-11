@@ -28,7 +28,10 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
             const gamesData = (await client.models.Game.list({
                 filter: {
                     // name: { contains: searchTerm }
-                    phase: { eq: "LOBBY" }
+                    or: [
+                        { phase: { eq: "REGISTRATION_OPEN" } },
+                        { phase: { eq: "LOBBY" } }
+                    ]
                 }
             })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
             setGames(gamesData.length > 0 ? gamesData : []);

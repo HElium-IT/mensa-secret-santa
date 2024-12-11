@@ -32,6 +32,10 @@ function GiftCreate({ gamePerson }: {
         <>
             <GiftCreateForm
                 overrides={{
+                    name: { label: "Il tuo regalo", placeholder: "Boomerang" },
+                    attribute_1: { label: "Attributo 1", placeholder: "Lancio" },
+                    attribute_2: { label: "Attributo 2", placeholder: "Sport" },
+                    attribute_3: { label: "Attributo 3", placeholder: "Legno" },
                     number: { display: 'none', isRequired: false },
                     ownedGamePersonId: { display: 'none', value: gamePerson.id },
                     winnerGamePersonId: { display: 'none', isRequired: false },
