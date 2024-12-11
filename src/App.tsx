@@ -21,6 +21,8 @@ function App() {
 	const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"]>();
 
 	useEffect(() => {
+		if (!user) return;
+		console.debug("User", user);
 		const subscription = client.models.Person.observeQuery({
 			filter: {
 				ownerLoginId: { eq: user.signInDetails?.loginId }
@@ -35,6 +37,7 @@ function App() {
 				} else if (items.length > 1) {
 					throw new Error("More than one person with the same ownerLoginId");
 				} else {
+					console.debug("Person", items[0]);
 					setPerson(items[0]);
 					if (DEBUG && !items[0].isAdmin) {
 						client.models.Person.update({
@@ -51,7 +54,7 @@ function App() {
 		}, 1000);
 
 		return () => subscription.unsubscribe();
-	}, []);
+	}, [user]);
 
 	if (loading) {
 		return (

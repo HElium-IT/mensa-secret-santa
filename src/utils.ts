@@ -18,22 +18,28 @@ export async function getPersonGames(gamePeople: Schema["GamePerson"]["type"][],
 
 export function gamePhaseToIcon(phase: Schema["Game"]["type"]["phase"]): string {
     const gamePhaseIcons = {
-        "REGISTRATION_OPEN": "🟢",
-        "LOBBY": "🟡",
-        "STARTED": "🔵",
-        "FINISHED": "🔴",
+        "REGISTRATION_OPEN": "🔵|✔️",
+        "LOBBY": "🟡|⏳",
+        "STARTED": "🟢|🏁",
+        "PAUSED": "🟢|⏸️",
+        "FINISHED": "🔴|🏁",
     }
     if (phase)
         return gamePhaseIcons[phase];
     return "";
 }
 
-export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"]): string {
+export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"], hasGift: boolean = false, giftHasNumber: boolean = false): string {
     const gamePhaseText = {
-        "REGISTRATION_OPEN": "Registra il tuo regalo in attesa che l'evento cominci!",
-        "LOBBY": "Consegna il tuo regalo e ottieni il numero!",
-        "STARTED": "La partita è iniziata!",
-        "FINISHED": "La partita è finita!",
+        "REGISTRATION_OPEN": (!hasGift)
+            ? "Registra gli attributi che più descrivono il tuo regalo; perchè tu l'hai già comprato, giusto? GIUSTO?!"
+            : "L'evento non è ancora iniziato... port nu poco 'e pazienza!",
+        "LOBBY": (!giftHasNumber)
+            ? "Consegna il tuo regalo a chi di dovere, jamm ja' ca te stamm aspettan!"
+            : "La partita sta per iniziare, stamm aspettanno tutta l'ata gente!",
+        "STARTED": "La partita è iniziata, Bona furtuna!",
+        "PAUSED": "La partita è in pausa, Aproffittane pe' magnà e bbivè!",
+        "FINISHED": "La partita è finita, spero che tu sia soddisfatto del tuo regalo; se così non fosse puoi sempre proporre uno scambio a qualcun altro!"
     }
     if (phase)
         return gamePhaseText[phase];

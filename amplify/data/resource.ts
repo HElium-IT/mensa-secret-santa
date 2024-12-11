@@ -25,7 +25,7 @@ const schema = a.schema({
       personId: a.id().required(),
       person: a.belongsTo("Person", "personId"),
 
-      gift: a.hasOne("Gift", ["gamePersonId"]),
+      gift: a.hasOne("Gift", "gamePersonId"),
 
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
@@ -52,7 +52,7 @@ const schema = a.schema({
       secret: a.string().required(),
       people: a.hasMany("GamePerson", "gameId"),
       joinQrCode: a.string(),
-      phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "FINISHED"]),
+      phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
     })
     .authorization((allow) => [allow.publicApiKey()])
 });

@@ -43,7 +43,7 @@ function GamesList() {
 
     return (
         <>
-            {<button onClick={() => setShowCreateForm(true)}>Crea Nuovo Gioco</button>}
+            {<button onClick={() => setShowCreateForm(true)}>Crea Nuovo Partita</button>}
             {showCreateForm &&
                 <GameCreateForm
                     overrides={{

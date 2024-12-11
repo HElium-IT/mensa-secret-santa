@@ -72,7 +72,7 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
             <h2> Cerca un gioco </h2>
             <input
                 type="text"
-                placeholder="Inserisci il nome del gioco"
+                placeholder="Secret Santa 2024"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />

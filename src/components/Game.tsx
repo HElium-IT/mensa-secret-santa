@@ -8,6 +8,7 @@ import { gamePhaseToIcon, gamePersonRoleToIcon, gamePhaseToText } from "../utils
 import GamePeople from './GamePeople';
 import Gift from "./Gift";
 import GiftCreate from "./GiftCreate";
+import GamePhaseUpdater from "./GamePhaseUpdater";
 
 const client = generateClient<Schema>();
 
@@ -25,7 +26,6 @@ function Game({ game, compact = false, onDelete }: {
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
     const [gamePersonRoleText, setPersonGameRoleText] = useState<string>("");
 
-    const [promptUpgradePhaseConfirmation, setPromptUpgradePhaseConfirmation] = useState(false);
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
     const [gift, setGift] = useState<Schema["Gift"]["type"]>();
@@ -57,13 +57,10 @@ function Game({ game, compact = false, onDelete }: {
         return () => subscription.unsubscribe();
     }, [gamePerson]);
 
-
-
-
     useEffect(() => {
-        setPhaseText(gamePhaseToText(phase));
         setPhaseIcon(gamePhaseToIcon(phase));
-    }, [phase]);
+        setPhaseText(gamePhaseToText(phase));
+    }, [phase, gift]);
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
@@ -91,20 +88,6 @@ function Game({ game, compact = false, onDelete }: {
         }
     }
 
-    async function upgradeGamePhase() {
-        if (!gamePerson || !phase) return
-        const nextPhase = {
-            "REGISTRATION_OPEN": "LOBBY",
-            "LOBBY": "STARTED",
-            "STARTED": "FINISHED",
-            "FINISHED": "REGISTRATION_OPEN"
-        }[phase] as Schema["Game"]["type"]["phase"];
-
-        client.models.Game.update({ ...game, phase: nextPhase });
-        setPhase(nextPhase);
-        setPromptUpgradePhaseConfirmation(false);
-    }
-
     if (gamePerson === undefined) {
         return <></>
     }
@@ -130,12 +113,12 @@ function Game({ game, compact = false, onDelete }: {
         <>
             <h2><span>{gamePersonRoleText}</span>{game.name}</h2>
             <p>Descrizione: {game.description}</p>
-            <p><span>{phaseIcon}</span> {phaseText}</p>
         </>
     )
 
     const giftDetails = (
         <>
+            <p><span>{phaseIcon}</span> {phaseText}</p>
             {phase !== "FINISHED" && (
                 gift ?
                     <Gift gift={gift} />
@@ -173,14 +156,13 @@ function Game({ game, compact = false, onDelete }: {
                     <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
                 }
             </p>
-            <p>
-                {!promptUpgradePhaseConfirmation && phase !== "FINISHED" &&
-                    <button onClick={() => setPromptUpgradePhaseConfirmation(true)}>Avanza fase</button>
-                }
-                {promptUpgradePhaseConfirmation &&
-                    <button onClick={upgradeGamePhase}>Conferma</button>
-                }
-            </p>
+            <GamePhaseUpdater
+                game={game}
+                gamePerson={gamePerson}
+                phase={phase}
+                setPhase={setPhase}
+            />
+
         </>
     );
 }

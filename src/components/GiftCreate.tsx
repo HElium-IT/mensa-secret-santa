@@ -32,7 +32,7 @@ function GiftCreate({ gamePerson }: {
             <GiftCreateForm
                 overrides={{
                     number: { display: 'none', isRequired: false },
-                    winnerGamePersonId: { display: 'none', isRequired: false },
+                    winnerGamePersonId: { display: 'none', value: "" },
                 }}
                 onSubmit={(fields) => {
                     fields.number = -1;
