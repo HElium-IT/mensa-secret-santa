@@ -113,7 +113,7 @@ function Game({ game, compact = false, onDelete }: {
 
     const gameBaseDetails = (
         <>
-            <h2><span>{gamePersonRoleText}</span>{game.name}</h2>
+            <h2><button style={{ margin: "1rem" }} onClick={onDelete}>{"<"}</button><span>{gamePersonRoleText}</span>{game.name}</h2>
             <p>Descrizione: {game.description}</p>
         </>
     )
@@ -132,16 +132,16 @@ function Game({ game, compact = false, onDelete }: {
 
     if (gamePerson.role === "PLAYER") {
         return (
-            <div className="game-card">
+            <>
                 {gameBaseDetails}
                 <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p>
                 {giftDetails}
-            </div>
+            </>
         )
     }
 
     return (
-        <div className="game-card">
+        <>
             {gameBaseDetails}
             {giftDetails}
             <h3>Creatori</h3>
@@ -153,21 +153,23 @@ function Game({ game, compact = false, onDelete }: {
             {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
                 <InviteGamePerson gameId={game.id} userRole={gamePerson.role} />
             )}
-            <p>
-                {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
-                    <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
-                }
-                {promptDeleteConfirmation &&
-                    <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
-                }
-            </p>
-            <GamePhaseUpdater
-                game={game}
-                gamePerson={gamePerson}
-                phase={phase}
-                setPhase={setPhase}
-            />
-        </div>
+            <div className="flex-row">
+                <p>
+                    {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
+                        <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
+                    }
+                    {promptDeleteConfirmation &&
+                        <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
+                    }
+                </p>
+                <GamePhaseUpdater
+                    game={game}
+                    gamePerson={gamePerson}
+                    phase={phase}
+                    setPhase={setPhase}
+                />
+            </div>
+        </>
     );
 }
 

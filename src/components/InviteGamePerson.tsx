@@ -31,7 +31,7 @@ function InviteGamePerson({ gameId, userRole }: {
     }
 
     return (
-        <div>
+        <div className="flex-row">
             <input
                 type="text"
                 placeholder="user@example.it; user@ciccio.it; user@boh.com; user@nice.net"

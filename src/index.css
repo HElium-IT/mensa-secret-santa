@@ -14,7 +14,8 @@ body {
 }
 
 main {
-  min-width: 75vw;
+  width: 95vw;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -56,7 +57,7 @@ ul {
   gap: 1px;
   background-color: black;
   border-radius: 8px;
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 li {
@@ -74,37 +75,37 @@ a {
   text-decoration: none;
 }
 
-.game-card {
-  background: white;
+.card {
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
   margin: 1rem;
   text-align: left;
   overflow-y: auto;
   max-height: 80vh;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  /* For Firefox */
+  /* overflow-x: hidden; */
+  /* scrollbar-width: none; */
 }
 
-.game-card::-webkit-scrollbar {
+.card.game {
+  background: white;
+  padding: 1.5rem;
+}
+
+.card.game::-webkit-scrollbar {
   display: none;
   /* For Chrome, Safari, and Opera */
 }
 
-.game-card h2 {
+.card.game h2 {
   margin-top: 0;
   font-size: 1.5rem;
   color: #333;
 }
 
-.game-card p {
+.card.game p {
   color: #666;
 }
 
-.game-card button {
-  margin-top: 1rem;
+.card.game button {
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -113,6 +114,44 @@ a {
   transition: background-color 0.3s;
 }
 
-.game-card button:hover {
+.card.game button:hover {
   background-color: #535bf2;
+}
+
+.flex-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: stretch;
+  align-items: center;
+}
+
+.gift-card {
+  background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  /* max-width: max-content; */
+  width: 50%;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gift-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.gift-card h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.gift-card p {
+  color: #666;
+  margin: 0.75rem 0;
+}
+
+.gift-winner {
+  color: #28a745;
+  font-weight: bold;
 }

@@ -32,13 +32,13 @@ export function gamePhaseToIcon(phase: Schema["Game"]["type"]["phase"]): string 
 export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"], hasGift: boolean = false, giftHasNumber: boolean = false): string {
     const gamePhaseText = {
         "REGISTRATION_OPEN": (!hasGift)
-            ? "Registra gli attributi che più descrivono il tuo regalo; perchè tu l'hai già comprato, giusto? GIUSTO?!"
-            : "L'evento non è ancora iniziato... port nu poco 'e pazienza!",
+            ? "Il giorno dell'evento sta arrivando. Registra gli attributi che più descrivono il tuo regalo; perchè tu l'hai già comprato, giusto? GIUSTO?!"
+            : "L'evento non è ancora iniziato... il regalo l'hai registrato, mo port nu poco 'e pazienza!",
         "LOBBY": (!giftHasNumber)
-            ? "Consegna il tuo regalo a chi di dovere, jamm ja' ca te stamm aspettan!"
+            ? "Oggi è il giorno! Consegna il tuo regalo a chi di dovere, jamm ja' ca te stamm aspettan!"
             : "La partita sta per iniziare, stamm aspettanno tutta l'ata gente!",
-        "STARTED": "La partita è iniziata, Bona furtuna!",
-        "PAUSED": "La partita è in pausa, Aproffittane pe' magnà e bbivè!",
+        "STARTED": "La partita è iniziata, bona furtuna!",
+        "PAUSED": "La partita è in pausa, aproffittane pe' magnà e, mi raccomando, bbìve!",
         "FINISHED": "La partita è finita, spero che tu sia soddisfatto del tuo regalo; se così non fosse puoi sempre proporre uno scambio a qualcun altro!"
     }
     if (phase)

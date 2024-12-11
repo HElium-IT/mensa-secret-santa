@@ -16,13 +16,13 @@ function Gift({ gift }: {
     }, [gift]);
 
     return (
-        <>
-            <h3>{gift.name}</h3>
+        <div className="gift-card">
+            <h4>{gift.name}</h4>
             <p>{gift.attribute_1}</p>
             <p>{gift.attribute_2}</p>
             <p>{gift.attribute_3}</p>
-            {giftWinner && <p>Il tuo regalo è stato vinto da {giftWinner}!</p>}
-        </>
+            {giftWinner && <p className="gift-winner">Il tuo regalo è stato vinto da {giftWinner}!</p>}
+        </div>
     );
 }
 

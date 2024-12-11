@@ -15,11 +15,12 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     const [person, setPerson] = useState<Schema["Person"]["type"]>();
     const [hasGift, setHasGift] = useState<Record<string, boolean>>({});
 
-    const filteredGamePeople = gamePeople.filter(gamePerson => gamePerson.role === filterRole);
+    const filteredGamePeople = gamePeople.filter(gamePerson => gamePerson.role === filterRole).sort(
+        (a, b) => a.personId.localeCompare(b.personId)
+    )
 
     useEffect(() => {
         getUserPerson(user).then(setPerson);
-
         gamePeople.forEach(async gamePerson => {
             const { data: gift } = await gamePerson.ownedGift();
             setHasGift(prevHasGift => ({ ...prevHasGift, [gamePerson.id]: !!gift }));
@@ -43,12 +44,12 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
             <ul>
                 {filteredGamePeople.map(gamePerson => (
                     <li key={gamePerson.id}>
-                        {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : ''}
+                        {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : '📧'}
                         {hasGift[gamePerson.id] ? '🎁' : ''}
                         {gamePerson.personId}
                         {
-                            userRole === 'CREATOR' && gamePerson.role !== 'CREATOR' &&
-                            <button onClick={() => upgradeToAdmin(gamePerson)}>
+                            (userRole === 'CREATOR' || userRole === "ADMIN") && gamePerson.role !== 'PLAYER' &&
+                            <button style={{ padding: 1 }} onClick={() => upgradeToAdmin(gamePerson)}>
                                 {gamePersonRoleToIcon("ADMIN")}
                             </button>
                         }

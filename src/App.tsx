@@ -65,16 +65,16 @@ function App() {
 
 	if (selectedGame) {
 		return (
-			<main>
+			<main className={"card game"}>
 				<Game game={selectedGame} onDelete={() => selectGame()} />
-				<button style={{ margin: "1rem" }} onClick={() => selectGame()}>Back</button>
+
 			</main>
 		)
 	}
 
 
 	return (
-		<main>
+		<main className={"card"}>
 			<h1 style={{ textAlign: "center" }}>
 				{user?.signInDetails?.loginId?.split('@')[0]}
 			</h1>

@@ -38,10 +38,6 @@ function GiftCreate({ gamePerson }: {
                     ownedGamePersonId: { display: 'none', value: gamePerson.id },
                     winnerGamePersonId: { display: 'none', isRequired: false },
                 }}
-                onSubmit={(fields) => {
-                    console.debug("GiftCreateForm submit", fields);
-                    return fields;
-                }}
                 onError={console.log}
                 onSuccess={(fields) => {
                     console.debug("GiftCreateForm success", fields);
