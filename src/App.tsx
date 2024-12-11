@@ -15,6 +15,9 @@ function App() {
 	const [person, setPerson] = useState<Schema["Person"]["type"]>();
 	const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"]>();
 
+	const [isSelectingGame, setIsSelectingGame] = useState(true);
+	const [isCreatingGame, setIsCreatingGame] = useState(false);
+
 	useEffect(() => {
 		if (!user) return;
 		console.debug("User", user);
@@ -78,9 +81,9 @@ function App() {
 			<h1 style={{ textAlign: "center" }}>
 				{user?.signInDetails?.loginId?.split('@')[0]}
 			</h1>
-			{person?.isAdmin && <GameCreate />}
-			<GameSelector setGame={selectGame} />
-			<GamesList setGame={selectGame} />
+			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} />}
+			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} />}
+			{!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} />}
 		</main>
 	);
 }

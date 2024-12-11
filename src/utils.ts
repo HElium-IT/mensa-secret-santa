@@ -65,3 +65,14 @@ export async function getUserPerson(user: AuthUser): Promise<Schema["Person"]["t
     const { data: person } = await client.models.Person.get({ ownerLoginId: user.signInDetails.loginId });
     return person ?? undefined;
 }
+
+export function sortGames(a: Schema["Game"]["type"], b: Schema["Game"]["type"]) {
+    const phaseOrder = ["STARTED", "PAUSED", "LOBBY", "REGISTRATION_OPEN", "FINISHED"];
+    const phaseComparison =
+        phaseOrder.indexOf(a.phase as NonNullable<Schema["Game"]["type"]["phase"]>)
+        - phaseOrder.indexOf(b.phase as NonNullable<Schema["Game"]["type"]["phase"]>);
+    if (phaseComparison !== 0) {
+        return phaseComparison;
+    }
+    return a.name.localeCompare(b.name);
+}

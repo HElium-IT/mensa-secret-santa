@@ -3,10 +3,18 @@ import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { sortGames } from "../utils";
+import Game from "./Game";
 
 const client = generateClient<Schema>();
 
-function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["type"]) => void }) {
+function GameSelector({
+    setGame,
+    setIsSelectingGame,
+}: {
+    readonly setGame: (game?: Schema["Game"]["type"]) => void
+    readonly setIsSelectingGame: (isSelectingGame: boolean) => void
+}) {
     const { user } = useAuthenticator();
     const [searchTerm, setSearchTerm] = useState("");
     const [games, setGames] = useState<Schema["Game"]["type"][]>([]);
@@ -15,27 +23,29 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
     const [secretInput, setSecretInput] = useState("");
     const [error, setError] = useState("");
 
+    async function fetchGames(searchTerm: string = "") {
+        // This is the worst way to do this, but it's fine for now.
+        // The filtering should be done server-side but I don't know
+        // how to do it, docs are shamefully lacking.
+        const gamesData = (await client.models.Game.list({
+            filter: {
+                // name: { contains: searchTerm }
+                or: [
+                    { phase: { eq: "REGISTRATION_OPEN" } },
+                    { phase: { eq: "LOBBY" } }
+                ]
+            }
+        })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        setGames(gamesData.length > 0 ? gamesData : []);
+    }
 
     useEffect(() => {
-        if (searchTerm.length < 3) {
+        if (!searchTerm) {
             setGames([]);
+            setIsSelectingGame(false);
             return;
         }
-        async function fetchGames(searchTerm: string = "") {
-            // This is the worst way to do this, but it's fine for now.
-            // The filtering should be done server-side but I don't know
-            // how to do it, docs are shamefully lacking.
-            const gamesData = (await client.models.Game.list({
-                filter: {
-                    // name: { contains: searchTerm }
-                    or: [
-                        { phase: { eq: "REGISTRATION_OPEN" } },
-                        { phase: { eq: "LOBBY" } }
-                    ]
-                }
-            })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
-            setGames(gamesData.length > 0 ? gamesData : []);
-        }
+        setIsSelectingGame(true);
         fetchGames(searchTerm);
     }, [searchTerm]);
 
@@ -72,17 +82,17 @@ function GameSelector({ setGame }: { readonly setGame: (game?: Schema["Game"]["t
 
     return (
         <>
-            <h2> Cerca un gioco </h2>
+            <h2> Cerca una partita </h2>
             <input
                 type="text"
                 placeholder="Secret Santa 2024"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <ul>
-                {games.map(game => (
+            <ul className='over'>
+                {games.sort(sortGames).map(game => (
                     <li key={game.id} onClick={() => setSelectedGame(game)}>
-                        {game.name}
+                        <Game game={game} compact />
                     </li>
                 ))}
             </ul>

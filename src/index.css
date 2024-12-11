@@ -60,7 +60,7 @@ ul {
 }
 
 ul.over {
-  overflow: auto;
+  overflow-y: auto;
 }
 
 li {

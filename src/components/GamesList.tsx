@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getPersonGames } from "../utils";
+import { getPersonGames, sortGames } from "../utils";
 import Game from './Game';
 
 
@@ -26,21 +26,10 @@ function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"
         return () => subscription.unsubscribe();
     }, [user]);
 
-    function sortGames(a: Schema["Game"]["type"], b: Schema["Game"]["type"]) {
-        const phaseOrder = ["STARTED", "PAUSED", "LOBBY", "REGISTRATION_OPEN", "FINISHED"];
-        const phaseComparison =
-            phaseOrder.indexOf(a.phase as NonNullable<Schema["Game"]["type"]["phase"]>)
-            - phaseOrder.indexOf(b.phase as NonNullable<Schema["Game"]["type"]["phase"]>);
-        if (phaseComparison !== 0) {
-            return phaseComparison;
-        }
-        return a.name.localeCompare(b.name);
-    }
-
     return (
         <>
-            <h2>I tuoi giochi</h2>
-            <ul className='fancy-bg over' style={{ overflowY: 'auto' }}>
+            <h2>Le tue partite</h2>
+            <ul className='over'>
                 {games.sort(sortGames).map(game => (
                     <li key={game.id} onClick={() => setGame(game)}>
                         <Game game={game} compact />

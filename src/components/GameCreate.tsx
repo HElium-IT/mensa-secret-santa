@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
@@ -8,7 +8,11 @@ import GameCreateForm from "../ui-components/GameCreateForm";
 
 const client = generateClient<Schema>();
 
-function GamesList() {
+function GamesList({
+    setIsCreatingGame,
+}: {
+    readonly setIsCreatingGame: (isCreatingGame: boolean) => void;
+}) {
     const { user } = useAuthenticator();
     const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -40,6 +44,10 @@ function GamesList() {
         }
         console.debug("GamePerson created", gamePerson.data);
     }
+
+    useEffect(() => {
+        setIsCreatingGame(showCreateForm);
+    }, [showCreateForm]);
 
     return (
         <>
