@@ -100,9 +100,7 @@ function Game({ game, compact = false, onDelete }: {
         const resultGame = await client.models.Game.delete({ id: game.id });
         console.log(resultGame.errors ?? resultGame.data);
         if (onDelete) {
-            console.log("calling onDelete");
             onDelete();
-            console.log("called onDelete");
         }
     }
 

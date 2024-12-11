@@ -16,7 +16,7 @@ const schema = a.schema({
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
-    .authorization((allow) => [allow.publicApiKey()])
+    .authorization((allow) => [allow.authenticated()])
     .secondaryIndexes((index) => [
       index("ownedGamePersonId").name("byOwnedGamePerson"),
       index("winnerGamePersonId").name("byWinnerGamePerson"),
@@ -35,7 +35,7 @@ const schema = a.schema({
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.publicApiKey()])
+    .authorization((allow) => [allow.authenticated()])
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
       index("personId").name("byPerson"),
@@ -47,7 +47,7 @@ const schema = a.schema({
       games: a.hasMany("GamePerson", "personId"),
       isAdmin: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.publicApiKey()])
+    .authorization((allow) => [allow.authenticated()])
     .identifier(["ownerLoginId"]),
 
   Game: a
@@ -59,7 +59,7 @@ const schema = a.schema({
       joinQrCode: a.string(),
       phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
     })
-    .authorization((allow) => [allow.publicApiKey()])
+    .authorization((allow) => [allow.authenticated()])
 });
 
 export type Schema = ClientSchema<typeof schema>;

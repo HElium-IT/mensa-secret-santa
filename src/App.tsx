@@ -62,8 +62,9 @@ function App() {
 	}
 
 	async function selectGame(game?: Schema["Game"]["type"]) {
-		console.debug("Game", { ...game, secret: "***" });
 		setSelectedGame(game);
+		if (game)
+			console.debug("Game", { ...game, secret: "***" });
 	}
 
 	if (selectedGame) {
