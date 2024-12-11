@@ -33,7 +33,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
         const { errors } = await client.models.GamePerson.update({
             id: gamePerson.id,
             role: 'ADMIN',
-        }, { authMode: 'userPool' })
+        }, { authMode: 'none' })
         if (errors) {
             alert(errors);
         }

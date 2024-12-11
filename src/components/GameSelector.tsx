@@ -35,7 +35,7 @@ function GameSelector({
                     { phase: { eq: "LOBBY" } }
                 ]
             },
-            authMode: 'userPool'
+            authMode: 'none'
         })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
         setGames(gamesData.length > 0 ? gamesData : []);
     }
@@ -68,7 +68,7 @@ function GameSelector({
                 filter: {
                     personId: { eq: user.signInDetails?.loginId }
                 },
-                authMode: 'userPool'
+                authMode: 'none'
             });
             if (!gamePeople) return;
             const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
