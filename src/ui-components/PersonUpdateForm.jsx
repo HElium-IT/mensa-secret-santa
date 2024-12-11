@@ -60,7 +60,7 @@ export default function PersonUpdateForm(props) {
   React.useEffect(resetStateValues, [personRecord]);
   const validations = {
     ownerLoginId: [{ type: "Required" }],
-    isAdmin: [{ type: "Required" }],
+    isAdmin: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -89,7 +89,7 @@ export default function PersonUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           ownerLoginId,
-          isAdmin,
+          isAdmin: isAdmin ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {

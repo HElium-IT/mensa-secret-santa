@@ -25,6 +25,7 @@ export default function GiftUpdateForm(props) {
     attribute_2: "",
     attribute_3: "",
     number: "",
+    winnerGamePersonId: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [attribute_1, setAttribute_1] = React.useState(
@@ -37,6 +38,9 @@ export default function GiftUpdateForm(props) {
     initialValues.attribute_3
   );
   const [number, setNumber] = React.useState(initialValues.number);
+  const [winnerGamePersonId, setWinnerGamePersonId] = React.useState(
+    initialValues.winnerGamePersonId
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = giftRecord
@@ -47,6 +51,7 @@ export default function GiftUpdateForm(props) {
     setAttribute_2(cleanValues.attribute_2);
     setAttribute_3(cleanValues.attribute_3);
     setNumber(cleanValues.number);
+    setWinnerGamePersonId(cleanValues.winnerGamePersonId);
     setErrors({});
   };
   const [giftRecord, setGiftRecord] = React.useState(giftModelProp);
@@ -71,6 +76,7 @@ export default function GiftUpdateForm(props) {
     attribute_2: [{ type: "Required" }],
     attribute_3: [{ type: "Required" }],
     number: [],
+    winnerGamePersonId: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -103,6 +109,7 @@ export default function GiftUpdateForm(props) {
           attribute_2,
           attribute_3,
           number: number ?? null,
+          winnerGamePersonId: winnerGamePersonId ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -168,6 +175,7 @@ export default function GiftUpdateForm(props) {
               attribute_2,
               attribute_3,
               number,
+              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -196,6 +204,7 @@ export default function GiftUpdateForm(props) {
               attribute_2,
               attribute_3,
               number,
+              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_1 ?? value;
@@ -224,6 +233,7 @@ export default function GiftUpdateForm(props) {
               attribute_2: value,
               attribute_3,
               number,
+              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_2 ?? value;
@@ -252,6 +262,7 @@ export default function GiftUpdateForm(props) {
               attribute_2,
               attribute_3: value,
               number,
+              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.attribute_3 ?? value;
@@ -284,6 +295,7 @@ export default function GiftUpdateForm(props) {
               attribute_2,
               attribute_3,
               number: value,
+              winnerGamePersonId,
             };
             const result = onChange(modelFields);
             value = result?.number ?? value;
@@ -297,6 +309,37 @@ export default function GiftUpdateForm(props) {
         errorMessage={errors.number?.errorMessage}
         hasError={errors.number?.hasError}
         {...getOverrideProps(overrides, "number")}
+      ></TextField>
+      <TextField
+        label="Winner game person id"
+        isRequired={false}
+        isReadOnly={false}
+        value={winnerGamePersonId}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+              number,
+              winnerGamePersonId: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.winnerGamePersonId ?? value;
+          }
+          if (errors.winnerGamePersonId?.hasError) {
+            runValidationTasks("winnerGamePersonId", value);
+          }
+          setWinnerGamePersonId(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("winnerGamePersonId", winnerGamePersonId)
+        }
+        errorMessage={errors.winnerGamePersonId?.errorMessage}
+        hasError={errors.winnerGamePersonId?.hasError}
+        {...getOverrideProps(overrides, "winnerGamePersonId")}
       ></TextField>
       <Flex
         justifyContent="space-between"

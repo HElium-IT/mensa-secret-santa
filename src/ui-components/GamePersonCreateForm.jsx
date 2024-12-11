@@ -39,7 +39,7 @@ export default function GamePersonCreateForm(props) {
   };
   const validations = {
     role: [],
-    acceptedInvitation: [{ type: "Required" }],
+    acceptedInvitation: [],
   };
   const runValidationTasks = async (
     fieldName,

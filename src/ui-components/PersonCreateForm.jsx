@@ -39,7 +39,7 @@ export default function PersonCreateForm(props) {
   };
   const validations = {
     ownerLoginId: [{ type: "Required" }],
-    isAdmin: [{ type: "Required" }],
+    isAdmin: [],
   };
   const runValidationTasks = async (
     fieldName,

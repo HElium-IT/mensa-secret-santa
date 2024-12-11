@@ -22,6 +22,7 @@ export declare type GiftUpdateFormInputValues = {
     attribute_2?: string;
     attribute_3?: string;
     number?: number;
+    winnerGamePersonId?: string;
 };
 export declare type GiftUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
@@ -29,6 +30,7 @@ export declare type GiftUpdateFormValidationValues = {
     attribute_2?: ValidationFunction<string>;
     attribute_3?: ValidationFunction<string>;
     number?: ValidationFunction<number>;
+    winnerGamePersonId?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GiftUpdateFormOverridesProps = {
@@ -38,6 +40,7 @@ export declare type GiftUpdateFormOverridesProps = {
     attribute_2?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_3?: PrimitiveOverrideProps<TextFieldProps>;
     number?: PrimitiveOverrideProps<TextFieldProps>;
+    winnerGamePersonId?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type GiftUpdateFormProps = React.PropsWithChildren<{
     overrides?: GiftUpdateFormOverridesProps | undefined | null;

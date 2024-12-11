@@ -61,7 +61,7 @@ export default function GamePersonUpdateForm(props) {
   React.useEffect(resetStateValues, [gamePersonRecord]);
   const validations = {
     role: [],
-    acceptedInvitation: [{ type: "Required" }],
+    acceptedInvitation: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -90,7 +90,7 @@ export default function GamePersonUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           role: role ?? null,
-          acceptedInvitation,
+          acceptedInvitation: acceptedInvitation ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {

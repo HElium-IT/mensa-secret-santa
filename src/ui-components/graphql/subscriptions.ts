@@ -49,6 +49,7 @@ export const onCreateGamePerson = /* GraphQL */ `
         name
         number
         updatedAt
+        winnerGamePersonId
         __typename
       }
       id
@@ -87,6 +88,7 @@ export const onCreateGift = /* GraphQL */ `
       name
       number
       updatedAt
+      winnerGamePersonId
       __typename
     }
   }
@@ -153,6 +155,7 @@ export const onDeleteGamePerson = /* GraphQL */ `
         name
         number
         updatedAt
+        winnerGamePersonId
         __typename
       }
       id
@@ -191,6 +194,7 @@ export const onDeleteGift = /* GraphQL */ `
       name
       number
       updatedAt
+      winnerGamePersonId
       __typename
     }
   }
@@ -257,6 +261,7 @@ export const onUpdateGamePerson = /* GraphQL */ `
         name
         number
         updatedAt
+        winnerGamePersonId
         __typename
       }
       id
@@ -295,6 +300,7 @@ export const onUpdateGift = /* GraphQL */ `
       name
       number
       updatedAt
+      winnerGamePersonId
       __typename
     }
   }

@@ -47,6 +47,7 @@ export const getGamePerson = /* GraphQL */ `
         name
         number
         updatedAt
+        winnerGamePersonId
         __typename
       }
       id
@@ -85,6 +86,7 @@ export const getGift = /* GraphQL */ `
       name
       number
       updatedAt
+      winnerGamePersonId
       __typename
     }
   }
@@ -233,6 +235,7 @@ export const listGifts = /* GraphQL */ `
         name
         number
         updatedAt
+        winnerGamePersonId
         __typename
       }
       nextToken

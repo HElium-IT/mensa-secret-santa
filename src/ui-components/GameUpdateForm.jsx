@@ -297,13 +297,13 @@ export default function GameUpdateForm(props) {
         {...getOverrideProps(overrides, "phase")}
       >
         <option
-          children="Lobby"
-          value="LOBBY"
+          children="Registration open"
+          value="REGISTRATION_OPEN"
           {...getOverrideProps(overrides, "phaseoption0")}
         ></option>
         <option
-          children="Registration open"
-          value="REGISTRATION_OPEN"
+          children="Lobby"
+          value="LOBBY"
           {...getOverrideProps(overrides, "phaseoption1")}
         ></option>
         <option
