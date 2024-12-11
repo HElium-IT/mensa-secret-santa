@@ -29,7 +29,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     }, [user]);
 
     async function upgradeToAdmin(gamePerson: Schema["GamePerson"]["type"]) {
-        if (!person?.isAdmin) return;
+        if (userRole === 'PLAYER') return;
         const { errors } = await client.models.GamePerson.update({
             id: gamePerson.id,
             role: 'ADMIN',
@@ -48,7 +48,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
                         {hasGift[gamePerson.id] ? '🎁' : ''}
                         {gamePerson.personId}
                         {
-                            (userRole === 'CREATOR' || userRole === "ADMIN") && gamePerson.role !== 'PLAYER' &&
+                            gamePerson.role === 'PLAYER' &&
                             <button style={{ padding: 1 }} onClick={() => upgradeToAdmin(gamePerson)}>
                                 {gamePersonRoleToIcon("ADMIN")}
                             </button>

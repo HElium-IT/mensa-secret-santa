@@ -40,7 +40,7 @@ function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"
     return (
         <>
             <h2>I tuoi giochi</h2>
-            <ul className='fancy-bg' style={{ overflowY: 'auto' }}>
+            <ul className='fancy-bg over' style={{ overflowY: 'auto' }}>
                 {games.sort(sortGames).map(game => (
                     <li key={game.id} onClick={() => setGame(game)}>
                         <Game game={game} compact />

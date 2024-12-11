@@ -30,6 +30,23 @@ function Game({ game, compact = false, onDelete }: {
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
     const [gift, setGift] = useState<Schema["Gift"]["type"]>();
+    const client = generateClient<Schema>();
+
+    const [totalGifts, setTotalGifts] = useState<number>(0);
+    const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
+
+    useEffect(() => {
+        gamePeople.forEach(async gamePerson => {
+            const { data: gift } = await gamePerson.ownedGift();
+            if (gift) {
+                setTotalGifts(totalGifts + 1);
+                if (gamePerson.role !== "PLAYER") {
+                    setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
+                }
+            }
+        });
+
+    }, [user]);
 
     useEffect(() => {
         if (!game) return;
@@ -134,7 +151,17 @@ function Game({ game, compact = false, onDelete }: {
         return (
             <>
                 {gameBaseDetails}
-                <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p>
+                {/* <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p> */}
+
+                {
+                    <p>
+                        regali totali {
+                            totalGifts
+                        } / {
+                            gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts
+                        } giocatori totali
+                    </p>
+                }
                 {giftDetails}
             </>
         )
