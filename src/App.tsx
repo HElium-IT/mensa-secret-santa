@@ -4,12 +4,7 @@ import { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
 import { DEBUG } from "./main";
-import {
-	Game,
-	GameSelector,
-	GameCreate,
-	GamesList,
-} from "./components";
+import { Game, GameSelector, GameCreate, GamesList } from "./components";
 
 const client = generateClient<Schema>();
 

@@ -9,6 +9,7 @@ import GamePeople from './GamePeople';
 import Gift from "./Gift";
 import GiftCreate from "./GiftCreate";
 import GamePhaseUpdater from "./GamePhaseUpdater";
+import InviteGamePerson from "./InviteGamePerson";
 
 const client = generateClient<Schema>();
 
@@ -144,11 +145,14 @@ function Game({ game, compact = false, onDelete }: {
             {gameBaseDetails}
             {giftDetails}
             <h3>Creatori</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} gameId={game.id} />
+            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
             <h3>Admin</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} gameId={game.id} />
+            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
             <h3>Giocatori</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} gameId={game.id} />
+            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
+            {gamePerson.role === "CREATOR" || (gamePerson.role === "ADMIN") && (
+                <InviteGamePerson gameId={game.id} userRole={gamePerson.role} />
+            )}
             <p>
                 {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
                     <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
