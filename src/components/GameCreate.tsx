@@ -27,7 +27,7 @@ function GamesList({
             secret: fields.secret,
             joinQrCode: "",
             phase: "REGISTRATION_OPEN" as Schema["Game"]["type"]["phase"],
-        }, { authMode: 'identityPool' });
+        }, { authMode: 'userPool' });
         if (!game.data)
             throw new Error(game.errors?.join(", ") ?? "Failed to create game");
         console.debug("Game created", game.data);
@@ -37,9 +37,9 @@ function GamesList({
             personId: user?.signInDetails?.loginId ?? '',
             role: "CREATOR",
             acceptedInvitation: true,
-        }, { authMode: 'identityPool' });
+        }, { authMode: 'userPool' });
         if (!gamePerson.data) {
-            client.models.Game.delete({ id: game.data.id }, { authMode: 'identityPool' });
+            client.models.Game.delete({ id: game.data.id }, { authMode: 'userPool' });
             throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
         }
         console.debug("GamePerson created", gamePerson.data);

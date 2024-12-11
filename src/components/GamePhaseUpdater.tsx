@@ -24,7 +24,7 @@ function GamePhaseUpdater({ game, gamePerson, phase, setPhase }: {
             "FINISHED": "REGISTRATION_OPEN"
         }[phase] as Schema["Game"]["type"]["phase"];
 
-        await client.models.Game.update({ id: game.id, phase: nextPhase }, { authMode: 'identityPool' });
+        await client.models.Game.update({ id: game.id, phase: nextPhase }, { authMode: 'userPool' });
         setPhase(nextPhase);
         setPromptUpgradePhaseConfirmation(false);
     }

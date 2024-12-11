@@ -35,7 +35,7 @@ function GameSelector({
                     { phase: { eq: "LOBBY" } }
                 ]
             },
-            authMode: 'identityPool'
+            authMode: 'userPool'
         })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
         setGames(gamesData.length > 0 ? gamesData : []);
     }
@@ -68,7 +68,7 @@ function GameSelector({
                 filter: {
                     personId: { eq: user.signInDetails?.loginId }
                 },
-                authMode: 'identityPool'
+                authMode: 'userPool'
             });
             if (!gamePeople) return;
             const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
@@ -92,7 +92,7 @@ function GameSelector({
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <ul className='over'>
-                {games.sort(sortGames).map(game => (
+                {games.sort(sortGames).filter(game => game).map(game => (
                     <li key={game.id} onClick={() => setSelectedGame(game)}>
                         <Game game={game} compact />
                     </li>
