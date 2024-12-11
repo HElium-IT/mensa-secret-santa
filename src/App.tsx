@@ -21,7 +21,7 @@ function App() {
 	const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"]>();
 
 	useEffect(() => {
-		client.models.Person.observeQuery({
+		const subscription = client.models.Person.observeQuery({
 			filter: {
 				ownerLoginId: { eq: user.signInDetails?.loginId }
 			}
@@ -49,6 +49,8 @@ function App() {
 		setTimeout(() => {
 			setLoading(false);
 		}, 1000);
+
+		return () => subscription.unsubscribe();
 	}, []);
 
 	if (loading) {

@@ -21,11 +21,12 @@ function GamesList() {
             name: fields.name,
             description: fields.description,
             secret: fields.secret,
-            joinQrCode: fields.joinQrCode ?? "",
-            phase: (fields.phase ?? "REGISTRATION_OPEN") as Schema["Game"]["type"]["phase"],
+            joinQrCode: "",
+            phase: "REGISTRATION_OPEN" as Schema["Game"]["type"]["phase"],
         });
         if (!game.data)
             throw new Error(game.errors?.join(", ") ?? "Failed to create game");
+        console.debug("Game created", game.data);
 
         const gamePerson = await client.models.GamePerson.create({
             gameId: game.data.id,
@@ -33,8 +34,11 @@ function GamesList() {
             role: "CREATOR",
             acceptedInvitation: true,
         });
-        if (!gamePerson.data)
+        if (!gamePerson.data) {
+            client.models.Game.delete({ id: game.data.id });
             throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
+        }
+        console.debug("GamePerson created", gamePerson.data);
     }
 
     return (
@@ -43,13 +47,13 @@ function GamesList() {
             {showCreateForm &&
                 <GameCreateForm
                     overrides={{
-                        joinQrCode: { display: 'none', value: "" },
-                        phase: { display: 'none', value: "LOBBY" },
+                        joinQrCode: { display: 'none', isRequired: false },
+                        phase: { display: 'none', isRequired: false },
                     }}
                     onSuccess={(fields) => {
-                        createGame(fields).then(() => {
-                            setShowCreateForm(false);
-                        }, alert);
+                        createGame(fields)
+                            .then(() => { setShowCreateForm(false); })
+                            .catch(alert);
                     }}
                 />
             }

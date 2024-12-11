@@ -11,7 +11,8 @@ const schema = a.schema({
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
 
-      number: a.integer(),
+      number: a.integer().default(-1),
+      winnerGamePersonId: a.string().default(""),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .identifier(["gamePersonId"]),
@@ -27,7 +28,7 @@ const schema = a.schema({
       gift: a.hasOne("Gift", ["gamePersonId"]),
 
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
-      acceptedInvitation: a.boolean().required().default(false),
+      acceptedInvitation: a.boolean().default(false),
     })
     .authorization((allow) => [allow.publicApiKey()])
     .secondaryIndexes((index) => [

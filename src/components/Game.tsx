@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import type { Schema } from "../../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
-import GamePeople from './GamePeople';
 
+import type { Schema } from "../../amplify/data/resource";
 import { gamePhaseToIcon, gamePersonRoleToIcon, gamePhaseToText } from "../utils";
+
+import GamePeople from './GamePeople';
+import Gift from "./Gift";
+import GiftCreate from "./GiftCreate";
 
 const client = generateClient<Schema>();
 
@@ -14,32 +17,53 @@ function Game({ game, compact = false, onDelete }: {
     readonly onDelete?: () => void
 }) {
     const { user } = useAuthenticator();
-    const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
+    const [phase, setPhase] = useState<Schema["Game"]["type"]["phase"]>(game.phase);
+    const [phaseText, setPhaseText] = useState<string>(gamePhaseToText(game.phase));
+    const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(game.phase));
+
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
+    const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
+    const [gamePersonRoleText, setPersonGameRoleText] = useState<string>("");
+
     const [promptUpgradePhaseConfirmation, setPromptUpgradePhaseConfirmation] = useState(false);
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
-    const [gameRoleText, setGameRoleText] = useState<string>("");
-    const [gamePhaseText, setGamePhaseText] = useState<string>(gamePhaseToText(game.phase));
-    const [gamePhaseIcon, setGamePhaseIcon] = useState<string>(gamePhaseToIcon(game.phase));
+    const [gift, setGift] = useState<Schema["Gift"]["type"]>();
 
     useEffect(() => {
+        if (!game) return;
         game.people().then(({ data: gamePeopleData }) => {
             if (!gamePeopleData) return;
             setGamePeople(gamePeopleData);
             gamePeopleData.forEach(gp => {
                 if (gp.personId === user.signInDetails?.loginId) {
+                    console.debug("GamePerson", gp);
                     setGamePerson(gp);
+                    setPersonGameRoleText(gamePersonRoleToIcon(gp.role));
                 }
             });
         });
     }, [game]);
 
     useEffect(() => {
-        if (gamePerson)
-            setGameRoleText(gamePersonRoleToIcon(gamePerson.role));
+        if (!gamePerson) return;
+        const subscription = client.models.Gift.observeQuery({ filter: { gamePersonId: { eq: gamePerson?.id } } }).subscribe({
+            next: ({ items: gifts }) => {
+                if (gifts && gifts.length > 0) {
+                    setGift(gifts[0]);
+                }
+            }
+        });
+        return () => subscription.unsubscribe();
     }, [gamePerson]);
 
+
+
+
+    useEffect(() => {
+        setPhaseText(gamePhaseToText(phase));
+        setPhaseIcon(gamePhaseToIcon(phase));
+    }, [phase]);
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
@@ -68,18 +92,16 @@ function Game({ game, compact = false, onDelete }: {
     }
 
     async function upgradeGamePhase() {
-        if (!gamePerson || !game.phase) return
+        if (!gamePerson || !phase) return
         const nextPhase = {
             "REGISTRATION_OPEN": "LOBBY",
             "LOBBY": "STARTED",
             "STARTED": "FINISHED",
             "FINISHED": "REGISTRATION_OPEN"
-        }[game.phase] as Schema["Game"]["type"]["phase"];
+        }[phase] as Schema["Game"]["type"]["phase"];
 
         client.models.Game.update({ ...game, phase: nextPhase });
-        game.phase = nextPhase;
-        setGamePhaseText(gamePhaseToText(nextPhase));
-        setGamePhaseIcon(gamePhaseToIcon(nextPhase));
+        setPhase(nextPhase);
         setPromptUpgradePhaseConfirmation(false);
     }
 
@@ -99,48 +121,66 @@ function Game({ game, compact = false, onDelete }: {
     if (compact) {
         return (
             <h3 >
-                <span>{gameRoleText}</span><span>{gamePhaseIcon}</span> {game.name}
+                <span>{gamePersonRoleText}</span><span>{phaseIcon}</span>{game.name}
             </h3>
         );
     }
 
+    const gameBaseDetails = (
+        <>
+            <h2><span>{gamePersonRoleText}</span>{game.name}</h2>
+            <p>Descrizione: {game.description}</p>
+            <p><span>{phaseIcon}</span> {phaseText}</p>
+        </>
+    )
+
+    const giftDetails = (
+        <>
+            {phase !== "FINISHED" && (
+                gift ?
+                    <Gift gift={gift} gamePerson={gamePerson} />
+                    :
+                    <GiftCreate gamePerson={gamePerson} />
+            )}
+        </>
+    )
+
     if (gamePerson.role === "PLAYER") {
         return (
             <>
-                <h2><span>{gameRoleText}</span>{game.name}</h2>
-                <p><span>{gamePhaseIcon}</span> {gamePhaseText}</p>
-                <p>Descrizione: {game.description}</p>
-                <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}
-                </p>
+                {gameBaseDetails}
+                <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p>
+                {giftDetails}
             </>
         )
     }
 
     return (
         <>
-            <h2><span>{gameRoleText}</span>{game.name}</h2>
-            <p>
-                <span>{gamePhaseIcon}</span> {gamePhaseText}
-            </p>
-            <p>Descrizione: {game.description}</p>
+            {gameBaseDetails}
+            {giftDetails}
             <h3>Creatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
             <h3>Admin</h3>
             <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
             <h3>Giocatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
-            {gamePerson.role === "CREATOR" &&
-                <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
-            }
-            {promptDeleteConfirmation &&
-                <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
-            }
-            {game.phase !== "FINISHED" &&
-                <button onClick={() => setPromptUpgradePhaseConfirmation(true)}>Avanza</button>
-            }
-            {promptUpgradePhaseConfirmation &&
-                <button onClick={upgradeGamePhase}>Conferma</button>
-            }
+            <p>
+                {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
+                    <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
+                }
+                {promptDeleteConfirmation &&
+                    <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
+                }
+            </p>
+            <p>
+                {!promptUpgradePhaseConfirmation && phase !== "FINISHED" &&
+                    <button onClick={() => setPromptUpgradePhaseConfirmation(true)}>Avanza fase</button>
+                }
+                {promptUpgradePhaseConfirmation &&
+                    <button onClick={upgradeGamePhase}>Conferma</button>
+                }
+            </p>
         </>
     );
 }
