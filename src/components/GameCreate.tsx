@@ -17,25 +17,55 @@ function GamesList({
     const { user } = useAuthenticator();
     const [showCreateForm, setShowCreateForm] = useState(false);
 
-    async function createGamePerson(gameValues: GameCreateFormInputValues) {
-        console.debug("Game created", gameValues);
-        const gamePerson = await client.models.GamePerson.create({
-            gameId: game.id,
-            personId: user?.signInDetails?.loginId ?? '',
-            role: "CREATOR",
-            acceptedInvitation: true,
-        }, { authMode: 'userPool' });
-        if (!gamePerson.data) {
-            client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
-            throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
-        }
-        console.debug("GamePerson created", gamePerson.data);
-    }
+    // async function createGamePerson(gameValues: GameCreateFormInputValues) {
+    //     console.debug("Game created", gameValues);
+    //     const gamePerson = await client.models.GamePerson.create({
+    //         gameId: game.id,
+    //         personId: user?.signInDetails?.loginId ?? '',
+    //         role: "CREATOR",
+    //         acceptedInvitation: true,
+    //     }, { authMode: 'userPool' });
+    //     if (!gamePerson.data) {
+    //         client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
+    //         throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
+    //     }
+    //     console.debug("GamePerson created", gamePerson.data);
+    // }
 
     useEffect(() => {
-        // TODO only one creator per game, saved in Game.creatorId.
-        // TODO client.models.Game.onCreate => client.models.GamePerson.create ["CREATOR"]
-    }, []);
+        if (!user) return;
+        const subscription = client.models.Game.observeQuery({
+            filter: {
+                creatorId: { eq: user?.signInDetails?.loginId }
+            }
+        }).subscribe({
+            next: async ({ items: games }) => {
+                await Promise.all([
+                    games.forEach(async game => {
+                        const { data: GamesPerson } = await client.models.GamePerson.listGamePersonByPersonId({
+                            personId: user?.signInDetails?.loginId ?? ''
+                        })
+                        let found = false;
+                        GamesPerson.forEach(gp => {
+                            if (gp.role === "CREATOR") {
+                                found = true;
+                            }
+                        })
+                        if (!found) {
+                            await client.models.GamePerson.create({
+                                gameId: game.id,
+                                personId: user?.signInDetails?.loginId ?? '',
+                                role: "CREATOR",
+                                acceptedInvitation: true,
+                            }, { authMode: 'userPool' });
+                        }
+                    })
+                ]);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [user]);
 
     useEffect(() => {
         setIsCreatingGame(showCreateForm);
@@ -49,17 +79,15 @@ function GamesList({
                     <button onClick={() => setShowCreateForm(false)}>Annulla</button>
                     <GameCreateForm
                         overrides={{
+                            creatorId: { display: 'none', value: user?.signInDetails?.loginId },
                             name: { label: "Nome", placeholder: "Cenone di natale" },
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
                             joinQrCode: { display: 'none', isRequired: false },
-                            phase: { display: 'none', isRequired: false },
+                            phase: { display: 'none', isRequired: false, value: "REGISTRATION_OPEN" },
                         }}
-                        onSuccess={(fields) => {
-                            createGamePerson(fields)
-                                .then(() => { setShowCreateForm(false); })
-                                .catch(alert);
-                        }}
+                        onError={console.error}
+                        onSuccess={console.debug}
                     />
                 </>
             }

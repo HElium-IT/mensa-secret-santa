@@ -52,6 +52,7 @@ const schema = a.schema({
 
   Game: a
     .model({
+      creatorId: a.id().required(),
       name: a.string().required(),
       description: a.string().required(),
       secret: a.string().required(),
