@@ -4,18 +4,6 @@ import type { AuthUser } from "aws-amplify/auth";
 
 const client = generateClient<Schema>();
 
-export async function getPersonGames(gamePeople: Schema["GamePerson"]["type"][], personId: string) {
-    const games = await Promise.all(gamePeople.map(async gp => {
-        if (gp.personId !== personId) return null;
-        const { data: game } = await gp.game();
-        return game;
-    }));
-    return games.filter(game => game !== null);
-}
-
-
-
-
 export function gamePhaseToIcon(phase: Schema["Game"]["type"]["phase"]): string {
     const gamePhaseIcons = {
         "REGISTRATION_OPEN": "🔵|✔️",

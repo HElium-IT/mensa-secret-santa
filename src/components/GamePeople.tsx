@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
-import { gamePersonRoleToIcon, getUserPerson } from '../utils';
+import { gamePersonRoleToIcon } from '../utils';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 
@@ -12,7 +12,6 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     readonly userRole: Schema["GamePerson"]["type"]["role"],
 }) {
     const { user } = useAuthenticator();
-    const [person, setPerson] = useState<Schema["Person"]["type"]>();
     const [hasGift, setHasGift] = useState<Record<string, boolean>>({});
 
     const filteredGamePeople = gamePeople.filter(gamePerson => gamePerson.role === filterRole).sort(
@@ -20,7 +19,6 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     )
 
     useEffect(() => {
-        getUserPerson(user).then(setPerson);
         gamePeople.forEach(async gamePerson => {
             const { data: gift } = await gamePerson.ownedGift();
             setHasGift(prevHasGift => ({ ...prevHasGift, [gamePerson.id]: !!gift }));
@@ -44,8 +42,8 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
             <ul>
                 {filteredGamePeople.map(gamePerson => (
                     <li key={gamePerson.id}>
-                        {person?.isAdmin && !gamePerson.acceptedInvitation ? '📧' : '📧'}
-                        {hasGift[gamePerson.id] ? '🎁' : ''}
+                        {(userRole === "CREATOR" || userRole === "ADMIN") && !gamePerson.acceptedInvitation && '📧'}
+                        {hasGift[gamePerson.id] && '🎁'}
                         {gamePerson.personId}
                         {
                             gamePerson.role === 'PLAYER' &&
