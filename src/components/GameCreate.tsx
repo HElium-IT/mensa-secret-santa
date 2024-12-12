@@ -40,7 +40,7 @@ function GamesList({
                                 personId: user?.signInDetails?.loginId ?? '',
                                 role: "CREATOR",
                                 acceptedInvitation: true,
-                            });
+                            }, { authMode: 'userPool' });
                         }
                     })
                 ]);

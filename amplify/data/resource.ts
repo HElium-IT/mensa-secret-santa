@@ -1,4 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { type AllowModifier } from "@aws-amplify/data-schema/internals";
+
+const crud = (allow: Omit<AllowModifier, "resource">) => [allow.authenticated().to(["create", "read", "update", "delete"])]
 
 const schema = a.schema({
   Gift: a
@@ -10,13 +13,14 @@ const schema = a.schema({
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
 
-      ownedGamePersonId: a.id(),
+      ownedGamePersonId: a.id().required(),
       ownedGamePerson: a.belongsTo("GamePerson", "ownedGamePersonId"),
 
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .identifier(["ownedGamePersonId"])
+    .authorization(crud)
     .secondaryIndexes((index) => [
       index("ownedGamePersonId").name("byOwnedGamePerson"),
       index("winnerGamePersonId").name("byWinnerGamePerson"),
@@ -35,7 +39,7 @@ const schema = a.schema({
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization(crud)
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
       index("personId").name("byPerson"),
@@ -47,7 +51,7 @@ const schema = a.schema({
       games: a.hasMany("GamePerson", "personId"),
       isAdmin: a.boolean().default(false),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization(crud)
     .identifier(["ownerLoginId"]),
 
   Game: a
@@ -60,7 +64,7 @@ const schema = a.schema({
       joinQrCode: a.string(),
       phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
     })
-    .authorization((allow) => [allow.authenticated()])
+    .authorization(crud)
 });
 
 export type Schema = ClientSchema<typeof schema>;

@@ -31,7 +31,7 @@ function App() {
 					client.models.Person.create({
 						ownerLoginId: user.signInDetails?.loginId as string,
 						isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
-					});
+					}, { authMode: 'userPool' });
 					return;
 				}
 				if (items.length > 1)
@@ -46,7 +46,7 @@ function App() {
 					client.models.Person.update({
 						ownerLoginId: user.signInDetails?.loginId as string,
 						isAdmin: true,
-					})
+					}, { authMode: 'userPool' })
 				}
 			}
 		});
