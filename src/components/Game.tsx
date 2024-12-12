@@ -85,19 +85,19 @@ function Game({ game, compact = false, onDelete }: {
         client.models.GamePerson.update({
             id: gamePerson.id,
             acceptedInvitation: true
-        }, { authMode: 'identityPool' })
+        }, { authMode: 'userPool' })
     }
 
     async function deleteGame() {
         if (!gamePerson) return
-        const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id }, { authMode: 'identityPool' });
+        const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id }, { authMode: 'userPool' });
         if (gamePeople) {
             await Promise.all(gamePeople.map(async gp => {
-                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id }, { authMode: 'identityPool' });
+                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id }, { authMode: 'userPool' });
                 console.log(resultGamePerson.errors ?? resultGamePerson.data);
             }));
         }
-        const resultGame = await client.models.Game.delete({ id: game.id }, { authMode: 'identityPool' });
+        const resultGame = await client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
         console.log(resultGame.errors ?? resultGame.data);
         if (onDelete) {
             onDelete();
