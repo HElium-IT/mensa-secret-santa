@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import type { GameCreateFormInputValues } from "../ui-components/GameCreateForm";
 import GameCreateForm from "../ui-components/GameCreateForm";
-import Game from './Game';
 
 
 const client = generateClient<Schema>();
