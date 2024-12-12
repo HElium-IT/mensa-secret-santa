@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sandbox": "npx ampx sandbox",
+    "aws-login": "aws sso login --no-browser",
+    "gen-forms": "npx ampx generate forms --out-dir ./src/ui-components"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.5.5",
