@@ -15,7 +15,7 @@ function InviteGamePerson({ gameId, userRole }: {
     async function invite() {
         const emails = inviteEmails.split(";").map(email => email.trim());
         await Promise.all(emails.map(async email => {
-            const { data: people } = await client.models.Person.list({ filter: { ownerLoginId: { eq: email } }, authMode: 'userPool' });
+            const { data: people } = await client.models.Person.list({ filter: { ownerLoginId: { eq: email } } });
             if (people.length === 0) {
                 alert(`Person with email ${email} not found`);
                 return;
@@ -25,7 +25,7 @@ function InviteGamePerson({ gameId, userRole }: {
                 personId: people[0].ownerLoginId,
                 role,
                 acceptedInvitation: false,
-            }, { authMode: 'userPool' });
+            });
         }));
         setInviteEmails("");
     }

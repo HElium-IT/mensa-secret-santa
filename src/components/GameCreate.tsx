@@ -15,21 +15,6 @@ function GamesList({
     const { user } = useAuthenticator();
     const [showCreateForm, setShowCreateForm] = useState(false);
 
-    // async function createGamePerson(gameValues: GameCreateFormInputValues) {
-    //     console.debug("Game created", gameValues);
-    //     const gamePerson = await client.models.GamePerson.create({
-    //         gameId: game.id,
-    //         personId: user?.signInDetails?.loginId ?? '',
-    //         role: "CREATOR",
-    //         acceptedInvitation: true,
-    //     }, { authMode: 'userPool' });
-    //     if (!gamePerson.data) {
-    //         client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
-    //         throw new Error(gamePerson.errors?.join(", ") ?? "Failed to create game person");
-    //     }
-    //     console.debug("GamePerson created", gamePerson.data);
-    // }
-
     useEffect(() => {
         if (!user) return;
         const subscription = client.models.Game.observeQuery({
@@ -55,7 +40,7 @@ function GamesList({
                                 personId: user?.signInDetails?.loginId ?? '',
                                 role: "CREATOR",
                                 acceptedInvitation: true,
-                            }, { authMode: 'userPool' });
+                            });
                         }
                     })
                 ]);
