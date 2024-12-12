@@ -6,6 +6,7 @@ export const onCreateGame = /* GraphQL */ `
   subscription OnCreateGame($filter: ModelSubscriptionGameFilterInput) {
     onCreateGame(filter: $filter) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -30,6 +31,7 @@ export const onCreateGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode
@@ -137,6 +139,7 @@ export const onDeleteGame = /* GraphQL */ `
   subscription OnDeleteGame($filter: ModelSubscriptionGameFilterInput) {
     onDeleteGame(filter: $filter) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -161,6 +164,7 @@ export const onDeleteGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode
@@ -268,6 +272,7 @@ export const onUpdateGame = /* GraphQL */ `
   subscription OnUpdateGame($filter: ModelSubscriptionGameFilterInput) {
     onUpdateGame(filter: $filter) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -292,6 +297,7 @@ export const onUpdateGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode

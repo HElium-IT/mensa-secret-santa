@@ -9,6 +9,7 @@ export const createGame = /* GraphQL */ `
   ) {
     createGame(condition: $condition, input: $input) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -34,6 +35,7 @@ export const createGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode
@@ -150,6 +152,7 @@ export const deleteGame = /* GraphQL */ `
   ) {
     deleteGame(condition: $condition, input: $input) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -175,6 +178,7 @@ export const deleteGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode
@@ -291,6 +295,7 @@ export const updateGame = /* GraphQL */ `
   ) {
     updateGame(condition: $condition, input: $input) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -316,6 +321,7 @@ export const updateGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode

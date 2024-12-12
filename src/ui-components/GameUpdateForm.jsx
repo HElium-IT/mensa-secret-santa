@@ -26,12 +26,14 @@ export default function GameUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
+    creatorId: "",
     name: "",
     description: "",
     secret: "",
     joinQrCode: "",
     phase: "",
   };
+  const [creatorId, setCreatorId] = React.useState(initialValues.creatorId);
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description
@@ -44,6 +46,7 @@ export default function GameUpdateForm(props) {
     const cleanValues = gameRecord
       ? { ...initialValues, ...gameRecord }
       : initialValues;
+    setCreatorId(cleanValues.creatorId);
     setName(cleanValues.name);
     setDescription(cleanValues.description);
     setSecret(cleanValues.secret);
@@ -68,6 +71,7 @@ export default function GameUpdateForm(props) {
   }, [idProp, gameModelProp]);
   React.useEffect(resetStateValues, [gameRecord]);
   const validations = {
+    creatorId: [{ type: "Required" }],
     name: [{ type: "Required" }],
     description: [{ type: "Required" }],
     secret: [{ type: "Required" }],
@@ -100,6 +104,7 @@ export default function GameUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
+          creatorId,
           name,
           description,
           secret,
@@ -157,6 +162,35 @@ export default function GameUpdateForm(props) {
       {...rest}
     >
       <TextField
+        label="Creator id"
+        isRequired={true}
+        isReadOnly={false}
+        value={creatorId}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              creatorId: value,
+              name,
+              description,
+              secret,
+              joinQrCode,
+              phase,
+            };
+            const result = onChange(modelFields);
+            value = result?.creatorId ?? value;
+          }
+          if (errors.creatorId?.hasError) {
+            runValidationTasks("creatorId", value);
+          }
+          setCreatorId(value);
+        }}
+        onBlur={() => runValidationTasks("creatorId", creatorId)}
+        errorMessage={errors.creatorId?.errorMessage}
+        hasError={errors.creatorId?.hasError}
+        {...getOverrideProps(overrides, "creatorId")}
+      ></TextField>
+      <TextField
         label="Name"
         isRequired={true}
         isReadOnly={false}
@@ -165,6 +199,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              creatorId,
               name: value,
               description,
               secret,
@@ -193,6 +228,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              creatorId,
               name,
               description: value,
               secret,
@@ -221,6 +257,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              creatorId,
               name,
               description,
               secret: value,
@@ -249,6 +286,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              creatorId,
               name,
               description,
               secret,
@@ -277,6 +315,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              creatorId,
               name,
               description,
               secret,

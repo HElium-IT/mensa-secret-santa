@@ -6,6 +6,7 @@ export const getGame = /* GraphQL */ `
   query GetGame($id: ID!) {
     getGame(id: $id) {
       createdAt
+      creatorId
       description
       id
       joinQrCode
@@ -28,6 +29,7 @@ export const getGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
+        creatorId
         description
         id
         joinQrCode
@@ -222,6 +224,7 @@ export const listGames = /* GraphQL */ `
     listGames(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         createdAt
+        creatorId
         description
         id
         joinQrCode
