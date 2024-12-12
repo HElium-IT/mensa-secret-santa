@@ -6,20 +6,19 @@ const crud = (allow: Omit<AllowModifier, "resource">) => [allow.authenticated().
 const schema = a.schema({
   Gift: a
     .model({
-      name: a.string().required(),
-      number: a.integer(),
+      ownedGamePersonId: a.id().required(),
+      ownedGamePerson: a.belongsTo("GamePerson", "ownedGamePersonId"),
 
+      name: a.string().required(),
       attribute_1: a.string().required(),
       attribute_2: a.string().required(),
       attribute_3: a.string().required(),
 
-      ownedGamePersonId: a.id().required(),
-      ownedGamePerson: a.belongsTo("GamePerson", "ownedGamePersonId"),
+      number: a.integer(),
 
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
-    .identifier(["ownedGamePersonId"])
     .authorization(crud)
     .secondaryIndexes((index) => [
       index("ownedGamePersonId").name("byOwnedGamePerson"),
@@ -48,8 +47,8 @@ const schema = a.schema({
   Person: a
     .model({
       ownerLoginId: a.id().required(),
-      games: a.hasMany("GamePerson", "personId"),
       isAdmin: a.boolean().default(false),
+      games: a.hasMany("GamePerson", "personId"),
     })
     .authorization(crud)
     .identifier(["ownerLoginId"]),
@@ -60,9 +59,9 @@ const schema = a.schema({
       name: a.string().required(),
       description: a.string().required(),
       secret: a.string().required(),
-      people: a.hasMany("GamePerson", "gameId"),
       joinQrCode: a.string(),
       phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
+      people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(crud)
 });
