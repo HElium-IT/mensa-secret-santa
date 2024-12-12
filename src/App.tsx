@@ -32,17 +32,21 @@ function App() {
 						ownerLoginId: user.signInDetails?.loginId as string,
 						isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
 					});
-				} else if (items.length > 1) {
+					return;
+				}
+				if (items.length > 1)
 					throw new Error("More than one person with the same ownerLoginId");
-				} else {
-					console.debug("Person", items[0]);
-					setPerson(items[0]);
-					if (DEBUG && !items[0].isAdmin) {
-						client.models.Person.update({
-							...items[0],
-							isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
-						})
-					}
+
+				console.debug("Person", items[0]);
+				setPerson(items[0]);
+				if ((
+					user.signInDetails?.loginId === "elio.palomba.dev@gmail.com"
+					|| user.signInDetails?.loginId === "elio.palomba99@gmail.com"
+				) && (!items[0].isAdmin)) {
+					client.models.Person.update({
+						ownerLoginId: user.signInDetails?.loginId as string,
+						isAdmin: true,
+					})
 				}
 			}
 		});

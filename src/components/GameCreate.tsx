@@ -71,6 +71,10 @@ function GamesList({
                         }}
                         onError={console.error}
                         onSuccess={console.debug}
+                        onSubmit={(game) => {
+                            console.debug("Game", game);
+                            return game
+                        }}
                     />
                 </>
             }
