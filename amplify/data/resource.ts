@@ -21,7 +21,6 @@ const schema = a.schema({
       index("winnerGamePersonId").name("byWinnerGamePerson"),
     ])
     .authorization(allow => [
-      allow.publicApiKey(),
       allow.authenticated(),
       allow.ownerDefinedIn("ownedGamePersonId"),
     ]),
@@ -45,7 +44,6 @@ const schema = a.schema({
       index("personId").name("byPerson"),
     ])
     .authorization(allow => [
-      allow.publicApiKey(),
       allow.authenticated(),
       allow.ownerDefinedIn("personId"),
     ]),
@@ -58,14 +56,13 @@ const schema = a.schema({
     })
     .identifier(["ownerLoginId"])
     .authorization(allow => [
-      allow.publicApiKey(),
       allow.authenticated(),
       allow.ownerDefinedIn("ownerLoginId"),
     ]),
 
   Game: a
     .model({
-      creatorId: a.id(),
+      creatorId: a.id().required(),
       name: a.string().required(),
       description: a.string().required(),
       secret: a.string().required(),
@@ -74,7 +71,6 @@ const schema = a.schema({
       people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(allow => [
-      allow.publicApiKey(),
       allow.authenticated(),
       allow.ownerDefinedIn("creatorId"),
     ]),

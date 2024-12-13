@@ -110,7 +110,7 @@ function Game({ game, compact = false, onDelete }: {
                 console.log(resultGamePerson.errors ?? resultGamePerson.data);
             }));
         }
-        const resultGame = await client.models.Game.delete({ id: game.id }, { authMode: 'userPool' });
+        const resultGame = await client.models.Game.delete({ id: game.id });
         console.log(resultGame.errors ?? resultGame.data);
         if (onDelete) {
             onDelete();

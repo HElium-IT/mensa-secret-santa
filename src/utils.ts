@@ -50,7 +50,7 @@ export function gamePersonRoleToIcon(role: Schema["GamePerson"]["type"]["role"])
 
 export async function getUserPerson(user: AuthUser): Promise<Schema["Person"]["type"] | undefined> {
     if (!user.signInDetails?.loginId) return undefined;
-    const { data: person } = await client.models.Person.get({ ownerLoginId: user.signInDetails.loginId }, { authMode: 'userPool' });
+    const { data: person } = await client.models.Person.get({ ownerLoginId: user.signInDetails.loginId });
     return person ?? undefined;
 }
 

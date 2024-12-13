@@ -7,29 +7,31 @@ import GameCreateForm from "../ui-components/GameCreateForm";
 
 const client = generateClient<Schema>();
 
-function GamesList({
+function GameCreate({
     setIsCreatingGame,
+    setGame,
 }: {
     readonly setIsCreatingGame: (isCreatingGame: boolean) => void;
+    readonly setGame: (createdGame: Schema["Game"]["type"] | undefined
+    ) => void;
 }) {
     const { user } = useAuthenticator();
     const [showCreateForm, setShowCreateForm] = useState(false);
 
     useEffect(() => {
-        if (!user) return;
-        const subscription = client.models.Game.onCreate({
-            filter: {
-                creatorId: { eq: user.signInDetails?.loginId },
-            }
-        }).subscribe({
+        if (!user.signInDetails?.loginId) return;
+        const subscription = client.models.Game.onCreate().subscribe({
             next: async (data) => {
+                if (data.creatorId !== user.signInDetails?.loginId) return;
                 console.debug("Game created", data);
-                await client.models.GamePerson.create({
+                const gamePerson = await client.models.GamePerson.create({
                     gameId: data.id,
                     personId: user.signInDetails?.loginId ?? '',
                     role: "CREATOR",
                     acceptedInvitation: true,
                 });
+                console.debug("GamePerson created", gamePerson);
+                setGame(data);
             }
         });
 
@@ -48,18 +50,19 @@ function GamesList({
                     <button onClick={() => setShowCreateForm(false)}>Annulla</button>
                     <GameCreateForm
                         overrides={{
-                            creatorId: { display: 'none', isRequired: false, value: user?.signInDetails?.loginId },
+                            creatorId: { display: 'none', value: user?.signInDetails?.loginId, defaultValue: user?.signInDetails?.loginId },
+                            phase: { display: 'none', value: "REGISTRATION_OPEN", defaultValue: "REGISTRATION_OPEN" },
+
                             name: { label: "Nome", placeholder: "Cenone di natale" },
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
+
                             joinQrCode: { display: 'none', isRequired: false },
-                            phase: { display: 'none', isRequired: false, value: "REGISTRATION_OPEN" },
                         }}
                         onError={console.error}
-                        onSuccess={console.debug}
                         onSubmit={(game) => {
-                            console.debug("Game", game);
-                            return game
+                            console.debug("Game created", game);
+                            return game;
                         }}
                     />
                 </>
@@ -69,4 +72,4 @@ function GamesList({
     );
 }
 
-export default GamesList;
+export default GameCreate;

@@ -86,7 +86,7 @@ function App() {
 					</button>
 				}
 			</div>
-			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} />}
+			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} setGame={selectGame} />}
 			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} />}
 			{!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} />}
 		</main>
