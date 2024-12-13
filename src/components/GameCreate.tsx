@@ -17,6 +17,8 @@ function GameCreate({
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [ownerId,] = useState(user.signInDetails?.loginId);
+    const [phase,] = useState("REGISTRATION_OPEN");
 
     useEffect(() => {
         if (!user.signInDetails?.loginId) return;
@@ -55,18 +57,19 @@ function GameCreate({
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
-                            joinQrCode: { display: 'none', isRequired: false },
-                            ownerId: { display: 'none', isRequired: false, defaultValue: user.signInDetails?.loginId },
-                            phase: { display: 'none', isRequired: false, defaultValue: "REGISTRATION_OPEN" },
+                            joinQrCode: { display: 'none' },
+                            ownerId: { display: 'none', value: ownerId, readOnly: true },
+                            phase: { display: 'none', value: phase, },
+
                         }}
                         onError={(error) => { console.error("Game creation error", error); }}
                         onSuccess={(game) => { console.debug("Game created", game); }}
-                        onSubmit={(game) => {
-                            game.ownerId = user.signInDetails?.loginId ?? '';
-                            game.phase = "REGISTRATION_OPEN";
-                            console.debug("Game to create", game);
-                            return game;
-                        }}
+                    // onSubmit={(game) => {
+                    //     game.ownerId = user.signInDetails?.loginId ?? '';
+                    //     game.phase = "REGISTRATION_OPEN";
+                    //     console.debug("Game to create", game);
+                    //     return game;
+                    // }}
                     />
                 </>
             }
