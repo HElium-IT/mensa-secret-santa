@@ -3,17 +3,13 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateGame = /* GraphQL */ `
-  subscription OnCreateGame(
-    $filter: ModelSubscriptionGameFilterInput
-    $owner: String
-  ) {
-    onCreateGame(filter: $filter, owner: $owner) {
+  subscription OnCreateGame($filter: ModelSubscriptionGameFilterInput) {
+    onCreateGame(filter: $filter) {
       createdAt
       description
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -29,9 +25,8 @@ export const onCreateGame = /* GraphQL */ `
 export const onCreateGamePerson = /* GraphQL */ `
   subscription OnCreateGamePerson(
     $filter: ModelSubscriptionGamePersonFilterInput
-    $owner: String
   ) {
-    onCreateGamePerson(filter: $filter, owner: $owner) {
+    onCreateGamePerson(filter: $filter) {
       acceptedInvitation
       createdAt
       game {
@@ -40,7 +35,6 @@ export const onCreateGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -49,7 +43,6 @@ export const onCreateGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -66,11 +59,8 @@ export const onCreateGamePerson = /* GraphQL */ `
   }
 `;
 export const onCreateGift = /* GraphQL */ `
-  subscription OnCreateGift(
-    $filter: ModelSubscriptionGiftFilterInput
-    $owner: String
-  ) {
-    onCreateGift(filter: $filter, owner: $owner) {
+  subscription OnCreateGift($filter: ModelSubscriptionGiftFilterInput) {
+    onCreateGift(filter: $filter) {
       attribute_1
       attribute_2
       attribute_3
@@ -78,7 +68,6 @@ export const onCreateGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
@@ -106,17 +95,13 @@ export const onCreatePerson = /* GraphQL */ `
   }
 `;
 export const onDeleteGame = /* GraphQL */ `
-  subscription OnDeleteGame(
-    $filter: ModelSubscriptionGameFilterInput
-    $owner: String
-  ) {
-    onDeleteGame(filter: $filter, owner: $owner) {
+  subscription OnDeleteGame($filter: ModelSubscriptionGameFilterInput) {
+    onDeleteGame(filter: $filter) {
       createdAt
       description
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -132,9 +117,8 @@ export const onDeleteGame = /* GraphQL */ `
 export const onDeleteGamePerson = /* GraphQL */ `
   subscription OnDeleteGamePerson(
     $filter: ModelSubscriptionGamePersonFilterInput
-    $owner: String
   ) {
-    onDeleteGamePerson(filter: $filter, owner: $owner) {
+    onDeleteGamePerson(filter: $filter) {
       acceptedInvitation
       createdAt
       game {
@@ -143,7 +127,6 @@ export const onDeleteGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -152,7 +135,6 @@ export const onDeleteGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -169,11 +151,8 @@ export const onDeleteGamePerson = /* GraphQL */ `
   }
 `;
 export const onDeleteGift = /* GraphQL */ `
-  subscription OnDeleteGift(
-    $filter: ModelSubscriptionGiftFilterInput
-    $owner: String
-  ) {
-    onDeleteGift(filter: $filter, owner: $owner) {
+  subscription OnDeleteGift($filter: ModelSubscriptionGiftFilterInput) {
+    onDeleteGift(filter: $filter) {
       attribute_1
       attribute_2
       attribute_3
@@ -181,7 +160,6 @@ export const onDeleteGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
@@ -209,17 +187,13 @@ export const onDeletePerson = /* GraphQL */ `
   }
 `;
 export const onUpdateGame = /* GraphQL */ `
-  subscription OnUpdateGame(
-    $filter: ModelSubscriptionGameFilterInput
-    $owner: String
-  ) {
-    onUpdateGame(filter: $filter, owner: $owner) {
+  subscription OnUpdateGame($filter: ModelSubscriptionGameFilterInput) {
+    onUpdateGame(filter: $filter) {
       createdAt
       description
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -235,9 +209,8 @@ export const onUpdateGame = /* GraphQL */ `
 export const onUpdateGamePerson = /* GraphQL */ `
   subscription OnUpdateGamePerson(
     $filter: ModelSubscriptionGamePersonFilterInput
-    $owner: String
   ) {
-    onUpdateGamePerson(filter: $filter, owner: $owner) {
+    onUpdateGamePerson(filter: $filter) {
       acceptedInvitation
       createdAt
       game {
@@ -246,7 +219,6 @@ export const onUpdateGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -255,7 +227,6 @@ export const onUpdateGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -272,11 +243,8 @@ export const onUpdateGamePerson = /* GraphQL */ `
   }
 `;
 export const onUpdateGift = /* GraphQL */ `
-  subscription OnUpdateGift(
-    $filter: ModelSubscriptionGiftFilterInput
-    $owner: String
-  ) {
-    onUpdateGift(filter: $filter, owner: $owner) {
+  subscription OnUpdateGift($filter: ModelSubscriptionGiftFilterInput) {
+    onUpdateGift(filter: $filter) {
       attribute_1
       attribute_2
       attribute_3
@@ -284,7 +252,6 @@ export const onUpdateGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId

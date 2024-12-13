@@ -10,7 +10,6 @@ export const getGame = /* GraphQL */ `
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -34,7 +33,6 @@ export const getGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -43,7 +41,6 @@ export const getGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -69,7 +66,6 @@ export const getGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
@@ -105,7 +101,6 @@ export const listGamePeople = /* GraphQL */ `
         createdAt
         gameId
         id
-        owner
         personId
         role
         updatedAt
@@ -136,7 +131,6 @@ export const listGamePersonByGameId = /* GraphQL */ `
         createdAt
         gameId
         id
-        owner
         personId
         role
         updatedAt
@@ -167,7 +161,6 @@ export const listGamePersonByPersonId = /* GraphQL */ `
         createdAt
         gameId
         id
-        owner
         personId
         role
         updatedAt
@@ -191,7 +184,6 @@ export const listGames = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -218,7 +210,6 @@ export const listGifts = /* GraphQL */ `
         id
         name
         number
-        owner
         ownerGamePersonId
         updatedAt
         winnerGamePersonId

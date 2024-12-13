@@ -13,7 +13,6 @@ export const createGame = /* GraphQL */ `
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -40,7 +39,6 @@ export const createGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -49,7 +47,6 @@ export const createGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -78,7 +75,6 @@ export const createGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
@@ -116,7 +112,6 @@ export const deleteGame = /* GraphQL */ `
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -143,7 +138,6 @@ export const deleteGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -152,7 +146,6 @@ export const deleteGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -181,7 +174,6 @@ export const deleteGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
@@ -219,7 +211,6 @@ export const updateGame = /* GraphQL */ `
       id
       joinQrCode
       name
-      owner
       ownerId
       people {
         nextToken
@@ -246,7 +237,6 @@ export const updateGamePerson = /* GraphQL */ `
         id
         joinQrCode
         name
-        owner
         ownerId
         phase
         secret
@@ -255,7 +245,6 @@ export const updateGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      owner
       person {
         createdAt
         isAdmin
@@ -284,7 +273,6 @@ export const updateGift = /* GraphQL */ `
       id
       name
       number
-      owner
       ownerGamePersonId
       updatedAt
       winnerGamePersonId
