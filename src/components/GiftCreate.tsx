@@ -18,7 +18,11 @@ function GiftCreate({ gamePerson }: {
                     number: { display: 'none' },
                     winnerGamePersonId: { display: 'none' },
                 }}
-                onChange={(data) => { console.debug("Gift changed", data); return data; }}
+                onChange={(data) => {
+                    console.debug("Gift changed", data);
+                    data.ownerGamePersonId = gamePerson.id;
+                    return data;
+                }}
                 onSubmit={(data) => { console.debug("Gift to create", data); return data; }}
                 onError={(error) => { console.error("Gift creation error", error); }}
                 onSuccess={(data) => { console.debug("Gift created", data); }}

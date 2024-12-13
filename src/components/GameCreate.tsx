@@ -60,7 +60,12 @@ function GameCreate({
                             phase: { display: 'none', defaultValue: "REGISTRATION_OPEN" as NonNullable<Schema["Game"]["type"]["phase"]> },
 
                         }}
-                        onChange={(data) => { console.debug("Game changed", data); return data; }}
+                        onChange={(data) => {
+                            console.debug("Game changed", data);
+                            data.ownerId = user.signInDetails?.loginId ?? 'UNKNOWN';
+                            data.phase = "REGISTRATION_OPEN";
+                            return data;
+                        }}
                         onSubmit={(data) => { console.debug("Game to create", data); return data; }}
                         onError={(error) => { console.error("Game creation error", error); }}
                         onSuccess={(data) => { console.debug("Game created", data); }}
