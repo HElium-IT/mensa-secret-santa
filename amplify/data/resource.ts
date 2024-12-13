@@ -1,5 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
+//  'read' to limit access only to 'get,list,listen,search,sync' operations
+
 const schema = a.schema({
   Gift: a
     .model({
@@ -15,9 +17,8 @@ const schema = a.schema({
 
     })
     .authorization(allow => [
-      allow.authenticated().to([
-        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
-      ])
+      allow.authenticated().to(["read"]),
+      allow.owner()
     ]),
 
   GamePerson: a
@@ -36,9 +37,8 @@ const schema = a.schema({
       index("personId").name("byPerson"),
     ])
     .authorization(allow => [
-      allow.authenticated().to([
-        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
-      ]),
+      allow.authenticated().to(["read"]),
+      allow.owner()
     ]),
 
   Person: a
@@ -49,9 +49,8 @@ const schema = a.schema({
     })
     .identifier(["ownerId"])
     .authorization(allow => [
-      allow.authenticated().to([
-        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
-      ]),
+      allow.authenticated().to(["read"]),
+      allow.owner()
     ]),
 
   Game: a
@@ -65,9 +64,8 @@ const schema = a.schema({
       people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(allow => [
-      allow.authenticated().to([
-        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
-      ]),
+      allow.authenticated().to(["read"]),
+      allow.owner()
     ]),
 
 })
