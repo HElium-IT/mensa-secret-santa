@@ -35,7 +35,7 @@ function GameSelector({
                     { phase: { eq: "LOBBY" } }
                 ]
             }
-        })).data.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        })).data.filter(game => game && game.name.toLowerCase().includes(searchTerm.toLowerCase()));
         setGames(gamesData.length > 0 ? gamesData : []);
     }
 
