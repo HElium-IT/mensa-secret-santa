@@ -9,11 +9,11 @@ export const createGame = /* GraphQL */ `
   ) {
     createGame(condition: $condition, input: $input) {
       createdAt
-      creatorId
       description
       id
       joinQrCode
       name
+      ownerId
       people {
         nextToken
         __typename
@@ -35,11 +35,11 @@ export const createGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
-        creatorId
         description
         id
         joinQrCode
         name
+        ownerId
         phase
         secret
         updatedAt
@@ -52,9 +52,10 @@ export const createGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -62,7 +63,7 @@ export const createGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        ownerLoginId
+        ownerId
         updatedAt
         __typename
       }
@@ -74,9 +75,10 @@ export const createGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -95,9 +97,10 @@ export const createGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      id
       name
       number
-      ownedGamePerson {
+      ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -107,7 +110,7 @@ export const createGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      ownedGamePersonId
+      ownerGamePersonId
       updatedAt
       winnerGamePerson {
         acceptedInvitation
@@ -136,7 +139,7 @@ export const createPerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      ownerLoginId
+      ownerId
       updatedAt
       __typename
     }
@@ -149,11 +152,11 @@ export const deleteGame = /* GraphQL */ `
   ) {
     deleteGame(condition: $condition, input: $input) {
       createdAt
-      creatorId
       description
       id
       joinQrCode
       name
+      ownerId
       people {
         nextToken
         __typename
@@ -175,11 +178,11 @@ export const deleteGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
-        creatorId
         description
         id
         joinQrCode
         name
+        ownerId
         phase
         secret
         updatedAt
@@ -192,9 +195,10 @@ export const deleteGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -202,7 +206,7 @@ export const deleteGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        ownerLoginId
+        ownerId
         updatedAt
         __typename
       }
@@ -214,9 +218,10 @@ export const deleteGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -235,9 +240,10 @@ export const deleteGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      id
       name
       number
-      ownedGamePerson {
+      ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -247,7 +253,7 @@ export const deleteGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      ownedGamePersonId
+      ownerGamePersonId
       updatedAt
       winnerGamePerson {
         acceptedInvitation
@@ -276,7 +282,7 @@ export const deletePerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      ownerLoginId
+      ownerId
       updatedAt
       __typename
     }
@@ -289,11 +295,11 @@ export const updateGame = /* GraphQL */ `
   ) {
     updateGame(condition: $condition, input: $input) {
       createdAt
-      creatorId
       description
       id
       joinQrCode
       name
+      ownerId
       people {
         nextToken
         __typename
@@ -315,11 +321,11 @@ export const updateGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
-        creatorId
         description
         id
         joinQrCode
         name
+        ownerId
         phase
         secret
         updatedAt
@@ -332,9 +338,10 @@ export const updateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -342,7 +349,7 @@ export const updateGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        ownerLoginId
+        ownerId
         updatedAt
         __typename
       }
@@ -354,9 +361,10 @@ export const updateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -375,9 +383,10 @@ export const updateGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      id
       name
       number
-      ownedGamePerson {
+      ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -387,7 +396,7 @@ export const updateGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      ownedGamePersonId
+      ownerGamePersonId
       updatedAt
       winnerGamePerson {
         acceptedInvitation
@@ -416,7 +425,7 @@ export const updatePerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      ownerLoginId
+      ownerId
       updatedAt
       __typename
     }

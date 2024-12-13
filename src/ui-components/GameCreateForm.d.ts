@@ -16,7 +16,7 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type GameCreateFormInputValues = {
-    creatorId?: string;
+    ownerId?: string;
     name?: string;
     description?: string;
     secret?: string;
@@ -24,7 +24,7 @@ export declare type GameCreateFormInputValues = {
     phase?: string;
 };
 export declare type GameCreateFormValidationValues = {
-    creatorId?: ValidationFunction<string>;
+    ownerId?: ValidationFunction<string>;
     name?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
     secret?: ValidationFunction<string>;
@@ -34,7 +34,7 @@ export declare type GameCreateFormValidationValues = {
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GameCreateFormOverridesProps = {
     GameCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    creatorId?: PrimitiveOverrideProps<TextFieldProps>;
+    ownerId?: PrimitiveOverrideProps<TextFieldProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
     secret?: PrimitiveOverrideProps<TextFieldProps>;

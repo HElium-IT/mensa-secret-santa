@@ -26,14 +26,14 @@ export default function GameUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    creatorId: "",
+    ownerId: "",
     name: "",
     description: "",
     secret: "",
     joinQrCode: "",
     phase: "",
   };
-  const [creatorId, setCreatorId] = React.useState(initialValues.creatorId);
+  const [ownerId, setOwnerId] = React.useState(initialValues.ownerId);
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description
@@ -46,7 +46,7 @@ export default function GameUpdateForm(props) {
     const cleanValues = gameRecord
       ? { ...initialValues, ...gameRecord }
       : initialValues;
-    setCreatorId(cleanValues.creatorId);
+    setOwnerId(cleanValues.ownerId);
     setName(cleanValues.name);
     setDescription(cleanValues.description);
     setSecret(cleanValues.secret);
@@ -71,7 +71,7 @@ export default function GameUpdateForm(props) {
   }, [idProp, gameModelProp]);
   React.useEffect(resetStateValues, [gameRecord]);
   const validations = {
-    creatorId: [],
+    ownerId: [{ type: "Required" }],
     name: [{ type: "Required" }],
     description: [{ type: "Required" }],
     secret: [{ type: "Required" }],
@@ -104,7 +104,7 @@ export default function GameUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          creatorId: creatorId ?? null,
+          ownerId,
           name,
           description,
           secret,
@@ -162,15 +162,15 @@ export default function GameUpdateForm(props) {
       {...rest}
     >
       <TextField
-        label="Creator id"
-        isRequired={false}
+        label="Owner id"
+        isRequired={true}
         isReadOnly={false}
-        value={creatorId}
+        value={ownerId}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId: value,
+              ownerId: value,
               name,
               description,
               secret,
@@ -178,17 +178,17 @@ export default function GameUpdateForm(props) {
               phase,
             };
             const result = onChange(modelFields);
-            value = result?.creatorId ?? value;
+            value = result?.ownerId ?? value;
           }
-          if (errors.creatorId?.hasError) {
-            runValidationTasks("creatorId", value);
+          if (errors.ownerId?.hasError) {
+            runValidationTasks("ownerId", value);
           }
-          setCreatorId(value);
+          setOwnerId(value);
         }}
-        onBlur={() => runValidationTasks("creatorId", creatorId)}
-        errorMessage={errors.creatorId?.errorMessage}
-        hasError={errors.creatorId?.hasError}
-        {...getOverrideProps(overrides, "creatorId")}
+        onBlur={() => runValidationTasks("ownerId", ownerId)}
+        errorMessage={errors.ownerId?.errorMessage}
+        hasError={errors.ownerId?.hasError}
+        {...getOverrideProps(overrides, "ownerId")}
       ></TextField>
       <TextField
         label="Name"
@@ -199,7 +199,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId,
+              ownerId,
               name: value,
               description,
               secret,
@@ -228,7 +228,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId,
+              ownerId,
               name,
               description: value,
               secret,
@@ -257,7 +257,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId,
+              ownerId,
               name,
               description,
               secret: value,
@@ -286,7 +286,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId,
+              ownerId,
               name,
               description,
               secret,
@@ -315,7 +315,7 @@ export default function GameUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              creatorId,
+              ownerId,
               name,
               description,
               secret,

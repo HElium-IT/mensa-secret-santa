@@ -66,6 +66,7 @@ function Game({ game, compact = false, onDelete }: {
             if (!gamePeopleData) return;
             setGamePeople(gamePeopleData);
             gamePeopleData.forEach(gp => {
+                if (!gp) return;
                 if (gp.personId === user.signInDetails?.loginId) {
                     console.debug("GamePerson", gp);
                     setGamePerson(gp);
@@ -77,7 +78,7 @@ function Game({ game, compact = false, onDelete }: {
 
     useEffect(() => {
         if (!gamePerson) return;
-        const subscription = client.models.Gift.observeQuery({ filter: { ownedGamePersonId: { eq: gamePerson?.id } } }).subscribe({
+        const subscription = client.models.Gift.observeQuery({ filter: { ownerGamePersonId: { eq: gamePerson?.id } } }).subscribe({
             next: ({ items: gifts }) => {
                 if (gifts && gifts.length > 0) {
                     setGift(gifts[0]);

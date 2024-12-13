@@ -15,7 +15,7 @@ import { updatePerson } from "./graphql/mutations";
 const client = generateClient();
 export default function PersonUpdateForm(props) {
   const {
-    ownerLoginId: ownerLoginIdProp,
+    ownerId: ownerIdProp,
     person: personModelProp,
     onSuccess,
     onError,
@@ -26,40 +26,38 @@ export default function PersonUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    ownerLoginId: "",
+    ownerId: "",
     isAdmin: false,
   };
-  const [ownerLoginId, setOwnerLoginId] = React.useState(
-    initialValues.ownerLoginId
-  );
+  const [ownerId, setOwnerId] = React.useState(initialValues.ownerId);
   const [isAdmin, setIsAdmin] = React.useState(initialValues.isAdmin);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = personRecord
       ? { ...initialValues, ...personRecord }
       : initialValues;
-    setOwnerLoginId(cleanValues.ownerLoginId);
+    setOwnerId(cleanValues.ownerId);
     setIsAdmin(cleanValues.isAdmin);
     setErrors({});
   };
   const [personRecord, setPersonRecord] = React.useState(personModelProp);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = ownerLoginIdProp
+      const record = ownerIdProp
         ? (
             await client.graphql({
               query: getPerson.replaceAll("__typename", ""),
-              variables: { ownerLoginId: ownerLoginIdProp },
+              variables: { ownerId: ownerIdProp },
             })
           )?.data?.getPerson
         : personModelProp;
       setPersonRecord(record);
     };
     queryData();
-  }, [ownerLoginIdProp, personModelProp]);
+  }, [ownerIdProp, personModelProp]);
   React.useEffect(resetStateValues, [personRecord]);
   const validations = {
-    ownerLoginId: [{ type: "Required" }],
+    ownerId: [{ type: "Required" }],
     isAdmin: [],
   };
   const runValidationTasks = async (
@@ -88,7 +86,7 @@ export default function PersonUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          ownerLoginId,
+          ownerId,
           isAdmin: isAdmin ?? null,
         };
         const validationResponses = await Promise.all(
@@ -123,7 +121,7 @@ export default function PersonUpdateForm(props) {
             query: updatePerson.replaceAll("__typename", ""),
             variables: {
               input: {
-                ownerLoginId: personRecord.ownerLoginId,
+                ownerId: personRecord.ownerId,
                 ...modelFields,
               },
             },
@@ -142,29 +140,29 @@ export default function PersonUpdateForm(props) {
       {...rest}
     >
       <TextField
-        label="Owner login id"
+        label="Owner id"
         isRequired={true}
         isReadOnly={true}
-        value={ownerLoginId}
+        value={ownerId}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              ownerLoginId: value,
+              ownerId: value,
               isAdmin,
             };
             const result = onChange(modelFields);
-            value = result?.ownerLoginId ?? value;
+            value = result?.ownerId ?? value;
           }
-          if (errors.ownerLoginId?.hasError) {
-            runValidationTasks("ownerLoginId", value);
+          if (errors.ownerId?.hasError) {
+            runValidationTasks("ownerId", value);
           }
-          setOwnerLoginId(value);
+          setOwnerId(value);
         }}
-        onBlur={() => runValidationTasks("ownerLoginId", ownerLoginId)}
-        errorMessage={errors.ownerLoginId?.errorMessage}
-        hasError={errors.ownerLoginId?.hasError}
-        {...getOverrideProps(overrides, "ownerLoginId")}
+        onBlur={() => runValidationTasks("ownerId", ownerId)}
+        errorMessage={errors.ownerId?.errorMessage}
+        hasError={errors.ownerId?.hasError}
+        {...getOverrideProps(overrides, "ownerId")}
       ></TextField>
       <SwitchField
         label="Is admin"
@@ -175,7 +173,7 @@ export default function PersonUpdateForm(props) {
           let value = e.target.checked;
           if (onChange) {
             const modelFields = {
-              ownerLoginId,
+              ownerId,
               isAdmin: value,
             };
             const result = onChange(modelFields);
@@ -202,7 +200,7 @@ export default function PersonUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(ownerLoginIdProp || personModelProp)}
+          isDisabled={!(ownerIdProp || personModelProp)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -214,7 +212,7 @@ export default function PersonUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(ownerLoginIdProp || personModelProp) ||
+              !(ownerIdProp || personModelProp) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

@@ -9,7 +9,7 @@ import { updateGift } from "./graphql/mutations";
 const client = generateClient();
 export default function GiftUpdateForm(props) {
   const {
-    ownedGamePersonId: ownedGamePersonIdProp,
+    id: idProp,
     gift: giftModelProp,
     onSuccess,
     onError,
@@ -52,18 +52,18 @@ export default function GiftUpdateForm(props) {
   const [giftRecord, setGiftRecord] = React.useState(giftModelProp);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = ownedGamePersonIdProp
+      const record = idProp
         ? (
             await client.graphql({
               query: getGift.replaceAll("__typename", ""),
-              variables: { ownedGamePersonId: ownedGamePersonIdProp },
+              variables: { id: idProp },
             })
           )?.data?.getGift
         : giftModelProp;
       setGiftRecord(record);
     };
     queryData();
-  }, [ownedGamePersonIdProp, giftModelProp]);
+  }, [idProp, giftModelProp]);
   React.useEffect(resetStateValues, [giftRecord]);
   const validations = {
     name: [{ type: "Required" }],
@@ -136,7 +136,7 @@ export default function GiftUpdateForm(props) {
             query: updateGift.replaceAll("__typename", ""),
             variables: {
               input: {
-                ownedGamePersonId: giftRecord.ownedGamePersonId,
+                id: giftRecord.id,
                 ...modelFields,
               },
             },
@@ -309,7 +309,7 @@ export default function GiftUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(ownedGamePersonIdProp || giftModelProp)}
+          isDisabled={!(idProp || giftModelProp)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -321,7 +321,7 @@ export default function GiftUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(ownedGamePersonIdProp || giftModelProp) ||
+              !(idProp || giftModelProp) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

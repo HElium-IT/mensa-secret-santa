@@ -15,14 +15,14 @@ function InviteGamePerson({ gameId, userRole }: {
     async function invite() {
         const emails = inviteEmails.split(";").map(email => email.trim());
         await Promise.all(emails.map(async email => {
-            const { data: people } = await client.models.Person.list({ filter: { ownerLoginId: { eq: email } } });
+            const { data: people } = await client.models.Person.list({ filter: { ownerId: { eq: email } } });
             if (people.length === 0) {
                 alert(`Person with email ${email} not found`);
                 return;
             }
             await client.models.GamePerson.create({
                 gameId,
-                personId: people[0].ownerLoginId,
+                personId: people[0].ownerId,
                 role,
             },);
         }));

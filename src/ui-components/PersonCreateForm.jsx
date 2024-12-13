@@ -24,21 +24,19 @@ export default function PersonCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    ownerLoginId: "",
+    ownerId: "",
     isAdmin: false,
   };
-  const [ownerLoginId, setOwnerLoginId] = React.useState(
-    initialValues.ownerLoginId
-  );
+  const [ownerId, setOwnerId] = React.useState(initialValues.ownerId);
   const [isAdmin, setIsAdmin] = React.useState(initialValues.isAdmin);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setOwnerLoginId(initialValues.ownerLoginId);
+    setOwnerId(initialValues.ownerId);
     setIsAdmin(initialValues.isAdmin);
     setErrors({});
   };
   const validations = {
-    ownerLoginId: [{ type: "Required" }],
+    ownerId: [{ type: "Required" }],
     isAdmin: [],
   };
   const runValidationTasks = async (
@@ -67,7 +65,7 @@ export default function PersonCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          ownerLoginId,
+          ownerId,
           isAdmin,
         };
         const validationResponses = await Promise.all(
@@ -123,29 +121,29 @@ export default function PersonCreateForm(props) {
       {...rest}
     >
       <TextField
-        label="Owner login id"
+        label="Owner id"
         isRequired={true}
         isReadOnly={false}
-        value={ownerLoginId}
+        value={ownerId}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              ownerLoginId: value,
+              ownerId: value,
               isAdmin,
             };
             const result = onChange(modelFields);
-            value = result?.ownerLoginId ?? value;
+            value = result?.ownerId ?? value;
           }
-          if (errors.ownerLoginId?.hasError) {
-            runValidationTasks("ownerLoginId", value);
+          if (errors.ownerId?.hasError) {
+            runValidationTasks("ownerId", value);
           }
-          setOwnerLoginId(value);
+          setOwnerId(value);
         }}
-        onBlur={() => runValidationTasks("ownerLoginId", ownerLoginId)}
-        errorMessage={errors.ownerLoginId?.errorMessage}
-        hasError={errors.ownerLoginId?.hasError}
-        {...getOverrideProps(overrides, "ownerLoginId")}
+        onBlur={() => runValidationTasks("ownerId", ownerId)}
+        errorMessage={errors.ownerId?.errorMessage}
+        hasError={errors.ownerId?.hasError}
+        {...getOverrideProps(overrides, "ownerId")}
       ></TextField>
       <SwitchField
         label="Is admin"
@@ -156,7 +154,7 @@ export default function PersonCreateForm(props) {
           let value = e.target.checked;
           if (onChange) {
             const modelFields = {
-              ownerLoginId,
+              ownerId,
               isAdmin: value,
             };
             const result = onChange(modelFields);

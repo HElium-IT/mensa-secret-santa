@@ -6,11 +6,11 @@ export const getGame = /* GraphQL */ `
   query GetGame($id: ID!) {
     getGame(id: $id) {
       createdAt
-      creatorId
       description
       id
       joinQrCode
       name
+      ownerId
       people {
         nextToken
         __typename
@@ -29,11 +29,11 @@ export const getGamePerson = /* GraphQL */ `
       createdAt
       game {
         createdAt
-        creatorId
         description
         id
         joinQrCode
         name
+        ownerId
         phase
         secret
         updatedAt
@@ -46,9 +46,10 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -56,7 +57,7 @@ export const getGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        ownerLoginId
+        ownerId
         updatedAt
         __typename
       }
@@ -68,9 +69,10 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -80,15 +82,16 @@ export const getGamePerson = /* GraphQL */ `
   }
 `;
 export const getGift = /* GraphQL */ `
-  query GetGift($ownedGamePersonId: ID!) {
-    getGift(ownedGamePersonId: $ownedGamePersonId) {
+  query GetGift($id: ID!) {
+    getGift(id: $id) {
       attribute_1
       attribute_2
       attribute_3
       createdAt
+      id
       name
       number
-      ownedGamePerson {
+      ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
@@ -98,7 +101,7 @@ export const getGift = /* GraphQL */ `
         updatedAt
         __typename
       }
-      ownedGamePersonId
+      ownerGamePersonId
       updatedAt
       winnerGamePerson {
         acceptedInvitation
@@ -116,15 +119,15 @@ export const getGift = /* GraphQL */ `
   }
 `;
 export const getPerson = /* GraphQL */ `
-  query GetPerson($ownerLoginId: ID!) {
-    getPerson(ownerLoginId: $ownerLoginId) {
+  query GetPerson($ownerId: ID!) {
+    getPerson(ownerId: $ownerId) {
       createdAt
       games {
         nextToken
         __typename
       }
       isAdmin
-      ownerLoginId
+      ownerId
       updatedAt
       __typename
     }
@@ -221,46 +224,14 @@ export const listGames = /* GraphQL */ `
     listGames(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         createdAt
-        creatorId
         description
         id
         joinQrCode
         name
+        ownerId
         phase
         secret
         updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const listGiftByWinnerGamePersonId = /* GraphQL */ `
-  query ListGiftByWinnerGamePersonId(
-    $filter: ModelGiftFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-    $winnerGamePersonId: ID!
-  ) {
-    listGiftByWinnerGamePersonId(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-      winnerGamePersonId: $winnerGamePersonId
-    ) {
-      items {
-        attribute_1
-        attribute_2
-        attribute_3
-        createdAt
-        name
-        number
-        ownedGamePersonId
-        updatedAt
-        winnerGamePersonId
         __typename
       }
       nextToken
@@ -273,24 +244,17 @@ export const listGifts = /* GraphQL */ `
     $filter: ModelGiftFilterInput
     $limit: Int
     $nextToken: String
-    $ownedGamePersonId: ID
-    $sortDirection: ModelSortDirection
   ) {
-    listGifts(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      ownedGamePersonId: $ownedGamePersonId
-      sortDirection: $sortDirection
-    ) {
+    listGifts(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         attribute_1
         attribute_2
         attribute_3
         createdAt
+        id
         name
         number
-        ownedGamePersonId
+        ownerGamePersonId
         updatedAt
         winnerGamePersonId
         __typename
@@ -305,20 +269,20 @@ export const listPeople = /* GraphQL */ `
     $filter: ModelPersonFilterInput
     $limit: Int
     $nextToken: String
-    $ownerLoginId: ID
+    $ownerId: ID
     $sortDirection: ModelSortDirection
   ) {
     listPeople(
       filter: $filter
       limit: $limit
       nextToken: $nextToken
-      ownerLoginId: $ownerLoginId
+      ownerId: $ownerId
       sortDirection: $sortDirection
     ) {
       items {
         createdAt
         isAdmin
-        ownerLoginId
+        ownerId
         updatedAt
         __typename
       }

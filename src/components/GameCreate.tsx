@@ -22,7 +22,7 @@ function GameCreate({
         if (!user.signInDetails?.loginId) return;
         const subscription = client.models.Game.onCreate().subscribe({
             next: async (data) => {
-                if (data.creatorId !== user.signInDetails?.loginId) return;
+                if (data.ownerId !== user.signInDetails?.loginId) return;
                 console.debug("Game created", data);
                 const gamePerson = await client.models.GamePerson.create({
                     gameId: data.id,
@@ -50,18 +50,19 @@ function GameCreate({
                     <button onClick={() => setShowCreateForm(false)}>Annulla</button>
                     <GameCreateForm
                         overrides={{
-                            creatorId: { display: 'none', value: user?.signInDetails?.loginId, defaultValue: user?.signInDetails?.loginId },
-                            phase: { display: 'none', value: "REGISTRATION_OPEN", defaultValue: "REGISTRATION_OPEN" },
 
                             name: { label: "Nome", placeholder: "Cenone di natale" },
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
                             joinQrCode: { display: 'none', isRequired: false },
+                            ownerId: { display: 'none', isRequired: false },
+                            phase: { display: 'none', isRequired: false },
                         }}
                         onError={console.error}
                         onSubmit={(game) => {
-                            console.debug("Game created", game);
+                            game.ownerId = user.signInDetails?.loginId ?? '';
+                            game.phase = "REGISTRATION_OPEN";
                             return game;
                         }}
                     />

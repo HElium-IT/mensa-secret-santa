@@ -19,11 +19,11 @@ function App() {
 	const [isCreatingGame, setIsCreatingGame] = useState(false);
 
 	async function getOrCreatePerson() {
-		let { data: person } = await client.models.Person.get({ ownerLoginId: user.signInDetails?.loginId ?? '' });
+		let { data: person } = await client.models.Person.get({ ownerId: user.signInDetails?.loginId ?? '' });
 
 		if (!person) {
 			const { data, errors } = await client.models.Person.create({
-				ownerLoginId: user.signInDetails?.loginId as string,
+				ownerId: user.signInDetails?.loginId as string,
 				isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com"
 			});
 			if (!data || errors) {

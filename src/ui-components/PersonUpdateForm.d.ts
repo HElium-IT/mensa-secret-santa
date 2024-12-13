@@ -17,23 +17,23 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type PersonUpdateFormInputValues = {
-    ownerLoginId?: string;
+    ownerId?: string;
     isAdmin?: boolean;
 };
 export declare type PersonUpdateFormValidationValues = {
-    ownerLoginId?: ValidationFunction<string>;
+    ownerId?: ValidationFunction<string>;
     isAdmin?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PersonUpdateFormOverridesProps = {
     PersonUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    ownerLoginId?: PrimitiveOverrideProps<TextFieldProps>;
+    ownerId?: PrimitiveOverrideProps<TextFieldProps>;
     isAdmin?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type PersonUpdateFormProps = React.PropsWithChildren<{
     overrides?: PersonUpdateFormOverridesProps | undefined | null;
 } & {
-    ownerLoginId?: string;
+    ownerId?: string;
     person?: Person;
     onSubmit?: (fields: PersonUpdateFormInputValues) => PersonUpdateFormInputValues;
     onSuccess?: (fields: PersonUpdateFormInputValues) => void;

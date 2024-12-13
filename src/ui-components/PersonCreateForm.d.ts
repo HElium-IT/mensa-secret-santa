@@ -16,17 +16,17 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type PersonCreateFormInputValues = {
-    ownerLoginId?: string;
+    ownerId?: string;
     isAdmin?: boolean;
 };
 export declare type PersonCreateFormValidationValues = {
-    ownerLoginId?: ValidationFunction<string>;
+    ownerId?: ValidationFunction<string>;
     isAdmin?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PersonCreateFormOverridesProps = {
     PersonCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    ownerLoginId?: PrimitiveOverrideProps<TextFieldProps>;
+    ownerId?: PrimitiveOverrideProps<TextFieldProps>;
     isAdmin?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type PersonCreateFormProps = React.PropsWithChildren<{
