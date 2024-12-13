@@ -1,5 +1,5 @@
 import { Schema } from "../../amplify/data/resource";
-import GiftCreateForm, { GiftCreateFormInputValues } from "../ui-components/GiftCreateForm";
+import GiftCreateForm from "../ui-components/GiftCreateForm";
 
 function GiftCreate({ gamePerson }: {
     readonly gamePerson: Schema["GamePerson"]["type"]
@@ -17,12 +17,12 @@ function GiftCreate({ gamePerson }: {
                     number: { display: 'none', isRequired: false },
                     winnerGamePersonId: { display: 'none', isRequired: false },
                 }}
-                onError={console.error}
-                onSuccess={console.debug}
-                onSubmit={(fields) => {
-                    const updatedFields = { ...fields } as Schema["Gift"]["type"];
-                    updatedFields.ownerGamePersonId = gamePerson.id;
-                    return updatedFields as GiftCreateFormInputValues
+                onError={(error) => { console.error("Gift creation error", error); }}
+                onSuccess={(gift) => { console.debug("Gift created", gift); }}
+                onSubmit={(gift) => {
+                    gift.ownerGamePersonId = gamePerson.id;
+                    console.debug("Gift to create", gift);
+                    return gift
                 }}
             />
         </>

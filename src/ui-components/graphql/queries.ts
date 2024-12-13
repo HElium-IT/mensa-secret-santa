@@ -41,19 +41,6 @@ export const getGamePerson = /* GraphQL */ `
       }
       gameId
       id
-      ownedGift {
-        attribute_1
-        attribute_2
-        attribute_3
-        createdAt
-        id
-        name
-        number
-        ownerGamePersonId
-        updatedAt
-        winnerGamePersonId
-        __typename
-      }
       person {
         createdAt
         isAdmin
@@ -64,19 +51,6 @@ export const getGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
-      wonGift {
-        attribute_1
-        attribute_2
-        attribute_3
-        createdAt
-        id
-        name
-        number
-        ownerGamePersonId
-        updatedAt
-        winnerGamePersonId
-        __typename
-      }
       __typename
     }
   }
@@ -91,28 +65,8 @@ export const getGift = /* GraphQL */ `
       id
       name
       number
-      ownerGamePerson {
-        acceptedInvitation
-        createdAt
-        gameId
-        id
-        personId
-        role
-        updatedAt
-        __typename
-      }
       ownerGamePersonId
       updatedAt
-      winnerGamePerson {
-        acceptedInvitation
-        createdAt
-        gameId
-        id
-        personId
-        role
-        updatedAt
-        __typename
-      }
       winnerGamePersonId
       __typename
     }

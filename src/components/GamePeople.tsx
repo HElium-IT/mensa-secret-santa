@@ -20,7 +20,10 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
 
     useEffect(() => {
         gamePeople.forEach(async gamePerson => {
-            const { data: gift } = await gamePerson.ownedGift();
+            // const { data: gift } = await gamePerson.ownedGift();
+            const { data: gifts } = await client.models.Gift.list({ filter: { ownerGamePersonId: { eq: gamePerson.id } } });
+            const gift = gifts?.[0];
+            if (!gift) return;
             setHasGift(prevHasGift => ({ ...prevHasGift, [gamePerson.id]: !!gift }));
         });
 

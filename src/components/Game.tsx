@@ -36,12 +36,16 @@ function Game({ game, compact = false, onDelete }: {
 
     useEffect(() => {
         gamePeople.forEach(async gamePerson => {
-            const { data: gift } = await gamePerson.ownedGift();
-            if (gift) {
-                setTotalGifts(totalGifts + 1);
-                if (gamePerson.role !== "PLAYER") {
-                    setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
-                }
+            const { data: gifts, errors } = await client.models.Gift.list({ filter: { ownerGamePersonId: { eq: gamePerson.id } } });
+            if (!gifts) {
+                console.error(gifts, errors)
+            }
+            const gift = gifts?.[0];
+            if (!gift) return;
+
+            setTotalGifts(totalGifts + 1);
+            if (gamePerson.role !== "PLAYER") {
+                setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
             }
         });
         const subscription = client.models.Game.onDelete({

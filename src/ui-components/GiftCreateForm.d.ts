@@ -16,6 +16,8 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type GiftCreateFormInputValues = {
+    ownerGamePersonId?: string;
+    winnerGamePersonId?: string;
     name?: string;
     attribute_1?: string;
     attribute_2?: string;
@@ -23,6 +25,8 @@ export declare type GiftCreateFormInputValues = {
     number?: number;
 };
 export declare type GiftCreateFormValidationValues = {
+    ownerGamePersonId?: ValidationFunction<string>;
+    winnerGamePersonId?: ValidationFunction<string>;
     name?: ValidationFunction<string>;
     attribute_1?: ValidationFunction<string>;
     attribute_2?: ValidationFunction<string>;
@@ -32,6 +36,8 @@ export declare type GiftCreateFormValidationValues = {
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GiftCreateFormOverridesProps = {
     GiftCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
+    ownerGamePersonId?: PrimitiveOverrideProps<TextFieldProps>;
+    winnerGamePersonId?: PrimitiveOverrideProps<TextFieldProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_1?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_2?: PrimitiveOverrideProps<TextFieldProps>;

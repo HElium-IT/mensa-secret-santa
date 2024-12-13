@@ -3,11 +3,8 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 const schema = a.schema({
   Gift: a
     .model({
-      ownerGamePersonId: a.string().required(),
-      ownerGamePerson: a.belongsTo("GamePerson", "ownerGamePersonId"),
-
-      winnerGamePersonId: a.string(),
-      winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
+      ownerGamePersonId: a.id().required(),
+      winnerGamePersonId: a.id(),
 
       name: a.string().required(),
       attribute_1: a.string().required(),
@@ -28,9 +25,6 @@ const schema = a.schema({
 
       personId: a.id().required(),
       person: a.belongsTo("Person", "personId"),
-
-      ownedGift: a.hasOne("Gift", "ownerGamePersonId"),
-      wonGift: a.hasOne("Gift", "winnerGamePersonId"),
 
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),

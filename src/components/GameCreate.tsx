@@ -59,10 +59,12 @@ function GameCreate({
                             ownerId: { display: 'none', isRequired: false },
                             phase: { display: 'none', isRequired: false },
                         }}
-                        onError={console.error}
+                        onError={(error) => { console.error("Game creation error", error); }}
+                        onSuccess={(game) => { console.debug("Game created", game); }}
                         onSubmit={(game) => {
                             game.ownerId = user.signInDetails?.loginId ?? '';
                             game.phase = "REGISTRATION_OPEN";
+                            console.debug("Game to create", game);
                             return game;
                         }}
                     />

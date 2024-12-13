@@ -20,12 +20,20 @@ export default function GiftUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
+    ownerGamePersonId: "",
+    winnerGamePersonId: "",
     name: "",
     attribute_1: "",
     attribute_2: "",
     attribute_3: "",
     number: "",
   };
+  const [ownerGamePersonId, setOwnerGamePersonId] = React.useState(
+    initialValues.ownerGamePersonId
+  );
+  const [winnerGamePersonId, setWinnerGamePersonId] = React.useState(
+    initialValues.winnerGamePersonId
+  );
   const [name, setName] = React.useState(initialValues.name);
   const [attribute_1, setAttribute_1] = React.useState(
     initialValues.attribute_1
@@ -42,6 +50,8 @@ export default function GiftUpdateForm(props) {
     const cleanValues = giftRecord
       ? { ...initialValues, ...giftRecord }
       : initialValues;
+    setOwnerGamePersonId(cleanValues.ownerGamePersonId);
+    setWinnerGamePersonId(cleanValues.winnerGamePersonId);
     setName(cleanValues.name);
     setAttribute_1(cleanValues.attribute_1);
     setAttribute_2(cleanValues.attribute_2);
@@ -66,6 +76,8 @@ export default function GiftUpdateForm(props) {
   }, [idProp, giftModelProp]);
   React.useEffect(resetStateValues, [giftRecord]);
   const validations = {
+    ownerGamePersonId: [{ type: "Required" }],
+    winnerGamePersonId: [],
     name: [{ type: "Required" }],
     attribute_1: [{ type: "Required" }],
     attribute_2: [{ type: "Required" }],
@@ -98,6 +110,8 @@ export default function GiftUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
+          ownerGamePersonId,
+          winnerGamePersonId: winnerGamePersonId ?? null,
           name,
           attribute_1,
           attribute_2,
@@ -155,6 +169,70 @@ export default function GiftUpdateForm(props) {
       {...rest}
     >
       <TextField
+        label="Owner game person id"
+        isRequired={true}
+        isReadOnly={false}
+        value={ownerGamePersonId}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              ownerGamePersonId: value,
+              winnerGamePersonId,
+              name,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+              number,
+            };
+            const result = onChange(modelFields);
+            value = result?.ownerGamePersonId ?? value;
+          }
+          if (errors.ownerGamePersonId?.hasError) {
+            runValidationTasks("ownerGamePersonId", value);
+          }
+          setOwnerGamePersonId(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("ownerGamePersonId", ownerGamePersonId)
+        }
+        errorMessage={errors.ownerGamePersonId?.errorMessage}
+        hasError={errors.ownerGamePersonId?.hasError}
+        {...getOverrideProps(overrides, "ownerGamePersonId")}
+      ></TextField>
+      <TextField
+        label="Winner game person id"
+        isRequired={false}
+        isReadOnly={false}
+        value={winnerGamePersonId}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId: value,
+              name,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+              number,
+            };
+            const result = onChange(modelFields);
+            value = result?.winnerGamePersonId ?? value;
+          }
+          if (errors.winnerGamePersonId?.hasError) {
+            runValidationTasks("winnerGamePersonId", value);
+          }
+          setWinnerGamePersonId(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("winnerGamePersonId", winnerGamePersonId)
+        }
+        errorMessage={errors.winnerGamePersonId?.errorMessage}
+        hasError={errors.winnerGamePersonId?.hasError}
+        {...getOverrideProps(overrides, "winnerGamePersonId")}
+      ></TextField>
+      <TextField
         label="Name"
         isRequired={true}
         isReadOnly={false}
@@ -163,6 +241,8 @@ export default function GiftUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId,
               name: value,
               attribute_1,
               attribute_2,
@@ -191,6 +271,8 @@ export default function GiftUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId,
               name,
               attribute_1: value,
               attribute_2,
@@ -219,6 +301,8 @@ export default function GiftUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId,
               name,
               attribute_1,
               attribute_2: value,
@@ -247,6 +331,8 @@ export default function GiftUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId,
               name,
               attribute_1,
               attribute_2,
@@ -279,6 +365,8 @@ export default function GiftUpdateForm(props) {
             : parseInt(e.target.value);
           if (onChange) {
             const modelFields = {
+              ownerGamePersonId,
+              winnerGamePersonId,
               name,
               attribute_1,
               attribute_2,
