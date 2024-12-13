@@ -17,8 +17,7 @@ const schema = a.schema({
 
     })
     .authorization(allow => [
-      allow.authenticated().to(["read"]),
-      allow.owner()
+      allow.authenticated()
     ]),
 
   GamePerson: a
@@ -37,8 +36,7 @@ const schema = a.schema({
       index("personId").name("byPerson"),
     ])
     .authorization(allow => [
-      allow.authenticated().to(["read"]),
-      allow.owner()
+      allow.authenticated()
     ]),
 
   Person: a
@@ -64,8 +62,7 @@ const schema = a.schema({
       people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(allow => [
-      allow.authenticated().to(["read"]),
-      allow.owner()
+      allow.authenticated()
     ]),
 
 })
