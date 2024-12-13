@@ -57,7 +57,6 @@ export const getGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -128,7 +127,6 @@ export const getPerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
@@ -350,7 +348,6 @@ export const listPeople = /* GraphQL */ `
       items {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename

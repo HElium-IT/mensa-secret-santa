@@ -3,8 +3,11 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateGame = /* GraphQL */ `
-  subscription OnCreateGame($filter: ModelSubscriptionGameFilterInput) {
-    onCreateGame(filter: $filter) {
+  subscription OnCreateGame(
+    $filter: ModelSubscriptionGameFilterInput
+    $ownerId: String
+  ) {
+    onCreateGame(filter: $filter, ownerId: $ownerId) {
       createdAt
       description
       id
@@ -59,7 +62,6 @@ export const onCreateGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -124,16 +126,15 @@ export const onCreateGift = /* GraphQL */ `
 export const onCreatePerson = /* GraphQL */ `
   subscription OnCreatePerson(
     $filter: ModelSubscriptionPersonFilterInput
-    $owner: String
+    $ownerId: String
   ) {
-    onCreatePerson(filter: $filter, owner: $owner) {
+    onCreatePerson(filter: $filter, ownerId: $ownerId) {
       createdAt
       games {
         nextToken
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
@@ -141,8 +142,11 @@ export const onCreatePerson = /* GraphQL */ `
   }
 `;
 export const onDeleteGame = /* GraphQL */ `
-  subscription OnDeleteGame($filter: ModelSubscriptionGameFilterInput) {
-    onDeleteGame(filter: $filter) {
+  subscription OnDeleteGame(
+    $filter: ModelSubscriptionGameFilterInput
+    $ownerId: String
+  ) {
+    onDeleteGame(filter: $filter, ownerId: $ownerId) {
       createdAt
       description
       id
@@ -197,7 +201,6 @@ export const onDeleteGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -262,16 +265,15 @@ export const onDeleteGift = /* GraphQL */ `
 export const onDeletePerson = /* GraphQL */ `
   subscription OnDeletePerson(
     $filter: ModelSubscriptionPersonFilterInput
-    $owner: String
+    $ownerId: String
   ) {
-    onDeletePerson(filter: $filter, owner: $owner) {
+    onDeletePerson(filter: $filter, ownerId: $ownerId) {
       createdAt
       games {
         nextToken
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
@@ -279,8 +281,11 @@ export const onDeletePerson = /* GraphQL */ `
   }
 `;
 export const onUpdateGame = /* GraphQL */ `
-  subscription OnUpdateGame($filter: ModelSubscriptionGameFilterInput) {
-    onUpdateGame(filter: $filter) {
+  subscription OnUpdateGame(
+    $filter: ModelSubscriptionGameFilterInput
+    $ownerId: String
+  ) {
+    onUpdateGame(filter: $filter, ownerId: $ownerId) {
       createdAt
       description
       id
@@ -335,7 +340,6 @@ export const onUpdateGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -400,16 +404,15 @@ export const onUpdateGift = /* GraphQL */ `
 export const onUpdatePerson = /* GraphQL */ `
   subscription OnUpdatePerson(
     $filter: ModelSubscriptionPersonFilterInput
-    $owner: String
+    $ownerId: String
   ) {
-    onUpdatePerson(filter: $filter, owner: $owner) {
+    onUpdatePerson(filter: $filter, ownerId: $ownerId) {
       createdAt
       games {
         nextToken
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename

@@ -63,7 +63,6 @@ export const createGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -140,7 +139,6 @@ export const createPerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
@@ -208,7 +206,6 @@ export const deleteGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -285,7 +282,6 @@ export const deletePerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
@@ -353,7 +349,6 @@ export const updateGamePerson = /* GraphQL */ `
       person {
         createdAt
         isAdmin
-        owner
         ownerId
         updatedAt
         __typename
@@ -430,7 +425,6 @@ export const updatePerson = /* GraphQL */ `
         __typename
       }
       isAdmin
-      owner
       ownerId
       updatedAt
       __typename
