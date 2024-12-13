@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "sandbox": "npx ampx sandbox",
     "aws-login": "aws sso login --no-browser",
-    "gen-forms": "npx ampx generate forms --out-dir ./src/ui-components"
+    "gen-forms": "npx ampx generate forms --out-dir ./src/ui-components",
+    "gen-forms-main": "npx ampx generate forms --out-dir ./src/ui-components --stack amplify-d3j79bbzo98nj9-main-branch-4c42090373"
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.5.5",
