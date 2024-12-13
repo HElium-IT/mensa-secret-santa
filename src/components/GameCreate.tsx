@@ -62,8 +62,10 @@ function GameCreate({
                             phase: { display: 'none', value: phase, },
 
                         }}
+                        onChange={(data) => { console.debug("Game changed", data); return data; }}
+                        onSubmit={(data) => { console.debug("Game to create", data); return data; }}
                         onError={(error) => { console.error("Game creation error", error); }}
-                        onSuccess={(game) => { console.debug("Game created", game); }}
+                        onSuccess={(data) => { console.debug("Game created", data); }}
                     // onSubmit={(game) => {
                     //     game.ownerId = user.signInDetails?.loginId ?? '';
                     //     game.phase = "REGISTRATION_OPEN";

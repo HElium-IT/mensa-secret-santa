@@ -20,8 +20,10 @@ function GiftCreate({ gamePerson }: {
                     number: { display: 'none' },
                     winnerGamePersonId: { display: 'none' },
                 }}
+                onChange={(data) => { console.debug("Gift changed", data); return data; }}
+                onSubmit={(data) => { console.debug("Gift to create", data); return data; }}
                 onError={(error) => { console.error("Gift creation error", error); }}
-                onSuccess={(gift) => { console.debug("Gift created", gift); }}
+                onSuccess={(data) => { console.debug("Gift created", data); }}
             // onSubmit={(gift) => {
             //     gift.ownerGamePersonId = gamePerson.id;
             //     console.debug("Gift to create", gift);
