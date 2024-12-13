@@ -41,6 +41,19 @@ export const getGamePerson = /* GraphQL */ `
       }
       gameId
       id
+      ownedGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       person {
         createdAt
         isAdmin
@@ -52,6 +65,19 @@ export const getGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -66,8 +92,28 @@ export const getGift = /* GraphQL */ `
       id
       name
       number
+      ownerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       ownerGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -188,6 +234,72 @@ export const listGames = /* GraphQL */ `
         phase
         secret
         updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const listGiftByOwnerGamePersonId = /* GraphQL */ `
+  query ListGiftByOwnerGamePersonId(
+    $filter: ModelGiftFilterInput
+    $limit: Int
+    $nextToken: String
+    $ownerGamePersonId: ID!
+    $sortDirection: ModelSortDirection
+  ) {
+    listGiftByOwnerGamePersonId(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      ownerGamePersonId: $ownerGamePersonId
+      sortDirection: $sortDirection
+    ) {
+      items {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const listGiftByWinnerGamePersonId = /* GraphQL */ `
+  query ListGiftByWinnerGamePersonId(
+    $filter: ModelGiftFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+    $winnerGamePersonId: ID!
+  ) {
+    listGiftByWinnerGamePersonId(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+      winnerGamePersonId: $winnerGamePersonId
+    ) {
+      items {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
         __typename
       }
       nextToken

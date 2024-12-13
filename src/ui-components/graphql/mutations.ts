@@ -47,6 +47,19 @@ export const createGamePerson = /* GraphQL */ `
       }
       gameId
       id
+      ownedGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       person {
         createdAt
         isAdmin
@@ -58,6 +71,19 @@ export const createGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -75,8 +101,28 @@ export const createGift = /* GraphQL */ `
       id
       name
       number
+      ownerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       ownerGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -146,6 +192,19 @@ export const deleteGamePerson = /* GraphQL */ `
       }
       gameId
       id
+      ownedGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       person {
         createdAt
         isAdmin
@@ -157,6 +216,19 @@ export const deleteGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -174,8 +246,28 @@ export const deleteGift = /* GraphQL */ `
       id
       name
       number
+      ownerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       ownerGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }
@@ -245,6 +337,19 @@ export const updateGamePerson = /* GraphQL */ `
       }
       gameId
       id
+      ownedGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       person {
         createdAt
         isAdmin
@@ -256,6 +361,19 @@ export const updateGamePerson = /* GraphQL */ `
       personId
       role
       updatedAt
+      wonGift {
+        attribute_1
+        attribute_2
+        attribute_3
+        createdAt
+        id
+        name
+        number
+        ownerGamePersonId
+        updatedAt
+        winnerGamePersonId
+        __typename
+      }
       __typename
     }
   }
@@ -273,8 +391,28 @@ export const updateGift = /* GraphQL */ `
       id
       name
       number
+      ownerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       ownerGamePersonId
       updatedAt
+      winnerGamePerson {
+        acceptedInvitation
+        createdAt
+        gameId
+        id
+        personId
+        role
+        updatedAt
+        __typename
+      }
       winnerGamePersonId
       __typename
     }

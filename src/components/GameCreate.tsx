@@ -50,20 +50,18 @@ function GameCreate({
                     <button onClick={() => setShowCreateForm(false)}>Annulla</button>
                     <GameCreateForm
                         overrides={{
-
                             name: { label: "Nome", placeholder: "Cenone di natale" },
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
-                            joinQrCode: { display: 'none' },
-                            ownerId: { display: 'none', readOnly: true, defaultValue: user.signInDetails?.loginId },
-                            phase: { display: 'none', defaultValue: "REGISTRATION_OPEN" as NonNullable<Schema["Game"]["type"]["phase"]> },
-
+                            joinQrCode: {},
+                            ownerId: { defaultValue: user.signInDetails?.loginId },
+                            phase: { defaultValue: "REGISTRATION_OPEN" as NonNullable<Schema["Game"]["type"]["phase"]> },
                         }}
                         onChange={(data) => {
-                            console.debug("Game changed", data);
                             data.ownerId = user.signInDetails?.loginId ?? 'UNKNOWN';
                             data.phase = "REGISTRATION_OPEN";
+                            console.debug("Game changed", data);
                             return data;
                         }}
                         onSubmit={(data) => { console.debug("Game to create", data); return data; }}

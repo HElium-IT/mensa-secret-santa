@@ -44,6 +44,7 @@ export declare type GameCreateFormOverridesProps = {
 export declare type GameCreateFormProps = React.PropsWithChildren<{
     overrides?: GameCreateFormOverridesProps | undefined | null;
 } & {
+    ownerId?: string;
     clearOnSuccess?: boolean;
     onSubmit?: (fields: GameCreateFormInputValues) => GameCreateFormInputValues;
     onSuccess?: (fields: GameCreateFormInputValues) => void;

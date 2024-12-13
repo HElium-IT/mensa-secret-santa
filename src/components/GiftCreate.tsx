@@ -7,22 +7,16 @@ function GiftCreate({ gamePerson }: {
     return (
         <>
             <GiftCreateForm
-
+                ownerGamePersonId={gamePerson.id}
                 overrides={{
                     name: { label: "Il tuo regalo", placeholder: "Boomerang" },
                     attribute_1: { label: "Attributo 1", placeholder: "Lancio" },
                     attribute_2: { label: "Attributo 2", placeholder: "Sport" },
                     attribute_3: { label: "Attributo 3", placeholder: "Legno" },
 
-                    ownerGamePersonId: { display: 'none', defaultValue: gamePerson.id, readOnly: true },
-                    number: { display: 'none' },
-                    winnerGamePersonId: { display: 'none' },
+                    number: {},
                 }}
-                onChange={(data) => {
-                    console.debug("Gift changed", data);
-                    data.ownerGamePersonId = gamePerson.id;
-                    return data;
-                }}
+                onChange={(data) => { console.debug("Gift changed", data); return data; }}
                 onSubmit={(data) => { console.debug("Gift to create", data); return data; }}
                 onError={(error) => { console.error("Gift creation error", error); }}
                 onSuccess={(data) => { console.debug("Gift created", data); }}

@@ -6,7 +6,10 @@ const schema = a.schema({
   Gift: a
     .model({
       ownerGamePersonId: a.id().required(),
+      ownerGamePerson: a.belongsTo("GamePerson", "ownerGamePersonId"),
+
       winnerGamePersonId: a.id(),
+      winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
 
       name: a.string().required(),
       attribute_1: a.string().required(),
@@ -16,6 +19,10 @@ const schema = a.schema({
       number: a.integer(),
 
     })
+    .secondaryIndexes((index) => [
+      index("ownerGamePersonId").name("byOwnerGamePerson"),
+      index("winnerGamePersonId").name("byWinnerGamePerson"),
+    ])
     .authorization(allow => [
       allow.authenticated()
     ]),
@@ -30,6 +37,9 @@ const schema = a.schema({
 
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
+
+      ownedGift: a.hasOne("Gift", "ownerGamePersonId"),
+      wonGift: a.hasOne("Gift", "winnerGamePersonId"),
     })
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
@@ -47,8 +57,8 @@ const schema = a.schema({
     })
     .identifier(["ownerId"])
     .authorization(allow => [
-      allow.authenticated().to(["read"]),
-      allow.owner()
+      allow.ownerDefinedIn("ownerId", "userPools"),
+      allow.authenticated(),
     ]),
 
   Game: a
@@ -62,6 +72,7 @@ const schema = a.schema({
       people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(allow => [
+      allow.ownerDefinedIn("ownerId", "userPools"),
       allow.authenticated()
     ]),
 
