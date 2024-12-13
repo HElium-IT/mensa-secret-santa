@@ -17,8 +17,6 @@ function GameCreate({
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [ownerId,] = useState(user.signInDetails?.loginId);
-    const [phase,] = useState("REGISTRATION_OPEN");
 
     useEffect(() => {
         if (!user.signInDetails?.loginId) return;
@@ -58,8 +56,8 @@ function GameCreate({
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
                             joinQrCode: { display: 'none' },
-                            ownerId: { display: 'none', value: ownerId, readOnly: true },
-                            phase: { display: 'none', value: phase, },
+                            ownerId: { display: 'none', readOnly: true, defaultValue: user.signInDetails?.loginId },
+                            phase: { display: 'none', defaultValue: "REGISTRATION_OPEN" as NonNullable<Schema["Game"]["type"]["phase"]> },
 
                         }}
                         onChange={(data) => { console.debug("Game changed", data); return data; }}

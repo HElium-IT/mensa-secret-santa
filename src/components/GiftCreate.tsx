@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { Schema } from "../../amplify/data/resource";
 import GiftCreateForm from "../ui-components/GiftCreateForm";
 
 function GiftCreate({ gamePerson }: {
     readonly gamePerson: Schema["GamePerson"]["type"]
 }) {
-    const [ownerGamePersonId,] = useState(gamePerson.id);
     return (
         <>
             <GiftCreateForm
@@ -16,7 +14,7 @@ function GiftCreate({ gamePerson }: {
                     attribute_2: { label: "Attributo 2", placeholder: "Sport" },
                     attribute_3: { label: "Attributo 3", placeholder: "Legno" },
 
-                    ownerGamePersonId: { display: 'none', value: ownerGamePersonId, readOnly: true },
+                    ownerGamePersonId: { display: 'none', defaultValue: gamePerson.id, readOnly: true },
                     number: { display: 'none' },
                     winnerGamePersonId: { display: 'none' },
                 }}
