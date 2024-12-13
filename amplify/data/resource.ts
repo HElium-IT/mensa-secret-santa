@@ -15,7 +15,9 @@ const schema = a.schema({
 
     })
     .authorization(allow => [
-      allow.authenticated(),
+      allow.authenticated().to([
+        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
+      ])
     ]),
 
   GamePerson: a
@@ -34,8 +36,9 @@ const schema = a.schema({
       index("personId").name("byPerson"),
     ])
     .authorization(allow => [
-      allow.authenticated(),
-      allow.ownerDefinedIn("personId"),
+      allow.authenticated().to([
+        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
+      ]),
     ]),
 
   Person: a
@@ -46,8 +49,9 @@ const schema = a.schema({
     })
     .identifier(["ownerId"])
     .authorization(allow => [
-      allow.authenticated(),
-      allow.ownerDefinedIn("ownerId"),
+      allow.authenticated().to([
+        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
+      ]),
     ]),
 
   Game: a
@@ -61,8 +65,9 @@ const schema = a.schema({
       people: a.hasMany("GamePerson", "gameId"),
     })
     .authorization(allow => [
-      allow.authenticated(),
-      allow.ownerDefinedIn("ownerId"),
+      allow.authenticated().to([
+        "create", "delete", "get", "list", "listen", "read", "search", "sync", "update"
+      ]),
     ]),
 
 })
@@ -72,7 +77,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode: "userPool",
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     }
