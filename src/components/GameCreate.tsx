@@ -17,33 +17,19 @@ function GamesList({
 
     useEffect(() => {
         if (!user) return;
-        const subscription = client.models.Game.observeQuery({
+        const subscription = client.models.Game.onCreate({
             filter: {
-                creatorId: { eq: user?.signInDetails?.loginId }
+                creator: { eq: user.signInDetails?.loginId },
             }
         }).subscribe({
-            next: async ({ items: games }) => {
-                await Promise.all([
-                    games.forEach(async game => {
-                        const { data: GamesPerson } = await client.models.GamePerson.listGamePersonByPersonId({
-                            personId: user?.signInDetails?.loginId ?? ''
-                        })
-                        let found = false;
-                        GamesPerson.forEach(gp => {
-                            if (gp.role === "CREATOR") {
-                                found = true;
-                            }
-                        })
-                        if (!found) {
-                            await client.models.GamePerson.create({
-                                gameId: game.id,
-                                personId: user?.signInDetails?.loginId ?? '',
-                                role: "CREATOR",
-                                acceptedInvitation: true,
-                            }, { authMode: 'userPool' });
-                        }
-                    })
-                ]);
+            next: async (data) => {
+                console.debug("Game created", data);
+                await client.models.GamePerson.create({
+                    gameId: data.id,
+                    personId: user.signInDetails?.loginId ?? '',
+                    role: "CREATOR",
+                    acceptedInvitation: true,
+                });
             }
         });
 
@@ -62,7 +48,7 @@ function GamesList({
                     <button onClick={() => setShowCreateForm(false)}>Annulla</button>
                     <GameCreateForm
                         overrides={{
-                            creatorId: { display: 'none', value: user?.signInDetails?.loginId },
+                            creatorId: { display: 'none', isRequired: false, value: user?.signInDetails?.loginId },
                             name: { label: "Nome", placeholder: "Cenone di natale" },
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },

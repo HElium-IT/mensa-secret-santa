@@ -44,7 +44,20 @@ function Game({ game, compact = false, onDelete }: {
                 }
             }
         });
+        const subscription = client.models.Game.onDelete({
+            filter: {
+                id: { eq: game.id }
+            }
+        }).subscribe({
+            next: async (game) => {
+                const { data: gamePeople } = await game.people();
+                gamePeople.forEach(async gamePerson => {
+                    client.models.GamePerson.delete({ id: gamePerson.id });
+                });
+            }
+        });
 
+        return () => subscription.unsubscribe();
     }, [user]);
 
     useEffect(() => {
@@ -85,15 +98,15 @@ function Game({ game, compact = false, onDelete }: {
         client.models.GamePerson.update({
             id: gamePerson.id,
             acceptedInvitation: true
-        }, { authMode: 'userPool' })
+        })
     }
 
     async function deleteGame() {
         if (!gamePerson) return
-        const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id }, { authMode: 'userPool' });
+        const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id });
         if (gamePeople) {
             await Promise.all(gamePeople.map(async gp => {
-                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id }, { authMode: 'userPool' });
+                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id });
                 console.log(resultGamePerson.errors ?? resultGamePerson.data);
             }));
         }

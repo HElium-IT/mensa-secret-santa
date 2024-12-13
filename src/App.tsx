@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { signOut } from 'aws-amplify/auth';
 import { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
@@ -17,46 +18,38 @@ function App() {
 	const [isSelectingGame, setIsSelectingGame] = useState(true);
 	const [isCreatingGame, setIsCreatingGame] = useState(false);
 
+	async function getOrCreatePerson() {
+		let { data: person } = await client.models.Person.get({ ownerLoginId: user.signInDetails?.loginId ?? '' });
+
+		if (!person) {
+			const { data, errors } = await client.models.Person.create({
+				ownerLoginId: user.signInDetails?.loginId as string,
+				isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com"
+			});
+			if (!data || errors) {
+				console.error(errors);
+				return;
+			}
+			person = data;
+		}
+		setPerson(person);
+	}
+
 	useEffect(() => {
 		if (!user) return;
 		console.debug("User", user);
-		const subscription = client.models.Person.observeQuery({
-			filter: {
-				ownerLoginId: { eq: user.signInDetails?.loginId }
-			}
-		}).subscribe({
-			next: ({ items }) => {
-				if (items.length === 0) {
-					client.models.Person.create({
-						ownerLoginId: user.signInDetails?.loginId as string,
-						isAdmin: user.signInDetails?.loginId === "elio.palomba.dev@gmail.com",
-					}, { authMode: 'userPool' });
-					return;
-				}
-				if (items.length > 1)
-					throw new Error("More than one person with the same ownerLoginId");
 
-				console.debug("Person", items[0]);
-				setPerson(items[0]);
-				if ((
-					user.signInDetails?.loginId === "elio.palomba.dev@gmail.com"
-					|| user.signInDetails?.loginId === "elio.palomba99@gmail.com"
-				) && (!items[0].isAdmin)) {
-					client.models.Person.update({
-						ownerLoginId: user.signInDetails?.loginId as string,
-						isAdmin: true,
-					}, { authMode: 'userPool' })
-				}
-			}
-		});
+		getOrCreatePerson()
 
 		setTimeout(() => {
 			setLoading(false);
 		}, 1000);
 
-		return () => subscription.unsubscribe();
 	}, [user]);
 
+	async function handleSignOut() {
+		await signOut()
+	}
 
 	if (loading) {
 		return (
@@ -82,9 +75,16 @@ function App() {
 
 	return (
 		<main className={"card"}>
-			<h1 style={{ textAlign: "center" }}>
-				{user?.signInDetails?.loginId?.split('@')[0]}
-			</h1>
+			<div className="flex-row" style={{ alignItems: 'center' }}>
+				<h1 style={{ textAlign: "center" }}>
+					Ciao {user?.signInDetails?.loginId?.split('@')[0]}
+				</h1>
+				{person?.isAdmin &&
+					<button type="button" onClick={handleSignOut}>
+						Sign out
+					</button>
+				}
+			</div>
 			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} />}
 			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} />}
 			{!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} />}

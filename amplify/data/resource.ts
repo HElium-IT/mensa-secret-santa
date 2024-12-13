@@ -1,7 +1,4 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { type AllowModifier } from "@aws-amplify/data-schema/internals";
-
-const crud = (allow: Omit<AllowModifier, "resource">) => [allow.authenticated().to(["create", "read", "update", "delete"])]
 
 const schema = a.schema({
   Gift: a
@@ -19,11 +16,16 @@ const schema = a.schema({
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
-    .authorization(crud)
     .secondaryIndexes((index) => [
       index("ownedGamePersonId").name("byOwnedGamePerson"),
       index("winnerGamePersonId").name("byWinnerGamePerson"),
+    ])
+    .authorization(allow => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+      allow.ownerDefinedIn("ownedGamePersonId"),
     ]),
+
   GamePerson: a
     .model({
       gameId: a.id().required(),
@@ -38,24 +40,32 @@ const schema = a.schema({
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
     })
-    .authorization(crud)
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
       index("personId").name("byPerson"),
+    ])
+    .authorization(allow => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+      allow.ownerDefinedIn("personId"),
     ]),
 
   Person: a
     .model({
-      ownerLoginId: a.id().required(),
+      ownerLoginId: a.string().required(),
       isAdmin: a.boolean().default(false),
       games: a.hasMany("GamePerson", "personId"),
     })
-    .authorization(crud)
-    .identifier(["ownerLoginId"]),
+    .identifier(["ownerLoginId"])
+    .authorization(allow => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+      allow.ownerDefinedIn("ownerLoginId"),
+    ]),
 
   Game: a
     .model({
-      creatorId: a.id().required(),
+      creator: a.id().required(),
       name: a.string().required(),
       description: a.string().required(),
       secret: a.string().required(),
@@ -63,18 +73,23 @@ const schema = a.schema({
       phase: a.enum(["REGISTRATION_OPEN", "LOBBY", "STARTED", "PAUSED", "FINISHED"]),
       people: a.hasMany("GamePerson", "gameId"),
     })
-    .authorization(crud)
-});
+    .authorization(allow => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+      allow.ownerDefinedIn("creator"),
+    ]),
+
+})
 
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "userPool",
-    // apiKeyAuthorizationMode: {
-    //   expiresInDays: 30,
-    // },
+    defaultAuthorizationMode: "apiKey",
+    apiKeyAuthorizationMode: {
+      expiresInDays: 30,
+    }
   },
 });
 
