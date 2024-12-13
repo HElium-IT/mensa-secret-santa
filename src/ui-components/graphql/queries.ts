@@ -46,7 +46,6 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
         ownedGamePersonId
@@ -69,7 +68,6 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
         ownedGamePersonId
@@ -82,13 +80,12 @@ export const getGamePerson = /* GraphQL */ `
   }
 `;
 export const getGift = /* GraphQL */ `
-  query GetGift($id: ID!) {
-    getGift(id: $id) {
+  query GetGift($ownedGamePersonId: ID!) {
+    getGift(ownedGamePersonId: $ownedGamePersonId) {
       attribute_1
       attribute_2
       attribute_3
       createdAt
-      id
       name
       number
       ownedGamePerson {
@@ -239,39 +236,6 @@ export const listGames = /* GraphQL */ `
     }
   }
 `;
-export const listGiftByOwnedGamePersonId = /* GraphQL */ `
-  query ListGiftByOwnedGamePersonId(
-    $filter: ModelGiftFilterInput
-    $limit: Int
-    $nextToken: String
-    $ownedGamePersonId: ID!
-    $sortDirection: ModelSortDirection
-  ) {
-    listGiftByOwnedGamePersonId(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      ownedGamePersonId: $ownedGamePersonId
-      sortDirection: $sortDirection
-    ) {
-      items {
-        attribute_1
-        attribute_2
-        attribute_3
-        createdAt
-        id
-        name
-        number
-        ownedGamePersonId
-        updatedAt
-        winnerGamePersonId
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const listGiftByWinnerGamePersonId = /* GraphQL */ `
   query ListGiftByWinnerGamePersonId(
     $filter: ModelGiftFilterInput
@@ -292,7 +256,6 @@ export const listGiftByWinnerGamePersonId = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
         ownedGamePersonId
@@ -310,14 +273,21 @@ export const listGifts = /* GraphQL */ `
     $filter: ModelGiftFilterInput
     $limit: Int
     $nextToken: String
+    $ownedGamePersonId: ID
+    $sortDirection: ModelSortDirection
   ) {
-    listGifts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listGifts(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      ownedGamePersonId: $ownedGamePersonId
+      sortDirection: $sortDirection
+    ) {
       items {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
         ownedGamePersonId

@@ -16,8 +16,8 @@ const schema = a.schema({
       winnerGamePersonId: a.id(),
       winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
     })
+    .identifier(["ownedGamePersonId"])
     .secondaryIndexes((index) => [
-      index("ownedGamePersonId").name("byOwnedGamePerson"),
       index("winnerGamePersonId").name("byWinnerGamePerson"),
     ])
     .authorization(allow => [
@@ -52,7 +52,7 @@ const schema = a.schema({
 
   Person: a
     .model({
-      ownerLoginId: a.string().required(),
+      ownerLoginId: a.id().required(),
       isAdmin: a.boolean().default(false),
       games: a.hasMany("GamePerson", "personId"),
     })
@@ -65,7 +65,7 @@ const schema = a.schema({
 
   Game: a
     .model({
-      creator: a.id().required(),
+      creatorId: a.id(),
       name: a.string().required(),
       description: a.string().required(),
       secret: a.string().required(),
@@ -76,7 +76,7 @@ const schema = a.schema({
     .authorization(allow => [
       allow.publicApiKey(),
       allow.authenticated(),
-      allow.ownerDefinedIn("creator"),
+      allow.ownerDefinedIn("creatorId"),
     ]),
 
 })

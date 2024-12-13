@@ -71,7 +71,7 @@ export default function GameUpdateForm(props) {
   }, [idProp, gameModelProp]);
   React.useEffect(resetStateValues, [gameRecord]);
   const validations = {
-    creatorId: [{ type: "Required" }],
+    creatorId: [],
     name: [{ type: "Required" }],
     description: [{ type: "Required" }],
     secret: [{ type: "Required" }],
@@ -104,7 +104,7 @@ export default function GameUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          creatorId,
+          creatorId: creatorId ?? null,
           name,
           description,
           secret,
@@ -163,7 +163,7 @@ export default function GameUpdateForm(props) {
     >
       <TextField
         label="Creator id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={creatorId}
         onChange={(e) => {

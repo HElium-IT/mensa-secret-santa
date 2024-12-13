@@ -33,6 +33,7 @@ function App() {
 			person = data;
 		}
 		setPerson(person);
+		console.debug("Person", person);
 	}
 
 	useEffect(() => {

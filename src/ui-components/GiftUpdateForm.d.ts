@@ -18,31 +18,31 @@ export declare type ValidationResponse = {
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type GiftUpdateFormInputValues = {
     name?: string;
-    number?: number;
     attribute_1?: string;
     attribute_2?: string;
     attribute_3?: string;
+    number?: number;
 };
 export declare type GiftUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
-    number?: ValidationFunction<number>;
     attribute_1?: ValidationFunction<string>;
     attribute_2?: ValidationFunction<string>;
     attribute_3?: ValidationFunction<string>;
+    number?: ValidationFunction<number>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GiftUpdateFormOverridesProps = {
     GiftUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
-    number?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_1?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_2?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_3?: PrimitiveOverrideProps<TextFieldProps>;
+    number?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type GiftUpdateFormProps = React.PropsWithChildren<{
     overrides?: GiftUpdateFormOverridesProps | undefined | null;
 } & {
-    id?: string;
+    ownedGamePersonId?: string;
     gift?: Gift;
     onSubmit?: (fields: GiftUpdateFormInputValues) => GiftUpdateFormInputValues;
     onSuccess?: (fields: GiftUpdateFormInputValues) => void;

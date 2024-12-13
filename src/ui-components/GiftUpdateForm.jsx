@@ -9,7 +9,7 @@ import { updateGift } from "./graphql/mutations";
 const client = generateClient();
 export default function GiftUpdateForm(props) {
   const {
-    id: idProp,
+    ownedGamePersonId: ownedGamePersonIdProp,
     gift: giftModelProp,
     onSuccess,
     onError,
@@ -21,13 +21,12 @@ export default function GiftUpdateForm(props) {
   } = props;
   const initialValues = {
     name: "",
-    number: "",
     attribute_1: "",
     attribute_2: "",
     attribute_3: "",
+    number: "",
   };
   const [name, setName] = React.useState(initialValues.name);
-  const [number, setNumber] = React.useState(initialValues.number);
   const [attribute_1, setAttribute_1] = React.useState(
     initialValues.attribute_1
   );
@@ -37,40 +36,41 @@ export default function GiftUpdateForm(props) {
   const [attribute_3, setAttribute_3] = React.useState(
     initialValues.attribute_3
   );
+  const [number, setNumber] = React.useState(initialValues.number);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = giftRecord
       ? { ...initialValues, ...giftRecord }
       : initialValues;
     setName(cleanValues.name);
-    setNumber(cleanValues.number);
     setAttribute_1(cleanValues.attribute_1);
     setAttribute_2(cleanValues.attribute_2);
     setAttribute_3(cleanValues.attribute_3);
+    setNumber(cleanValues.number);
     setErrors({});
   };
   const [giftRecord, setGiftRecord] = React.useState(giftModelProp);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = idProp
+      const record = ownedGamePersonIdProp
         ? (
             await client.graphql({
               query: getGift.replaceAll("__typename", ""),
-              variables: { id: idProp },
+              variables: { ownedGamePersonId: ownedGamePersonIdProp },
             })
           )?.data?.getGift
         : giftModelProp;
       setGiftRecord(record);
     };
     queryData();
-  }, [idProp, giftModelProp]);
+  }, [ownedGamePersonIdProp, giftModelProp]);
   React.useEffect(resetStateValues, [giftRecord]);
   const validations = {
     name: [{ type: "Required" }],
-    number: [],
     attribute_1: [{ type: "Required" }],
     attribute_2: [{ type: "Required" }],
     attribute_3: [{ type: "Required" }],
+    number: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -99,10 +99,10 @@ export default function GiftUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           name,
-          number: number ?? null,
           attribute_1,
           attribute_2,
           attribute_3,
+          number: number ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -136,7 +136,7 @@ export default function GiftUpdateForm(props) {
             query: updateGift.replaceAll("__typename", ""),
             variables: {
               input: {
-                id: giftRecord.id,
+                ownedGamePersonId: giftRecord.ownedGamePersonId,
                 ...modelFields,
               },
             },
@@ -164,10 +164,10 @@ export default function GiftUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               name: value,
-              number,
               attribute_1,
               attribute_2,
               attribute_3,
+              number,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -183,38 +183,6 @@ export default function GiftUpdateForm(props) {
         {...getOverrideProps(overrides, "name")}
       ></TextField>
       <TextField
-        label="Number"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={number}
-        onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              name,
-              number: value,
-              attribute_1,
-              attribute_2,
-              attribute_3,
-            };
-            const result = onChange(modelFields);
-            value = result?.number ?? value;
-          }
-          if (errors.number?.hasError) {
-            runValidationTasks("number", value);
-          }
-          setNumber(value);
-        }}
-        onBlur={() => runValidationTasks("number", number)}
-        errorMessage={errors.number?.errorMessage}
-        hasError={errors.number?.hasError}
-        {...getOverrideProps(overrides, "number")}
-      ></TextField>
-      <TextField
         label="Attribute 1"
         isRequired={true}
         isReadOnly={false}
@@ -224,10 +192,10 @@ export default function GiftUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
-              number,
               attribute_1: value,
               attribute_2,
               attribute_3,
+              number,
             };
             const result = onChange(modelFields);
             value = result?.attribute_1 ?? value;
@@ -252,10 +220,10 @@ export default function GiftUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
-              number,
               attribute_1,
               attribute_2: value,
               attribute_3,
+              number,
             };
             const result = onChange(modelFields);
             value = result?.attribute_2 ?? value;
@@ -280,10 +248,10 @@ export default function GiftUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
-              number,
               attribute_1,
               attribute_2,
               attribute_3: value,
+              number,
             };
             const result = onChange(modelFields);
             value = result?.attribute_3 ?? value;
@@ -298,6 +266,38 @@ export default function GiftUpdateForm(props) {
         hasError={errors.attribute_3?.hasError}
         {...getOverrideProps(overrides, "attribute_3")}
       ></TextField>
+      <TextField
+        label="Number"
+        isRequired={false}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={number}
+        onChange={(e) => {
+          let value = isNaN(parseInt(e.target.value))
+            ? e.target.value
+            : parseInt(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              name,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+              number: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.number ?? value;
+          }
+          if (errors.number?.hasError) {
+            runValidationTasks("number", value);
+          }
+          setNumber(value);
+        }}
+        onBlur={() => runValidationTasks("number", number)}
+        errorMessage={errors.number?.errorMessage}
+        hasError={errors.number?.hasError}
+        {...getOverrideProps(overrides, "number")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
@@ -309,7 +309,7 @@ export default function GiftUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || giftModelProp)}
+          isDisabled={!(ownedGamePersonIdProp || giftModelProp)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -321,7 +321,7 @@ export default function GiftUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(idProp || giftModelProp) ||
+              !(ownedGamePersonIdProp || giftModelProp) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

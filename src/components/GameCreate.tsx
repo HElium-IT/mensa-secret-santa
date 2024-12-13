@@ -19,7 +19,7 @@ function GamesList({
         if (!user) return;
         const subscription = client.models.Game.onCreate({
             filter: {
-                creator: { eq: user.signInDetails?.loginId },
+                creatorId: { eq: user.signInDetails?.loginId },
             }
         }).subscribe({
             next: async (data) => {

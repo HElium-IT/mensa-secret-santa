@@ -50,7 +50,7 @@ export default function GameCreateForm(props) {
     setErrors({});
   };
   const validations = {
-    creatorId: [{ type: "Required" }],
+    creatorId: [],
     name: [{ type: "Required" }],
     description: [{ type: "Required" }],
     secret: [{ type: "Required" }],
@@ -144,7 +144,7 @@ export default function GameCreateForm(props) {
     >
       <TextField
         label="Creator id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={creatorId}
         onChange={(e) => {
