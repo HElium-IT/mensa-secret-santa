@@ -13,7 +13,7 @@ function GiftCreate({ gamePerson }: {
                     attribute_2: { label: "Attributo 2", placeholder: "Sport" },
                     attribute_3: { label: "Attributo 3", placeholder: "Legno" },
 
-                    ownerGamePersonId: { display: 'none', isRequired: false },
+                    ownerGamePersonId: { display: 'none', isRequired: false, defaultValue: gamePerson.id },
                     number: { display: 'none', isRequired: false },
                     winnerGamePersonId: { display: 'none', isRequired: false },
                 }}

@@ -17,7 +17,7 @@ function Game({ game, compact = false, onDelete }: {
     readonly compact?: boolean
     readonly onDelete?: () => void
 }) {
-    const { user } = useAuthenticator();
+    const { user } = useAuthenticator((context) => [context.user]);
     const [phase, setPhase] = useState<Schema["Game"]["type"]["phase"]>(game.phase);
     const [phaseText, setPhaseText] = useState<string>(gamePhaseToText(game.phase));
     const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(game.phase));

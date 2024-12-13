@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { signOut } from 'aws-amplify/auth';
 import { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
@@ -10,7 +9,7 @@ const client = generateClient<Schema>();
 
 
 function App() {
-	const { user } = useAuthenticator();
+	const { user, signOut } = useAuthenticator((context) => [context.user]);
 	const [loading, setLoading] = useState(true);
 	const [person, setPerson] = useState<Schema["Person"]["type"]>();
 	const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"]>();

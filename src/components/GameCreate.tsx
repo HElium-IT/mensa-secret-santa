@@ -15,7 +15,7 @@ function GameCreate({
     readonly setGame: (createdGame: Schema["Game"]["type"] | undefined
     ) => void;
 }) {
-    const { user } = useAuthenticator();
+    const { user } = useAuthenticator((context) => [context.user]);
     const [showCreateForm, setShowCreateForm] = useState(false);
 
     useEffect(() => {
@@ -56,8 +56,8 @@ function GameCreate({
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
                             joinQrCode: { display: 'none', isRequired: false },
-                            ownerId: { display: 'none', isRequired: false },
-                            phase: { display: 'none', isRequired: false },
+                            ownerId: { display: 'none', isRequired: false, defaultValue: user.signInDetails?.loginId },
+                            phase: { display: 'none', isRequired: false, defaultValue: "REGISTRATION_OPEN" },
                         }}
                         onError={(error) => { console.error("Game creation error", error); }}
                         onSuccess={(game) => { console.debug("Game created", game); }}

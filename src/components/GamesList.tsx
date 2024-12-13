@@ -9,7 +9,7 @@ import { sortGames } from '../utils';
 const client = generateClient<Schema>();
 
 function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"] | undefined) => void }) {
-    const { user } = useAuthenticator();
+    const { user } = useAuthenticator((context) => [context.user]);
     const [games, setGames] = useState<Schema["Game"]["type"][]>([]);
 
     useEffect(() => {

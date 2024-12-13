@@ -15,7 +15,7 @@ function GameSelector({
     readonly setGame: (game?: Schema["Game"]["type"]) => void
     readonly setIsSelectingGame: (isSelectingGame: boolean) => void
 }) {
-    const { user } = useAuthenticator();
+    const { user } = useAuthenticator((context) => [context.user]);
     const [searchTerm, setSearchTerm] = useState("");
     const [games, setGames] = useState<Schema["Game"]["type"][]>([]);
     const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"] | null>(null);

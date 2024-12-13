@@ -11,7 +11,7 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     readonly filterRole: Schema["GamePerson"]["type"]["role"],
     readonly userRole: Schema["GamePerson"]["type"]["role"],
 }) {
-    const { user } = useAuthenticator();
+    const { user } = useAuthenticator((context) => [context.user]);
     const [hasGift, setHasGift] = useState<Record<string, boolean>>({});
 
     const filteredGamePeople = gamePeople.filter(gamePerson => gamePerson.role === filterRole).sort(
