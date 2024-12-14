@@ -23,8 +23,8 @@ export const getGame = /* GraphQL */ `
   }
 `;
 export const getGamePerson = /* GraphQL */ `
-  query GetGamePerson($id: ID!) {
-    getGamePerson(id: $id) {
+  query GetGamePerson($gameId: ID!, $personId: ID!) {
+    getGamePerson(gameId: $gameId, personId: $personId) {
       acceptedInvitation
       createdAt
       game {
@@ -40,18 +40,18 @@ export const getGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      id
       ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       person {
@@ -69,12 +69,13 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       __typename
@@ -82,38 +83,37 @@ export const getGamePerson = /* GraphQL */ `
   }
 `;
 export const getGift = /* GraphQL */ `
-  query GetGift($id: ID!) {
-    getGift(id: $id) {
+  query GetGift($ownerGameId: ID!, $ownerPersonId: ID!) {
+    getGift(ownerGameId: $ownerGameId, ownerPersonId: $ownerPersonId) {
       attribute_1
       attribute_2
       attribute_3
       createdAt
-      id
       name
       number
+      ownerGameId
       ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      ownerGamePersonId
+      ownerPersonId
       updatedAt
+      winnerGameId
       winnerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      winnerGamePersonId
+      winnerPersonId
       __typename
     }
   }
@@ -136,15 +136,24 @@ export const getPerson = /* GraphQL */ `
 export const listGamePeople = /* GraphQL */ `
   query ListGamePeople(
     $filter: ModelGamePersonFilterInput
+    $gameId: ID
     $limit: Int
     $nextToken: String
+    $personId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
   ) {
-    listGamePeople(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listGamePeople(
+      filter: $filter
+      gameId: $gameId
+      limit: $limit
+      nextToken: $nextToken
+      personId: $personId
+      sortDirection: $sortDirection
+    ) {
       items {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
@@ -174,7 +183,6 @@ export const listGamePersonByGameId = /* GraphQL */ `
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
@@ -204,7 +212,6 @@ export const listGamePersonByPersonId = /* GraphQL */ `
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
@@ -239,19 +246,19 @@ export const listGames = /* GraphQL */ `
     }
   }
 `;
-export const listGiftByOwnerGamePersonId = /* GraphQL */ `
-  query ListGiftByOwnerGamePersonId(
+export const listGiftByOwnerGameId = /* GraphQL */ `
+  query ListGiftByOwnerGameId(
     $filter: ModelGiftFilterInput
     $limit: Int
     $nextToken: String
-    $ownerGamePersonId: ID!
+    $ownerGameId: ID!
     $sortDirection: ModelSortDirection
   ) {
-    listGiftByOwnerGamePersonId(
+    listGiftByOwnerGameId(
       filter: $filter
       limit: $limit
       nextToken: $nextToken
-      ownerGamePersonId: $ownerGamePersonId
+      ownerGameId: $ownerGameId
       sortDirection: $sortDirection
     ) {
       items {
@@ -259,12 +266,13 @@ export const listGiftByOwnerGamePersonId = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       nextToken
@@ -272,32 +280,33 @@ export const listGiftByOwnerGamePersonId = /* GraphQL */ `
     }
   }
 `;
-export const listGiftByWinnerGamePersonId = /* GraphQL */ `
-  query ListGiftByWinnerGamePersonId(
+export const listGiftByOwnerPersonId = /* GraphQL */ `
+  query ListGiftByOwnerPersonId(
     $filter: ModelGiftFilterInput
     $limit: Int
     $nextToken: String
+    $ownerPersonId: ID!
     $sortDirection: ModelSortDirection
-    $winnerGamePersonId: ID!
   ) {
-    listGiftByWinnerGamePersonId(
+    listGiftByOwnerPersonId(
       filter: $filter
       limit: $limit
       nextToken: $nextToken
+      ownerPersonId: $ownerPersonId
       sortDirection: $sortDirection
-      winnerGamePersonId: $winnerGamePersonId
     ) {
       items {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       nextToken
@@ -310,19 +319,30 @@ export const listGifts = /* GraphQL */ `
     $filter: ModelGiftFilterInput
     $limit: Int
     $nextToken: String
+    $ownerGameId: ID
+    $ownerPersonId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
   ) {
-    listGifts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listGifts(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      ownerGameId: $ownerGameId
+      ownerPersonId: $ownerPersonId
+      sortDirection: $sortDirection
+    ) {
       items {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       nextToken

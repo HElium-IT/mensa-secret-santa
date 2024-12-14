@@ -5,11 +5,13 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 const schema = a.schema({
   Gift: a
     .model({
-      ownerGamePersonId: a.id().required(),
-      ownerGamePerson: a.belongsTo("GamePerson", "ownerGamePersonId"),
+      ownerGameId: a.id().required(),
+      ownerPersonId: a.id().required(),
+      ownerGamePerson: a.belongsTo("GamePerson", ["ownerGameId", "ownerPersonId"]),
 
-      winnerGamePersonId: a.id(),
-      winnerGamePerson: a.belongsTo("GamePerson", "winnerGamePersonId"),
+      winnerGameId: a.id(),
+      winnerPersonId: a.id(),
+      winnerGamePerson: a.belongsTo("GamePerson", ["winnerGameId", "winnerPersonId"]),
 
       name: a.string().required(),
       attribute_1: a.string().required(),
@@ -19,9 +21,10 @@ const schema = a.schema({
       number: a.integer(),
 
     })
+    .identifier(["ownerGameId", "ownerPersonId"])
     .secondaryIndexes((index) => [
-      index("ownerGamePersonId").name("byOwnerGamePerson"),
-      index("winnerGamePersonId").name("byWinnerGamePerson"),
+      index("ownerGameId").name("byGame"),
+      index("ownerPersonId").name("byPerson"),
     ])
     .authorization(allow => [
       allow.authenticated()
@@ -38,9 +41,10 @@ const schema = a.schema({
       role: a.enum(["CREATOR", "ADMIN", "PLAYER"]),
       acceptedInvitation: a.boolean().default(false),
 
-      ownedGift: a.hasOne("Gift", "ownerGamePersonId"),
-      wonGift: a.hasOne("Gift", "winnerGamePersonId"),
+      ownedGift: a.hasOne("Gift", ["ownerGameId", "ownerPersonId"]),
+      wonGift: a.hasOne("Gift", ["winnerGameId", "winnerPersonId"]),
     })
+    .identifier(["gameId", "personId"])
     .secondaryIndexes((index) => [
       index("gameId").name("byGame"),
       index("personId").name("byPerson"),

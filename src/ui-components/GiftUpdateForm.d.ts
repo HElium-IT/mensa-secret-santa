@@ -42,7 +42,10 @@ export declare type GiftUpdateFormOverridesProps = {
 export declare type GiftUpdateFormProps = React.PropsWithChildren<{
     overrides?: GiftUpdateFormOverridesProps | undefined | null;
 } & {
-    id?: string;
+    id?: {
+        ownerGameId: string;
+        ownerPersonId: string;
+    };
     gift?: Gift;
     onSubmit?: (fields: GiftUpdateFormInputValues) => GiftUpdateFormInputValues;
     onSuccess?: (fields: GiftUpdateFormInputValues) => void;

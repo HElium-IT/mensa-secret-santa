@@ -75,15 +75,14 @@ function App() {
 
 	return (
 		<main className={"card"}>
-			<div className="flex-row" style={{ alignItems: 'center' }}>
-				<h1 style={{ textAlign: "center" }}>
-					Ciao {user?.signInDetails?.loginId?.split('@')[0]}
-				</h1>
-				{person?.isAdmin &&
-					<button type="button" onClick={handleSignOut}>
-						Sign out
-					</button>
-				}
+			<div className="flex-row" style={{ justifyContent: "center" }}>
+				<h2 style={{ textAlign: "center", textOverflow: "ellipsis", overflow: "hidden" }}>
+					{user?.signInDetails?.loginId?.split('@')[0]}
+				</h2>
+				<button type="button" onClick={handleSignOut}>
+					LogOut
+				</button>
+
 			</div>
 			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} setGame={selectGame} />}
 			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} />}

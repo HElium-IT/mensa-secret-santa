@@ -50,7 +50,7 @@ export default function GamePersonUpdateForm(props) {
         ? (
             await client.graphql({
               query: getGamePerson.replaceAll("__typename", ""),
-              variables: { id: idProp },
+              variables: { ...idProp },
             })
           )?.data?.getGamePerson
         : gamePersonModelProp;
@@ -124,7 +124,8 @@ export default function GamePersonUpdateForm(props) {
             query: updateGamePerson.replaceAll("__typename", ""),
             variables: {
               input: {
-                id: gamePersonRecord.id,
+                gameId: gamePersonRecord.gameId,
+                personId: gamePersonRecord.personId,
                 ...modelFields,
               },
             },

@@ -35,19 +35,21 @@ function Game({ game, compact = false, onDelete }: {
     const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
 
     useEffect(() => {
-        gamePeople.forEach(async gamePerson => {
-            const { data: gifts, errors } = await client.models.Gift.list({ filter: { ownerGamePersonId: { eq: gamePerson.id } } });
-            if (!gifts) {
-                console.error(gifts, errors)
-            }
-            const gift = gifts?.[0];
-            if (!gift) return;
-
-            setTotalGifts(totalGifts + 1);
-            if (gamePerson.role !== "PLAYER") {
-                setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
-            }
+        if (!game) return;
+        game.people().then(({ data: gamePeopleData }) => {
+            if (!gamePeopleData) return;
+            console.debug("Game.GamePeople", gamePeopleData);
+            setGamePeople(gamePeopleData);
+            gamePeopleData.forEach(gp => {
+                if (!gp) return;
+                if (gp.personId === user.signInDetails?.loginId) {
+                    console.debug("Game.GamePerson", gp);
+                    setGamePerson(gp);
+                    setPersonGameRoleText(gamePersonRoleToIcon(gp.role));
+                }
+            });
         });
+
         const subscription = client.models.Game.onDelete({
             filter: {
                 id: { eq: game.id }
@@ -56,39 +58,51 @@ function Game({ game, compact = false, onDelete }: {
             next: async (game) => {
                 const { data: gamePeople } = await game.people();
                 gamePeople.forEach(async gamePerson => {
-                    client.models.GamePerson.delete({ id: gamePerson.id });
+                    client.models.GamePerson.delete({
+                        gameId: game.id,
+                        personId: gamePerson.personId
+                    });
                 });
             }
         });
+        console.log("Game.onDeleteSubscription", subscription);
 
         return () => subscription.unsubscribe();
-    }, [user]);
+    }, []);
 
     useEffect(() => {
-        if (!game) return;
-        game.people().then(({ data: gamePeopleData }) => {
-            if (!gamePeopleData) return;
-            setGamePeople(gamePeopleData);
-            gamePeopleData.forEach(gp => {
-                if (!gp) return;
-                if (gp.personId === user.signInDetails?.loginId) {
-                    console.debug("GamePerson", gp);
-                    setGamePerson(gp);
-                    setPersonGameRoleText(gamePersonRoleToIcon(gp.role));
-                }
-            });
+        if (!gamePeople?.length) return;
+        gamePeople.forEach(async gamePerson => {
+            const { data: fetchedGift, errors } = await client.models.Gift.get({
+                ownerGameId: game.id,
+                ownerPersonId: gamePerson.personId
+            })
+            if (errors) {
+                console.error("Game.fetchedGift", errors)
+                return;
+            }
+            if (!fetchedGift) return
+            setTotalGifts(totalGifts + 1);
+            if (gamePerson.role !== "PLAYER") {
+                setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
+            }
         });
-    }, [game]);
+    }, [gamePeople]);
 
     useEffect(() => {
         if (!gamePerson) return;
-        const subscription = client.models.Gift.observeQuery({ filter: { ownerGamePersonId: { eq: gamePerson?.id } } }).subscribe({
+        const subscription = client.models.Gift.observeQuery({
+            filter: {
+                ownerGameId: { eq: game.id },
+                ownerPersonId: { eq: gamePerson.personId }
+            }
+        }).subscribe({
             next: ({ items: gifts }) => {
                 if (gifts && gifts.length > 0) {
                     setGift(gifts[0]);
                 }
             }
-        });
+        })
         return () => subscription.unsubscribe();
     }, [gamePerson]);
 
@@ -100,10 +114,16 @@ function Game({ game, compact = false, onDelete }: {
 
     async function acceptGameInvitation() {
         if (!gamePerson) return
-        client.models.GamePerson.update({
-            id: gamePerson.id,
+        const { data: updatedGamePerson, errors } = await client.models.GamePerson.update({
+            gameId: game.id,
+            personId: gamePerson.personId,
             acceptedInvitation: true
         })
+        if (errors || !updatedGamePerson) {
+            console.error("Game.acceptGameInvitation", errors);
+            return;
+        }
+        console.debug("Game.acceptGameInvitation", updatedGamePerson);
     }
 
     async function deleteGame() {
@@ -111,35 +131,37 @@ function Game({ game, compact = false, onDelete }: {
         const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id });
         if (gamePeople) {
             await Promise.all(gamePeople.map(async gp => {
-                const resultGamePerson = await client.models.GamePerson.delete({ id: gp.id });
-                console.log(resultGamePerson.errors ?? resultGamePerson.data);
+                const resultGamePerson = await client.models.GamePerson.delete(
+                    { gameId: game.id, personId: gp.personId }
+                );
+                console.log("Game.deleteGamePeople",
+                    resultGamePerson.errors ?? resultGamePerson.data);
             }));
         }
         const resultGame = await client.models.Game.delete({ id: game.id });
-        console.log(resultGame.errors ?? resultGame.data);
+        console.log("Game.deleteGame",
+            resultGame.errors ?? resultGame.data);
         if (onDelete) {
             onDelete();
         }
     }
 
-    if (gamePerson === undefined) {
-        return <></>
+    if (gamePerson === undefined || compact) {
+        return <div className="flex-row">
+            <h3 >
+                <span>{gamePersonRoleText}</span><span>{phaseIcon}</span>{game.name}
+            </h3>
+        </div>
     }
 
     if (!gamePerson.acceptedInvitation) {
         return (
-            <>
-                <h3 >{game.name}</h3>
-                <button onClick={acceptGameInvitation}>Accetta invito come {gamePerson.role?.toLowerCase()}</button>
-            </>
-        );
-    }
-
-    if (compact) {
-        return (
-            <h3 >
-                <span>{gamePersonRoleText}</span><span>{phaseIcon}</span>{game.name}
-            </h3>
+            <div className="flex-row">
+                <h3><span>{phaseIcon}</span>{game.name}</h3>
+                <button onClick={acceptGameInvitation}>
+                    Accetta invito come {gamePerson.role?.toLowerCase()}
+                </button>
+            </div>
         );
     }
 

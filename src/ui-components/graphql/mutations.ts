@@ -46,18 +46,18 @@ export const createGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      id
       ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       person {
@@ -75,12 +75,13 @@ export const createGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       __typename
@@ -97,32 +98,31 @@ export const createGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      id
       name
       number
+      ownerGameId
       ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      ownerGamePersonId
+      ownerPersonId
       updatedAt
+      winnerGameId
       winnerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      winnerGamePersonId
+      winnerPersonId
       __typename
     }
   }
@@ -189,18 +189,18 @@ export const deleteGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      id
       ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       person {
@@ -218,12 +218,13 @@ export const deleteGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       __typename
@@ -240,32 +241,31 @@ export const deleteGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      id
       name
       number
+      ownerGameId
       ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      ownerGamePersonId
+      ownerPersonId
       updatedAt
+      winnerGameId
       winnerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      winnerGamePersonId
+      winnerPersonId
       __typename
     }
   }
@@ -332,18 +332,18 @@ export const updateGamePerson = /* GraphQL */ `
         __typename
       }
       gameId
-      id
       ownedGift {
         attribute_1
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       person {
@@ -361,12 +361,13 @@ export const updateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
-        id
         name
         number
-        ownerGamePersonId
+        ownerGameId
+        ownerPersonId
         updatedAt
-        winnerGamePersonId
+        winnerGameId
+        winnerPersonId
         __typename
       }
       __typename
@@ -383,32 +384,31 @@ export const updateGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
-      id
       name
       number
+      ownerGameId
       ownerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      ownerGamePersonId
+      ownerPersonId
       updatedAt
+      winnerGameId
       winnerGamePerson {
         acceptedInvitation
         createdAt
         gameId
-        id
         personId
         role
         updatedAt
         __typename
       }
-      winnerGamePersonId
+      winnerPersonId
       __typename
     }
   }

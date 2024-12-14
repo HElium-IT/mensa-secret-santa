@@ -11,13 +11,24 @@ function Gift({ gift }: {
 
     useEffect(() => {
         if (!gift) return;
-        async function getGiftWinner() {
-            // const { data: gamePerson } = await gift.winnerGamePerson();
-            if (!gift.winnerGamePersonId) return;
-            const { data: gamePerson } = await client.models.GamePerson.get({ id: gift.winnerGamePersonId });
-            setGiftWinner(gamePerson?.personId);
-        }
-        getGiftWinner();
+
+        const subscription = client.models.Gift.onUpdate({
+            filter: {
+                ownerGameId: { eq: gift.ownerGameId },
+                ownerPersonId: { eq: gift.ownerPersonId }
+            }
+        }).subscribe({
+            next: async (updatedGift) => {
+                // if (!updatedGift.winnerGamePersonId) return;
+                // const { data: gamePerson } = await client.models.GamePerson.get({ id: updatedGift.winnerGamePersonId });
+                // setGiftWinner(gamePerson?.personId);
+                if (!updatedGift) return;
+                const { data: winnerGamePerson } = await updatedGift.winnerGamePerson();
+                setGiftWinner(winnerGamePerson?.personId);
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, [gift]);
 
     return (

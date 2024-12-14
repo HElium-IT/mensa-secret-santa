@@ -7,6 +7,8 @@ body {
   width: 100dvw;
   justify-content: center;
   align-items: center;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .fancy-bg {
@@ -60,7 +62,7 @@ ul {
 }
 
 ul.over {
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 li {
@@ -126,6 +128,7 @@ a {
   gap: 0.5rem;
   justify-content: stretch;
   align-items: center;
+  /* flex-wrap: wrap; */
 }
 
 .gift-card {

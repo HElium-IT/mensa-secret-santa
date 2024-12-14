@@ -21,7 +21,6 @@ export default function GameCreateForm(props) {
     onValidate,
     onChange,
     overrides,
-    ownerIdValue,
     ...rest
   } = props;
   const initialValues = {
@@ -32,7 +31,7 @@ export default function GameCreateForm(props) {
     joinQrCode: "",
     phase: "",
   };
-  const [ownerId, setOwnerId] = React.useState(ownerIdValue);
+  const [ownerId, setOwnerId] = React.useState(initialValues.ownerId);
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description

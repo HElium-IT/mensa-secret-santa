@@ -20,18 +20,22 @@ function GameCreate({
 
     useEffect(() => {
         if (!user.signInDetails?.loginId) return;
-        const subscription = client.models.Game.onCreate().subscribe({
-            next: async (data) => {
-                if (data.ownerId !== user.signInDetails?.loginId) return;
-                console.debug("Game created", data);
-                const gamePerson = await client.models.GamePerson.create({
-                    gameId: data.id,
+        const subscription = client.models.Game.onCreate({
+            filter: {
+                ownerId: { eq: user.signInDetails?.loginId }
+            }
+        }).subscribe({
+            next: async (game) => {
+                if (game.ownerId !== user.signInDetails?.loginId) return;
+                console.info("GameCreate.GameOnCreateSubscription", "triggered", game);
+                const { data: gamePerson } = await client.models.GamePerson.create({
+                    gameId: game.id,
                     personId: user.signInDetails?.loginId ?? '',
                     role: "CREATOR",
                     acceptedInvitation: true,
                 });
                 console.debug("GamePerson created", gamePerson);
-                setGame(data);
+                setGame(game);
             }
         });
 
@@ -54,18 +58,21 @@ function GameCreate({
                             description: { label: "Descrizione", placeholder: "Cena Natale 2024 a casa di Francesco" },
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
-                            joinQrCode: {},
-                            ownerId: { defaultValue: user.signInDetails?.loginId },
-                            phase: { defaultValue: "REGISTRATION_OPEN" as NonNullable<Schema["Game"]["type"]["phase"]> },
+                            joinQrCode: { display: 'none' },
+                            ownerId: { required: false, value: user.signInDetails?.loginId },
+                            phase: { required: false, value: "REGISTRATION_OPEN" }
                         }}
-                        onChange={(data) => {
+                        onValidate={{
+                            ownerId: () => { return { hasError: false } },
+                            phase: () => { return { hasError: false } }
+                        }}
+                        onSubmit={(data) => {
                             data.ownerId = user.signInDetails?.loginId ?? 'UNKNOWN';
                             data.phase = "REGISTRATION_OPEN";
-                            console.debug("Game changed", data);
+                            console.debug("Game to create", data);
                             return data;
                         }}
-                        onSubmit={(data) => { console.debug("Game to create", data); return data; }}
-                        onError={(error) => { console.error("Game creation error", error); }}
+                        onError={(fields, errors) => { console.error("Game creation error", { fields, errors }); }}
                         onSuccess={(data) => { console.debug("Game created", data); }}
                     // onSubmit={(game) => {
                     //     game.ownerId = user.signInDetails?.loginId ?? '';

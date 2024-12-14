@@ -56,7 +56,7 @@ export default function GiftUpdateForm(props) {
         ? (
             await client.graphql({
               query: getGift.replaceAll("__typename", ""),
-              variables: { id: idProp },
+              variables: { ...idProp },
             })
           )?.data?.getGift
         : giftModelProp;
@@ -136,7 +136,8 @@ export default function GiftUpdateForm(props) {
             query: updateGift.replaceAll("__typename", ""),
             variables: {
               input: {
-                id: giftRecord.id,
+                ownerGameId: giftRecord.ownerGameId,
+                ownerPersonId: giftRecord.ownerPersonId,
                 ...modelFields,
               },
             },

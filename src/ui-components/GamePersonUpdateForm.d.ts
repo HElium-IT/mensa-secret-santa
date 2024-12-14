@@ -33,7 +33,10 @@ export declare type GamePersonUpdateFormOverridesProps = {
 export declare type GamePersonUpdateFormProps = React.PropsWithChildren<{
     overrides?: GamePersonUpdateFormOverridesProps | undefined | null;
 } & {
-    id?: string;
+    id?: {
+        gameId: string;
+        personId: string;
+    };
     gamePerson?: GamePerson;
     onSubmit?: (fields: GamePersonUpdateFormInputValues) => GamePersonUpdateFormInputValues;
     onSuccess?: (fields: GamePersonUpdateFormInputValues) => void;

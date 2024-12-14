@@ -17,68 +17,94 @@ function GameSelector({
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [fetchedGames, setFetchedGames] = useState<Schema["Game"]["type"][]>([]);
     const [games, setGames] = useState<Schema["Game"]["type"][]>([]);
     const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"] | null>(null);
     const [promptSecret, setPromptSecret] = useState(false);
     const [secretInput, setSecretInput] = useState("");
     const [error, setError] = useState("");
 
-    async function fetchGames(searchTerm: string = "") {
-        // This is the worst way to do this, but it's fine for now.
-        // The filtering should be done server-side but I don't know
-        // how to do it, docs are shamefully lacking.
-        const gamesData = (await client.models.Game.list({
-            filter: {
-                // name: { contains: searchTerm }
-                or: [
-                    { phase: { eq: "REGISTRATION_OPEN" } },
-                    { phase: { eq: "LOBBY" } }
-                ]
+    useEffect(() => {
+        const subscription = client.models.Game.observeQuery().subscribe({
+            next: async ({ items: games }) => {
+                console.debug("GameSelector.FetchedGames", games);
+                setFetchedGames(games);
             }
-        })).data.filter(game => game && game.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        setGames(gamesData.length > 0 ? gamesData : []);
-    }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
-        if (!searchTerm) {
+        if (!searchTerm || !fetchedGames) {
             setGames([]);
             setIsSelectingGame(false);
             return;
         }
         setIsSelectingGame(true);
-        fetchGames(searchTerm);
-    }, [searchTerm]);
-
-    async function validateSecret() {
-        if (selectedGame?.secret === secretInput) {
-            setGame(selectedGame);
-        } else {
-            setError("Invalid secret");
-        }
-    }
+        const games = fetchedGames.filter(game =>
+            ["REGISTRATION_OPEN", "LOBBY"].includes(game.phase ?? '')
+            && game.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        console.debug("GameSelector.Games", games);
+        setGames(games);
+    }, [searchTerm, fetchedGames]);
 
     useEffect(() => {
+        console.debug("GameSelector.SelectedGame", selectedGame);
         if (!selectedGame) {
             setPromptSecret(false);
             return;
         }
         async function fetchGamePerson(game: Schema["Game"]["type"]) {
-            const { data: gamePeople } = await client.models.GamePerson.listGamePersonByGameId({ gameId: game.id }, {
-                filter: {
-                    personId: { eq: user.signInDetails?.loginId }
-                }
-            });
-            if (!gamePeople) return;
-            const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
-            if (!gamePerson) return;
-            if (gamePerson.acceptedInvitation) {
-                setGame(game);
-            } else {
+            if (!user.signInDetails?.loginId) return;
+
+            const { data: gamePerson } = await client.models.GamePerson.get({ gameId: game.id, personId: user.signInDetails?.loginId });
+            if (!gamePerson) {
+                console.debug("GameSelector.PromptSecret", true);
                 setPromptSecret(true);
+                return;
             }
+            console.debug("GameSelector.GamePersonFound", gamePerson);
+            if (!gamePerson.acceptedInvitation) {
+                const { data: gamePerson, errors } = await client.models.GamePerson.update({
+                    gameId: game.id,
+                    personId: user.signInDetails?.loginId,
+                    acceptedInvitation: true
+                });
+                if (errors || !gamePerson) {
+                    console.error(errors);
+                    return;
+                }
+                console.debug("GameSelector.GamePersonUpdate", gamePerson);
+                console.info(`Implicitly accepted invitation with role ${gamePerson.role}`);
+            }
+            setGame(game);
         }
+
         fetchGamePerson(selectedGame);
     }, [selectedGame]);
+
+    async function validateSecret() {
+        if (!selectedGame || !user.signInDetails?.loginId) return;
+
+        if (selectedGame?.secret === secretInput) {
+            const { data: gamePerson, errors } = await client.models.GamePerson.create({
+                gameId: selectedGame.id,
+                personId: user.signInDetails?.loginId,
+                role: "PLAYER",
+                acceptedInvitation: true
+            });
+            if (errors) {
+                console.error(errors);
+                return;
+            }
+            console.debug("GameSelector.GamePersonCreate", gamePerson);
+            setGame(selectedGame);
+        } else {
+            setError("Invalid secret");
+        }
+    }
 
     return (
         <>
@@ -90,8 +116,10 @@ function GameSelector({
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <ul className='over'>
-                {games.sort(sortGames).filter(game => game).map(game => (
-                    <li key={game.id} onClick={() => setSelectedGame(game)}>
+                {games.map(game => (
+                    <li key={game.id} onClick={() => {
+                        setSelectedGame(game)
+                    }}>
                         <Game game={game} compact />
                     </li>
                 ))}

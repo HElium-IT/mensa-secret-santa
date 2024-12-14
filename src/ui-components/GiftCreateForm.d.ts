@@ -16,6 +16,8 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type GiftCreateFormInputValues = {
+    ownerPersonId?: string;
+    ownerGameId?: string;
     name?: string;
     attribute_1?: string;
     attribute_2?: string;
@@ -41,7 +43,6 @@ export declare type GiftCreateFormOverridesProps = {
 export declare type GiftCreateFormProps = React.PropsWithChildren<{
     overrides?: GiftCreateFormOverridesProps | undefined | null;
 } & {
-    ownerGamePersonId?: string;
     clearOnSuccess?: boolean;
     onSubmit?: (fields: GiftCreateFormInputValues) => GiftCreateFormInputValues;
     onSuccess?: (fields: GiftCreateFormInputValues) => void;

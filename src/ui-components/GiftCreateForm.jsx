@@ -15,7 +15,6 @@ export default function GiftCreateForm(props) {
     onValidate,
     onChange,
     overrides,
-    ownerGamePersonId,
     ...rest
   } = props;
   const initialValues = {
@@ -116,7 +115,6 @@ export default function GiftCreateForm(props) {
             query: createGift.replaceAll("__typename", ""),
             variables: {
               input: {
-                ownerGamePersonId: ownerGamePersonId,
                 ...modelFields,
               },
             },
