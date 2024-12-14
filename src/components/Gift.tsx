@@ -4,10 +4,12 @@ import { generateClient } from "aws-amplify/data";
 
 const client = generateClient<Schema>();
 
-function Gift({ gift }: {
-    readonly gift: Schema["Gift"]["type"]
+function Gift({ gift, onDelete }: {
+    readonly gift: Schema["Gift"]["type"],
+    readonly onDelete?: () => void
 }) {
     const [giftWinner, setGiftWinner] = useState<Schema["GamePerson"]["type"]["personId"]>();
+    const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
 
     useEffect(() => {
         if (!gift) return;
@@ -31,9 +33,40 @@ function Gift({ gift }: {
         return () => subscription.unsubscribe();
     }, [gift]);
 
+    async function deleteGift() {
+        if (!gift) return;
+        const { data: resultGift, errors } = await client.models.Gift.delete({
+            ownerGameId: gift.ownerGameId,
+            ownerPersonId: gift.ownerPersonId
+        });
+        if (errors) {
+            console.error("Gift.deleteGift", errors);
+            return;
+        }
+        console.debug("Gift.deleteGift", resultGift);
+        if (onDelete)
+            onDelete();
+
+    }
+
     return (
         <div className="gift-card">
-            <h4>{gift.name}</h4>
+            <div className="flex-row">
+                <h4>{gift.name}</h4>
+                {!promptDeleteConfirmation &&
+                    <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
+                }
+                {promptDeleteConfirmation &&
+                    <>
+                        <button style={{ background: 'red' }} onClick={deleteGift}>Conferma</button >
+                        <button style={{ background: 'lightcoral' }} onClick={() => {
+                            setPromptDeleteConfirmation(false);
+                        }}>Annulla</button>
+                    </>
+                }
+
+            </div>
+
             <p>{gift.attribute_1}</p>
             <p>{gift.attribute_2}</p>
             <p>{gift.attribute_3}</p>

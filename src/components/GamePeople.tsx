@@ -13,11 +13,41 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
     const [hasGift, setHasGift] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-        gamePeople.forEach(async gamePerson => {
-            const { data: gift } = await gamePerson.ownedGift();
-            if (!gift) return;
-            setHasGift(prevHasGift => ({ ...prevHasGift, [gamePerson.personId]: !!gift }));
+        if (!gamePeople?.length) return;
+
+        // const subscription = client.models.GamePerson.observeQuery({
+        //     filter: {
+        //         gameId: { eq: gameId }
+        //     }
+        // }).subscribe({
+        //     next: async ({ items: gamePeople }) => {
+        //         setGamePeople(gamePeople);
+        //         console.debug("GamePeople.gamePeopleChanged", gamePeople);
+        //         gamePeople.forEach(async gamePerson => {
+        //             const { data: gift } = await gamePerson.ownedGift();
+        //             if (gift) {
+        //                 setHasGift(hasGift => ({ ...hasGift, [gamePerson.personId]: true }));
+        //             }
+        //         });
+        //     }
+        // });
+
+        const subscription = client.models.Gift.observeQuery({
+            filter: {
+                ownerGameId: { eq: gamePeople[0].gameId }
+            }
+        }).subscribe({
+            next: ({ items: gifts }) => {
+                const giftOwners = gifts.map(gift => gift.ownerPersonId);
+                const hasGift = gamePeople.reduce((acc, gamePerson) => {
+                    acc[gamePerson.personId] = giftOwners.includes(gamePerson.personId);
+                    return acc;
+                }, {} as Record<string, boolean>);
+                setHasGift(hasGift);
+            }
         });
+
+        return () => subscription.unsubscribe();
 
     }, [gamePeople]);
 
