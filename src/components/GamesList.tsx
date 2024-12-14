@@ -33,7 +33,7 @@ function GamesList({ setGame, isAdmin = false }: {
             }
         });
         return () => subscription.unsubscribe();
-    }, [user]);
+    }, []);
 
     return (
         <>

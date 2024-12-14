@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 
@@ -21,9 +21,10 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
-    const [dynamicGame, setDynamicGame] = useState<Schema["Game"]["type"]>(game);
-    const [phaseText, setPhaseText] = useState<string>(gamePhaseToText(game.phase));
-    const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(game.phase));
+    const gameMemo = useMemo(() => game, [game]);
+    const [dynamicGame, setDynamicGame] = useState<Schema["Game"]["type"]>(gameMemo);
+    const [phaseText, setPhaseText] = useState<string>(gamePhaseToText(gameMemo.phase));
+    const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(gameMemo.phase));
 
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
@@ -38,38 +39,37 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     const [totalGifts, setTotalGifts] = useState<number>(0);
     const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
 
+    async function _setGamePeople(gamePeople?: Schema["GamePerson"]["type"][]) {
+        if (!gamePeople) {
+            const { data, errors } = await gameMemo.people();
+            if (errors) {
+                console.error("Game._setGamePeople", errors);
+                return;
+            }
+            gamePeople = data;
+        }
+        setGamePeople(gamePeople);
+        console.debug("Game.GamePeople", gamePeople);
+
+        const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
+        if (!gamePerson) return;
+
+        setGamePerson(gamePerson);
+        setPersonGameRoleText(gamePersonRoleToIcon(gamePerson.role));
+        console.debug("Game.GamePerson", gamePerson);
+    }
+
+
     useEffect(() => {
-        if (!game) return;
+        if (!gameMemo) return;
 
-        let gamePeopleSubscriptions: Subscription[] = [];
-        client.models.GamePerson.listGamePersonByGameId({
-            gameId: game.id
-        }).then(({ data: gamePeople }) => {
-
-            gamePeopleSubscriptions = gamePeople.map(gamePerson => {
-                const subscription = client.models.GamePerson.observeQuery({
-                    filter: {
-                        gameId: { eq: game.id },
-                        personId: { eq: gamePerson.personId }
-                    }
-                }).subscribe({
-                    next: async ({ items: gamePeople }) => {
-                        setGamePeople(gamePeople);
-
-                        const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
-                        if (!gamePerson) return;
-
-                        setGamePerson(gamePerson);
-                        setPersonGameRoleText(gamePersonRoleToIcon(gamePerson?.role));
-                        console.debug("Game.GamePeople", gamePeople);
-                        console.debug("Game.GamePerson", gamePerson);
-                    }
-                });
-                return subscription;
-            });
-        })
-        console.debug("Game.GamePeopleSubscriptions", gamePeopleSubscriptions);
-
+        const gamePeopleSubscription = client.models.GamePerson.observeQuery({
+        }).subscribe({
+            next: async ({ items: gamePeople }) => {
+                _setGamePeople(gamePeople.filter(gp => gp.gameId === gameMemo.id));
+            }
+        });
+        console.debug("Game.GamePeopleSubscription", gamePeopleSubscription);
 
         const gameOnDelete = client.models.Game.onDelete({
             filter: {
@@ -86,7 +86,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
                 });
             }
         });
-        console.debug("Game.onDeleteSubscription", onDelete);
+        console.debug("Game.onDeleteSubscription", gameOnDelete);
 
         const gameOnUpdate = client.models.Game.onUpdate({
             filter: {
@@ -100,11 +100,11 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         console.debug("Game.onUpdateSubscription", gameOnUpdate);
 
         return () => {
-            gamePeopleSubscriptions.forEach(observer => observer.unsubscribe());
+            gamePeopleSubscription.unsubscribe();
             gameOnDelete.unsubscribe();
             gameOnUpdate.unsubscribe();
         }
-    }, []);
+    }, [gameMemo]);
 
     useEffect(() => {
         if (!gamePeople?.length) return;
@@ -255,6 +255,40 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         </>
     )
 
+    const abandonPrompt = (
+        <>
+            {!promptAbandonConfirmation
+                && gamePerson.role !== "CREATOR" &&
+                <button style={{ background: 'red' }} onClick={() => setPromptAbandonConfirmation(true)}>Abbandona</button>
+            }
+            {promptAbandonConfirmation &&
+                <button style={{ background: 'red' }} onClick={abandonGame}>Conferma</button>
+            }
+            {promptAbandonConfirmation &&
+                <button style={{ background: 'lightcoral' }} onClick={() => {
+                    setPromptAbandonConfirmation(false);
+                }}>Annulla</button>
+            }
+        </>
+    )
+
+    const deletePrompt = (
+        <>
+            {!promptDeleteConfirmation
+                && (gamePerson.role === "CREATOR" || isAdmin) &&
+                <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
+            }
+            {promptDeleteConfirmation &&
+                <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
+            }
+            {promptDeleteConfirmation &&
+                <button style={{ background: 'lightcoral' }} onClick={() => {
+                    setPromptDeleteConfirmation(false);
+                }}>Annulla</button>
+            }
+        </>
+    )
+
     if (gamePerson.role === "PLAYER") {
         return (
             <>
@@ -271,6 +305,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
                     </p>
                 }
                 {giftDetails}
+                {abandonPrompt}
             </>
         )
     }
@@ -279,38 +314,23 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         <>
             {gameBaseDetails}
             {giftDetails}
+
+
             <h3>Creatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
             <h3>Admin</h3>
             <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
             <h3>Giocatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
+
             {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
                 <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role} />
             )}
             <div className="flex-row">
-                {!promptDeleteConfirmation
-                    && (gamePerson.role === "CREATOR" || isAdmin) &&
-                    <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
-                }
-                {promptDeleteConfirmation &&
-                    <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
-                }
-                {!promptAbandonConfirmation
-                    && gamePerson.role !== "CREATOR" &&
-                    <button style={{ background: 'red' }} onClick={() => setPromptAbandonConfirmation(true)}>Abbandona</button>
-                }
-                {promptAbandonConfirmation &&
-                    <button style={{ background: 'red' }} onClick={abandonGame}>Conferma</button>
-                }
-                {(promptDeleteConfirmation || promptAbandonConfirmation) &&
-                    <button style={{ background: 'lightcoral' }} onClick={() => {
-                        setPromptDeleteConfirmation(false);
-                        setPromptAbandonConfirmation(false);
-                    }}>Annulla</button>
-                }
+                {deletePrompt}
+                {abandonPrompt}
                 <GamePhaseUpdater
-                    game={game}
+                    game={gameMemo}
                     gamePerson={gamePerson}
                     phase={dynamicGame.phase}
                     setPhase={(phase: Schema["Game"]["type"]["phase"]) => setDynamicGame({ ...dynamicGame, phase })}
