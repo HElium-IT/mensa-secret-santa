@@ -12,7 +12,6 @@ function GameGiftControl({ game, gamePeople, userRole }: {
 }) {
     const [selectedGamePersonId, setSelectedGamePersonId] = useState<Schema["GamePerson"]["type"]["personId"]>("");
     const [selectedIsValid, setSelectedIsValid] = useState(false);
-    const [fetchedGifts, setFetchedGifts] = useState<Schema["Gift"]["type"][]>([]);
     const [gamePeopleWithUnregisteredGift, setGamePeopleWithUnregisteredGift] = useState<Schema["GamePerson"]["type"][]>([]);
     if (!game || userRole === "PLAYER") {
         return null;
