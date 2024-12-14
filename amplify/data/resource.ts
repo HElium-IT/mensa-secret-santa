@@ -19,7 +19,7 @@ const schema = a.schema({
       attribute_3: a.string().required(),
 
       number: a.integer(),
-
+      isSelected: a.boolean().default(false),
     })
     .identifier(["ownerGameId", "ownerPersonId"])
     .secondaryIndexes((index) => [

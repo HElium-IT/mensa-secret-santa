@@ -54,6 +54,20 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
         console.debug("GamePeople.upgradeToAdmin", updatedGamePerson);
     }
 
+    async function demoteToPlayer(gamePerson: Schema["GamePerson"]["type"]) {
+        if (userRole === 'PLAYER') return;
+        const { data: updatedGamePerson, errors } = await client.models.GamePerson.update({
+            gameId: gamePerson.gameId,
+            personId: gamePerson.personId,
+            role: 'PLAYER',
+        })
+        if (errors || !updatedGamePerson) {
+            console.error("GamePeople.demoteToPlayer", errors);
+            return;
+        }
+        console.debug("GamePeople.demoteToPlayer", updatedGamePerson);
+    }
+
     return (
         <>
             <ul>
@@ -62,12 +76,18 @@ function GamePeople({ gamePeople, filterRole, userRole }: {
                         {(userRole === "CREATOR" || userRole === "ADMIN") && !gamePerson.acceptedInvitation && '📧'}
                         {hasGift[gamePerson.personId] && '🎁'}
                         {gamePerson.personId}
-                        {
-                            gamePerson.role === 'PLAYER' &&
+                        {userRole === "CREATOR" && gamePerson.role === 'PLAYER' &&
                             <button style={{ padding: 1 }} onClick={() => upgradeToAdmin(gamePerson)}>
                                 {gamePersonRoleToIcon("ADMIN")}
                             </button>
                         }
+                        {userRole === "CREATOR" && gamePerson.role === 'ADMIN' &&
+                            <button style={{ padding: 1 }} onClick={() => demoteToPlayer(gamePerson)}>
+                                {gamePersonRoleToIcon("PLAYER")}
+                            </button>
+
+                        }
+
                     </li>
                 ))}
             </ul>

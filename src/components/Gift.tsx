@@ -51,8 +51,8 @@ function Gift({ gift, onDelete }: {
 
     return (
         <div className="gift-card">
-            <div className="flex-row">
-                <h4>{gift.name}</h4>
+            <div className="flex-row" style={{ flexWrap: 'wrap' }}>
+                <h2 style={{ margin: '0px' }}>{gift.number ? gift.number + ' - ' : ''}{gift.name}</h2>
                 {!promptDeleteConfirmation &&
                     <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
                 }
