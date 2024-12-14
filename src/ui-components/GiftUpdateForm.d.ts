@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { Gift } from "./graphql/types";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
@@ -17,11 +17,14 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type GiftUpdateFormInputValues = {
+    ownerPersonId?: string;
+    ownerGameId?: string;
     name?: string;
     attribute_1?: string;
     attribute_2?: string;
     attribute_3?: string;
     number?: number;
+    isSelected?: boolean;
 };
 export declare type GiftUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
@@ -29,6 +32,7 @@ export declare type GiftUpdateFormValidationValues = {
     attribute_2?: ValidationFunction<string>;
     attribute_3?: ValidationFunction<string>;
     number?: ValidationFunction<number>;
+    isSelected?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GiftUpdateFormOverridesProps = {
@@ -38,6 +42,7 @@ export declare type GiftUpdateFormOverridesProps = {
     attribute_2?: PrimitiveOverrideProps<TextFieldProps>;
     attribute_3?: PrimitiveOverrideProps<TextFieldProps>;
     number?: PrimitiveOverrideProps<TextFieldProps>;
+    isSelected?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type GiftUpdateFormProps = React.PropsWithChildren<{
     overrides?: GiftUpdateFormOverridesProps | undefined | null;

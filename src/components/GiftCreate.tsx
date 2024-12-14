@@ -14,6 +14,7 @@ function GiftCreate({ gamePerson }: {
                     attribute_3: { label: "Attributo 3", placeholder: "Legno" },
 
                     number: { display: 'none', required: false },
+                    isSelected: { display: 'none' },
                 }}
                 onSubmit={(data) => {
                     console.debug("GiftCreateForm.onSubmit", data);

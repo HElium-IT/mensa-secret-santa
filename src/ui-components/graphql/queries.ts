@@ -45,6 +45,7 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -69,6 +70,7 @@ export const getGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -89,6 +91,7 @@ export const getGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      isSelected
       name
       number
       ownerGameId
@@ -266,6 +269,7 @@ export const listGiftByOwnerGameId = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -300,6 +304,7 @@ export const listGiftByOwnerPersonId = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -336,6 +341,7 @@ export const listGifts = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId

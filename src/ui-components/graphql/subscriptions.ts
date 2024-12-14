@@ -50,6 +50,7 @@ export const onCreateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -74,6 +75,7 @@ export const onCreateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -94,6 +96,7 @@ export const onCreateGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      isSelected
       name
       number
       ownerGameId
@@ -189,6 +192,7 @@ export const onDeleteGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -213,6 +217,7 @@ export const onDeleteGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -233,6 +238,7 @@ export const onDeleteGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      isSelected
       name
       number
       ownerGameId
@@ -328,6 +334,7 @@ export const onUpdateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -352,6 +359,7 @@ export const onUpdateGamePerson = /* GraphQL */ `
         attribute_2
         attribute_3
         createdAt
+        isSelected
         name
         number
         ownerGameId
@@ -372,6 +380,7 @@ export const onUpdateGift = /* GraphQL */ `
       attribute_2
       attribute_3
       createdAt
+      isSelected
       name
       number
       ownerGameId

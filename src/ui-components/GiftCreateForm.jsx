@@ -1,7 +1,13 @@
 /* eslint-disable */
 "use client";
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { createGift } from "./graphql/mutations";
@@ -23,6 +29,7 @@ export default function GiftCreateForm(props) {
     attribute_2: "",
     attribute_3: "",
     number: "",
+    isSelected: false,
   };
   const [name, setName] = React.useState(initialValues.name);
   const [attribute_1, setAttribute_1] = React.useState(
@@ -35,6 +42,7 @@ export default function GiftCreateForm(props) {
     initialValues.attribute_3
   );
   const [number, setNumber] = React.useState(initialValues.number);
+  const [isSelected, setIsSelected] = React.useState(initialValues.isSelected);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
@@ -42,6 +50,7 @@ export default function GiftCreateForm(props) {
     setAttribute_2(initialValues.attribute_2);
     setAttribute_3(initialValues.attribute_3);
     setNumber(initialValues.number);
+    setIsSelected(initialValues.isSelected);
     setErrors({});
   };
   const validations = {
@@ -50,6 +59,7 @@ export default function GiftCreateForm(props) {
     attribute_2: [{ type: "Required" }],
     attribute_3: [{ type: "Required" }],
     number: [],
+    isSelected: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -82,6 +92,7 @@ export default function GiftCreateForm(props) {
           attribute_2,
           attribute_3,
           number,
+          isSelected,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -149,6 +160,7 @@ export default function GiftCreateForm(props) {
               attribute_2,
               attribute_3,
               number,
+              isSelected,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -177,6 +189,7 @@ export default function GiftCreateForm(props) {
               attribute_2,
               attribute_3,
               number,
+              isSelected,
             };
             const result = onChange(modelFields);
             value = result?.attribute_1 ?? value;
@@ -205,6 +218,7 @@ export default function GiftCreateForm(props) {
               attribute_2: value,
               attribute_3,
               number,
+              isSelected,
             };
             const result = onChange(modelFields);
             value = result?.attribute_2 ?? value;
@@ -233,6 +247,7 @@ export default function GiftCreateForm(props) {
               attribute_2,
               attribute_3: value,
               number,
+              isSelected,
             };
             const result = onChange(modelFields);
             value = result?.attribute_3 ?? value;
@@ -265,6 +280,7 @@ export default function GiftCreateForm(props) {
               attribute_2,
               attribute_3,
               number: value,
+              isSelected,
             };
             const result = onChange(modelFields);
             value = result?.number ?? value;
@@ -279,6 +295,35 @@ export default function GiftCreateForm(props) {
         hasError={errors.number?.hasError}
         {...getOverrideProps(overrides, "number")}
       ></TextField>
+      <SwitchField
+        label="Is selected"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isSelected}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              name,
+              attribute_1,
+              attribute_2,
+              attribute_3,
+              number,
+              isSelected: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.isSelected ?? value;
+          }
+          if (errors.isSelected?.hasError) {
+            runValidationTasks("isSelected", value);
+          }
+          setIsSelected(value);
+        }}
+        onBlur={() => runValidationTasks("isSelected", isSelected)}
+        errorMessage={errors.isSelected?.errorMessage}
+        hasError={errors.isSelected?.hasError}
+        {...getOverrideProps(overrides, "isSelected")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
