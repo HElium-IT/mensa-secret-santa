@@ -59,14 +59,15 @@ function GameCreate({
                             secret: { label: "Segreto", placeholder: "Ciccio2024" },
 
                             joinQrCode: { display: 'none' },
-                            ownerId: { required: false, value: user.signInDetails?.loginId },
-                            phase: { required: false, value: "REGISTRATION_OPEN" }
+                            ownerId: { display: 'none', required: false, value: user.signInDetails?.loginId },
+                            phase: { display: 'none', required: false, value: "REGISTRATION_OPEN" }
                         }}
                         onValidate={{
                             ownerId: () => { return { hasError: false } },
                             phase: () => { return { hasError: false } }
                         }}
                         onSubmit={(data) => {
+                            // TODO Check if thise 2 lines can be removed (since the "value" attribute is set in the overrides)
                             data.ownerId = user.signInDetails?.loginId ?? 'UNKNOWN';
                             data.phase = "REGISTRATION_OPEN";
                             console.debug("Game to create", data);

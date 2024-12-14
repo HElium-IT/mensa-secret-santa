@@ -13,7 +13,7 @@ function GiftCreate({ gamePerson }: {
                     attribute_2: { label: "Attributo 2", placeholder: "Sport" },
                     attribute_3: { label: "Attributo 3", placeholder: "Legno" },
 
-                    number: { 'display': 'none' },
+                    number: { display: 'none', required: false },
                 }}
                 onSubmit={(data) => {
                     console.debug("GiftCreateForm.onSubmit", data);
