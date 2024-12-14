@@ -8,7 +8,10 @@ import { sortGames } from '../utils';
 
 const client = generateClient<Schema>();
 
-function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"] | undefined) => void }) {
+function GamesList({ setGame, isAdmin = false }: {
+    readonly setGame: (game: Schema["Game"]["type"] | undefined) => void,
+    readonly isAdmin?: boolean
+}) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [games, setGames] = useState<Schema["Game"]["type"][]>([]);
 
@@ -30,7 +33,7 @@ function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"
             }
         });
         return () => subscription.unsubscribe();
-    }, [user]);
+    }, []);
 
     return (
         <>
@@ -38,7 +41,7 @@ function GamesList({ setGame }: { readonly setGame: (game: Schema["Game"]["type"
             <ul className='over'>
                 {games.sort(sortGames).map(game => (
                     <li key={game.id} onClick={() => setGame(game)}>
-                        <Game game={game} compact />
+                        <Game game={game} compact isAdmin={isAdmin} />
                     </li>
                 ))}
             </ul>

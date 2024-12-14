@@ -9,7 +9,7 @@ function GamePhaseUpdater({ game, gamePerson, phase, setPhase }: {
     readonly game: Schema["Game"]["type"],
     readonly gamePerson: Schema["GamePerson"]["type"],
     readonly phase: Schema["Game"]["type"]["phase"],
-    readonly setPhase: React.Dispatch<React.SetStateAction<Schema["Game"]["type"]["phase"]>>
+    readonly setPhase: (phase: Schema["Game"]["type"]["phase"]) => void
 }) {
     const [upgradeAction, setUpgradeAction] = useState<"ADVANCE" | "PAUSE" | "FINISH" | "RESUME" | undefined>();
     const [promptUpgradePhaseConfirmation, setPromptUpgradePhaseConfirmation] = useState(false);
@@ -30,7 +30,7 @@ function GamePhaseUpdater({ game, gamePerson, phase, setPhase }: {
     }
 
     return (
-        <p>
+        <>
             {phase !== "FINISHED" && (
                 <>
                     {!promptUpgradePhaseConfirmation && (
@@ -89,7 +89,7 @@ function GamePhaseUpdater({ game, gamePerson, phase, setPhase }: {
                             >
                                 Conferma
                             </button>
-                            <button
+                            <button style={{ background: 'lightcoral' }}
                                 onClick={() => {
                                     setPromptUpgradePhaseConfirmation(false);
                                     setUpgradeAction(undefined);
@@ -101,7 +101,7 @@ function GamePhaseUpdater({ game, gamePerson, phase, setPhase }: {
                     )}
                 </>
             )}
-        </p>
+        </>
     );
 }
 

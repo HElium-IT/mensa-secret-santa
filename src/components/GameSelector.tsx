@@ -10,9 +10,11 @@ const client = generateClient<Schema>();
 function GameSelector({
     setGame,
     setIsSelectingGame,
+    isAdmin = false
 }: {
     readonly setGame: (game?: Schema["Game"]["type"]) => void
     readonly setIsSelectingGame: (isSelectingGame: boolean) => void
+    readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -41,12 +43,18 @@ function GameSelector({
             return;
         }
         setIsSelectingGame(true);
-        const games = fetchedGames.filter(game =>
+
+        Promise.all(fetchedGames.filter(game =>
             ["REGISTRATION_OPEN", "LOBBY"].includes(game.phase ?? '')
             && game.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        ).map(async game => {
+            const { data: gamePeople } = await game.people();
+            const gamePerson = gamePeople.find(gamePerson => gamePerson.personId === user.signInDetails?.loginId);
+            if (gamePerson) return;
+            return game;
+        })).then(games => setGames(games.filter(game => !!game)));
         console.debug("GameSelector.Games", games);
-        setGames(games);
+
     }, [searchTerm, fetchedGames]);
 
     useEffect(() => {
@@ -119,7 +127,7 @@ function GameSelector({
                     <li key={game.id} onClick={() => {
                         setSelectedGame(game)
                     }}>
-                        <Game game={game} compact />
+                        <Game game={game} compact isAdmin={isAdmin} />
                     </li>
                 ))}
             </ul>
