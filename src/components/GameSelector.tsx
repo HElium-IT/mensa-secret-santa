@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { sortGames } from "../utils";
 import Game from "./Game";
 
 const client = generateClient<Schema>();
