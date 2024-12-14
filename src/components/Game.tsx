@@ -10,7 +10,6 @@ import Gift from "./Gift";
 import GiftCreate from "./GiftCreate";
 import GamePhaseUpdater from "./GamePhaseUpdater";
 import InviteGamePerson from "./InviteGamePerson";
-import { Subscription } from "rxjs";
 
 // TODO: everything should be reactive, so we should use the subscription to update the UI.
 
@@ -63,6 +62,11 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     useEffect(() => {
         if (!gameMemo) return;
 
+        if (compact) {
+            game.people().then(({ data: gamePeople }) => { _setGamePeople(gamePeople); });
+            return;
+        }
+
         const gamePeopleSubscription = client.models.GamePerson.observeQuery({
         }).subscribe({
             next: async ({ items: gamePeople }) => {
@@ -104,29 +108,28 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             gameOnDelete.unsubscribe();
             gameOnUpdate.unsubscribe();
         }
-    }, [gameMemo]);
+    }, []);
 
     useEffect(() => {
         if (!gamePeople?.length) return;
-        gamePeople.forEach(async gamePerson => {
-            const { data: fetchedGift, errors } = await client.models.Gift.get({
-                ownerGameId: dynamicGame.id,
-                ownerPersonId: gamePerson.personId
-            })
-            if (errors) {
-                console.error("Game.fetchedGift", errors)
-                return;
+
+        const subscription = client.models.Gift.observeQuery({
+            filter: {
+                ownerGameId: { eq: dynamicGame.id }
             }
-            if (!fetchedGift) return
-            setTotalGifts(totalGifts + 1);
-            if (gamePerson.role !== "PLAYER") {
-                setNonPlayerTotalGifts(nonPlayerTotalGifts + 1);
+        }).subscribe({
+            next: ({ items: gifts }) => {
+                setTotalGifts(gifts.length);
+                setNonPlayerTotalGifts(gifts.filter(gift => gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
             }
         });
+
+        return () => subscription.unsubscribe();
+
     }, [gamePeople]);
 
     useEffect(() => {
-        if (!gamePerson) return;
+        if (!gamePerson || compact) return;
         const subscription = client.models.Gift.observeQuery({
             filter: {
                 ownerGameId: { eq: dynamicGame.id },
@@ -139,6 +142,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
                 }
             }
         })
+        console.debug("Game.GiftSubscription", subscription);
         return () => subscription.unsubscribe();
     }, [gamePerson]);
 
@@ -289,22 +293,21 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         </>
     )
 
+    const giftsDetails = (
+        <>
+            <h3>Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali</h3>
+        </>
+
+    )
+
     if (gamePerson.role === "PLAYER") {
         return (
             <>
                 {gameBaseDetails}
                 {/* <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p> */}
                 <button onClick={abandonGame}>Abbandona</button>
-                {
-                    <p>
-                        regali totali {
-                            totalGifts
-                        } / {
-                            gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts
-                        } giocatori totali
-                    </p>
-                }
                 {giftDetails}
+                {giftsDetails}
                 {abandonPrompt}
             </>
         )
@@ -326,6 +329,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
                 <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role} />
             )}
+            {giftsDetails}
             <div className="flex-row">
                 {deletePrompt}
                 {abandonPrompt}

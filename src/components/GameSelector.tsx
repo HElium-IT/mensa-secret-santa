@@ -43,12 +43,18 @@ function GameSelector({
             return;
         }
         setIsSelectingGame(true);
-        const games = fetchedGames.filter(game =>
+
+        Promise.all(fetchedGames.filter(game =>
             ["REGISTRATION_OPEN", "LOBBY"].includes(game.phase ?? '')
             && game.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        ).map(async game => {
+            const { data: gamePeople } = await game.people();
+            const gamePerson = gamePeople.find(gamePerson => gamePerson.personId === user.signInDetails?.loginId);
+            if (gamePerson) return;
+            return game;
+        })).then(games => setGames(games.filter(game => !!game)));
         console.debug("GameSelector.Games", games);
-        setGames(games);
+
     }, [searchTerm, fetchedGames]);
 
     useEffect(() => {
