@@ -11,6 +11,7 @@ import GiftCreate from "./GiftCreate";
 import GamePhaseUpdater from "./GamePhaseUpdater";
 import InviteGamePerson from "./InviteGamePerson";
 
+// TODO: everything should be reactive, so we should use the subscription to update the UI.
 
 function Game({ game, compact = false, onDelete }: {
     readonly game: Schema["Game"]["type"],
@@ -147,11 +148,14 @@ function Game({ game, compact = false, onDelete }: {
     }
 
     if (gamePerson === undefined || compact) {
-        return <div className="flex-row">
-            <h3 >
-                <span>{gamePersonRoleText}</span><span>{phaseIcon}</span>{game.name}
-            </h3>
-        </div>
+        return (
+            <div className="flex-row">
+                <h3>
+                    {gamePersonRoleText && <span>{gamePersonRoleText}</span>}
+                    <span>{phaseIcon}</span>{game.name}
+                </h3>
+            </div>
+        )
     }
 
     if (!gamePerson.acceptedInvitation) {
