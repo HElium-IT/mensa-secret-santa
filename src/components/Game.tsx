@@ -13,10 +13,11 @@ import InviteGamePerson from "./InviteGamePerson";
 
 // TODO: everything should be reactive, so we should use the subscription to update the UI.
 
-function Game({ game, compact = false, onDelete }: {
+function Game({ game, compact = false, onDelete, isAdmin = false }: {
     readonly game: Schema["Game"]["type"],
     readonly compact?: boolean
     readonly onDelete?: () => void
+    readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [phase, setPhase] = useState<Schema["Game"]["type"]["phase"]>(game.phase);
@@ -223,7 +224,8 @@ function Game({ game, compact = false, onDelete }: {
             )}
             <div className="flex-row">
                 <p>
-                    {!promptDeleteConfirmation && gamePerson.role === "CREATOR" &&
+                    {!promptDeleteConfirmation
+                        && (gamePerson.role === "CREATOR" || isAdmin) &&
                         <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
                     }
                     {promptDeleteConfirmation &&

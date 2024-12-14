@@ -10,9 +10,11 @@ const client = generateClient<Schema>();
 function GameSelector({
     setGame,
     setIsSelectingGame,
+    isAdmin = false
 }: {
     readonly setGame: (game?: Schema["Game"]["type"]) => void
     readonly setIsSelectingGame: (isSelectingGame: boolean) => void
+    readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -119,7 +121,7 @@ function GameSelector({
                     <li key={game.id} onClick={() => {
                         setSelectedGame(game)
                     }}>
-                        <Game game={game} compact />
+                        <Game game={game} compact isAdmin={isAdmin} />
                     </li>
                 ))}
             </ul>

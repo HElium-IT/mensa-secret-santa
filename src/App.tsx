@@ -3,7 +3,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
-import { Game, GameSelector, GameCreate, GamesList } from "./components";
+import { Game, GameSelector, GameCreate, GamesList, UserDetails } from "./components";
 
 const client = generateClient<Schema>();
 
@@ -66,8 +66,11 @@ function App() {
 	if (selectedGame) {
 		return (
 			<main className={"card game"}>
-				<Game game={selectedGame} onDelete={() => selectGame()} />
-
+				<Game
+					game={selectedGame}
+					onDelete={() => selectGame()}
+					isAdmin={!!person?.isAdmin}
+				/>
 			</main>
 		)
 	}
@@ -75,18 +78,10 @@ function App() {
 
 	return (
 		<main className={"card"}>
-			<div className="flex-row" style={{ justifyContent: "center" }}>
-				<h2 style={{ textAlign: "center", textOverflow: "ellipsis", overflow: "hidden" }}>
-					{user?.signInDetails?.loginId?.split('@')[0]}
-				</h2>
-				<button type="button" onClick={handleSignOut}>
-					LogOut
-				</button>
-
-			</div>
+			<UserDetails user={user} signOut={handleSignOut} />
 			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} setGame={selectGame} />}
-			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} />}
-			{!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} />}
+			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} isAdmin={!!person?.isAdmin} />}
+			{!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} isAdmin={!!person?.isAdmin} />}
 		</main>
 	);
 }
