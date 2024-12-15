@@ -329,8 +329,6 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         return (
             <>
                 {gameBaseDetails}
-                {/* <p>Numero di giocatori: {gamePeople.filter(gp => gp.role === "PLAYER").length}</p> */}
-                <button onClick={abandonGame}>Abbandona</button>
                 {ownedGiftDetails}
                 {wonGiftDetails}
                 {giftsDetails}
