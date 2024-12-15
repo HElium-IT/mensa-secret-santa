@@ -77,7 +77,7 @@ function App() {
 
 
 	return (
-		<main className={"card"}>
+		<main className={"card"} style={{ maxHeight: "95vh" }}>
 			<UserDetails user={user} signOut={handleSignOut} />
 			{person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} setGame={selectGame} />}
 			{!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} isAdmin={!!person?.isAdmin} />}

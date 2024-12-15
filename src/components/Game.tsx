@@ -27,6 +27,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(gameMemo.phase));
 
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
+    const [gamePeopleGifts, setGamePeopleGifts] = useState<Record<string, Schema["Gift"]["type"]>>({});
     const [gamePerson, setGamePerson] = useState<Schema["GamePerson"]["type"]>();
     const [gamePersonRoleText, setPersonGameRoleText] = useState<string>("");
 
@@ -35,10 +36,17 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
 
     const [ownedGift, setOwnedGift] = useState<Schema["Gift"]["type"]>();
     const [wonGift, setWonGift] = useState<Schema["Gift"]["type"]>();
+    const [selectedGift, setSelectedGift] = useState<Schema["Gift"]["type"]>();
     const client = generateClient<Schema>();
 
     const [totalGifts, setTotalGifts] = useState<number>(0);
     const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
+
+    const [RegisteredGifts, setRegisteredGifts] = useState<number>(0);
+    const [nonPlayerRegisteredGifts, setNonPlayerRegisteredGifts] = useState<number>(0);
+
+    const [wonGifts, setWonGifts] = useState<number>(0);
+    const [nonPlayerWonGifts, setNonPlayerWonGifts] = useState<number>(0);
 
     async function _setGamePeople(gamePeople?: Schema["GamePerson"]["type"][]) {
         if (!gamePeople) {
@@ -52,6 +60,15 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         setGamePeople(gamePeople);
         console.debug("Game.GamePeople", gamePeople);
 
+        gamePeople.forEach(async gamePerson => {
+            const { data: gift } = await gamePerson.wonGift();
+            if (gift) {
+                setGamePeopleGifts((prev) => ({
+                    ...prev,
+                    [gamePerson.personId as string]: gift
+                }));
+            }
+        });
         const gamePerson = gamePeople.find(gp => gp.personId === user.signInDetails?.loginId);
         if (!gamePerson) return;
 
@@ -64,11 +81,6 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     useEffect(() => {
         if (!gameMemo) return;
 
-        if (compact) {
-            game.people().then(({ data: gamePeople }) => { _setGamePeople(gamePeople); });
-            return;
-        }
-
         const gamePeopleSubscription = client.models.GamePerson.observeQuery({
         }).subscribe({
             next: async ({ items: gamePeople }) => {
@@ -76,6 +88,8 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             }
         });
         console.debug("Game.GamePeopleSubscription", gamePeopleSubscription);
+
+        if (compact) return;
 
         const gameOnDelete = client.models.Game.onDelete({
             filter: {
@@ -123,6 +137,12 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             next: ({ items: gifts }) => {
                 setTotalGifts(gifts.length);
                 setNonPlayerTotalGifts(gifts.filter(gift => gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
+
+                setRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0).length);
+                setNonPlayerRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0 && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
+
+                setWonGifts(gifts.filter(gift => !!gift.winnerGameId).length);
+                setNonPlayerWonGifts(gifts.filter(gift => !!gift.winnerGameId && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
             }
         });
 
@@ -141,6 +161,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         }).subscribe({
             next: ({ items: gifts }) => {
                 if (gifts && gifts.length > 0) {
+                    console.info("Game.OwnedGiftSubscription.Next", gifts);
                     setOwnedGift(gifts[0]);
                 }
             }
@@ -155,14 +176,32 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         }).subscribe({
             next: ({ items: gifts }) => {
                 if (gifts && gifts.length > 0) {
+                    console.info("Game.WonGiftSubscription.Next", gifts);
                     setWonGift(gifts[0]);
                 }
             }
         })
         console.debug("Game.WonGiftSubscription", wonGiftSub);
 
+        const selectedGiftSub = client.models.Gift.observeQuery({
+            filter: {
+                ownerGameId: { eq: dynamicGame.id },
+                isSelected: { eq: true },
+            }
+        }).subscribe({
+            next: ({ items: gifts }) => {
+                if (gifts && gifts.length > 0) {
+                    console.info("Game.SelectedGiftSubscription.Next", gifts);
+                    setSelectedGift(gifts[0]);
+                }
+            }
+        });
 
-        return () => ownedGiftSub.unsubscribe();
+        return () => {
+            ownedGiftSub.unsubscribe();
+            wonGiftSub.unsubscribe();
+            selectedGiftSub.unsubscribe();
+        }
     }, [gamePerson]);
 
     useEffect(() => {
@@ -269,18 +308,23 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
 
     const ownedGiftDetails = (
         <>
-            {dynamicGame.phase !== "FINISHED" && (
-                ownedGift ?
-                    <Gift gift={ownedGift} onDelete={() => setOwnedGift(undefined)} />
-                    :
-                    <GiftCreate gamePerson={gamePerson} />
-            )}
+            {ownedGift ?
+                <Gift gift={ownedGift} onDelete={() => setOwnedGift(undefined)} ownerGamePerson={gamePerson} />
+                :
+                <GiftCreate gamePerson={gamePerson} />
+            }
+        </>
+    )
+
+    const selectedGiftDetails = (
+        <>
+            {selectedGift && <Gift gift={selectedGift} ownerGamePerson={gamePerson} selected />}
         </>
     )
 
     const wonGiftDetails = (
         <>
-            {wonGift && <Gift gift={wonGift} />}
+            {wonGift && <Gift gift={wonGift} ownerGamePerson={gamePerson} />}
         </>
     )
 
@@ -320,7 +364,24 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
 
     const giftsDetails = (
         <>
-            <h4>Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali</h4>
+            {["REGISTRATION_OPEN", "LOBBY"].includes(dynamicGame.phase ?? '') &&
+                <h4>Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali</h4>}
+            {dynamicGame.phase === "LOBBY" &&
+                <h4>Regali registrati {RegisteredGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerRegisteredGifts} giocatori totali</h4>}
+            {["STARTED", "PAUSED"].includes(dynamicGame.phase ?? '') &&
+                <h4>Regali vinti {wonGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerWonGifts} giocatori totali</h4>}
+            {dynamicGame.phase === "FINISHED" && gamePerson.role !== "PLAYER" &&
+                <ul>
+                    {gamePeopleGifts && Object.entries(gamePeopleGifts).map(([personId, gift]) => (
+                        <li key={personId}>
+                            <p style={{ margin: '0px' }}>{personId}</p>
+                            <p style={{ margin: '0px' }}>{gift.name}</p>
+                            <p style={{ margin: '0px' }}>{gift.ownerPersonId}</p>
+                        </li>
+                    ))
+                    }
+                </ul>
+            }
         </>
 
     )
@@ -330,6 +391,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             <>
                 {gameBaseDetails}
                 {ownedGiftDetails}
+                {selectedGiftDetails}
                 {wonGiftDetails}
                 {giftsDetails}
                 {abandonPrompt}
@@ -341,6 +403,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         <>
             {gameBaseDetails}
             {ownedGiftDetails}
+            {selectedGiftDetails}
             {wonGiftDetails}
 
             <h3>Creatori</h3>

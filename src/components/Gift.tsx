@@ -4,9 +4,11 @@ import { generateClient } from "aws-amplify/data";
 
 const client = generateClient<Schema>();
 
-function Gift({ gift, onDelete }: {
+function Gift({ gift, ownerGamePerson, onDelete, selected = false }: {
     readonly gift: Schema["Gift"]["type"],
-    readonly onDelete?: () => void
+    readonly ownerGamePerson?: Schema["GamePerson"]["type"],
+    readonly onDelete?: () => void,
+    readonly selected?: boolean
 }) {
     const [giftWinner, setGiftWinner] = useState<Schema["GamePerson"]["type"]["personId"]>();
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
@@ -14,23 +16,26 @@ function Gift({ gift, onDelete }: {
     useEffect(() => {
         if (!gift) return;
 
-        const subscription = client.models.Gift.onUpdate({
-            filter: {
-                ownerGameId: { eq: gift.ownerGameId },
-                ownerPersonId: { eq: gift.ownerPersonId }
-            }
-        }).subscribe({
-            next: async (updatedGift) => {
-                // if (!updatedGift.winnerGamePersonId) return;
-                // const { data: gamePerson } = await client.models.GamePerson.get({ id: updatedGift.winnerGamePersonId });
-                // setGiftWinner(gamePerson?.personId);
-                if (!updatedGift) return;
-                const { data: winnerGamePerson } = await updatedGift.winnerGamePerson();
-                setGiftWinner(winnerGamePerson?.personId);
-            }
-        });
+        // client.models.Gift.update({
+        //     ownerGameId: gift.ownerGameId,
+        //     ownerPersonId: gift.ownerPersonId,
+        //     isSelected: false
+        // })
 
-        return () => subscription.unsubscribe();
+        async function fetchGiftWinner() {
+            if (!gift.winnerPersonId) return;
+            const { data: person, errors } = await client.models.Person.get({
+                ownerId: gift.winnerPersonId
+            })
+            if (errors) {
+                console.error("Gift.fetchGiftWinner", errors);
+                return;
+            }
+            if (!person) return;
+            setGiftWinner(person.ownerId);
+        }
+
+        fetchGiftWinner();
     }, [gift]);
 
     async function deleteGift() {
@@ -49,11 +54,38 @@ function Gift({ gift, onDelete }: {
 
     }
 
+    if (gift.isSelected && selected && gift.ownerPersonId === ownerGamePerson?.personId)
+        return null;
+
+
+    if (gift.isSelected && gift.ownerPersonId !== ownerGamePerson?.personId) {
+        return (
+            <div className="gift-card">
+                <h2 style={{ margin: '0px' }}>{gift.number}</h2>
+                <p>{gift.attribute_1}</p>
+                <p>{gift.attribute_2}</p>
+                <p>{gift.attribute_3}</p>
+                <p>Se lo vuoi, prova ad indovinare:</p>
+                <input type="text" placeholder="Credo che sia..." />
+                <p>TIMER 10</p>
+            </div>
+        );
+    }
+
+    if (gift.winnerPersonId === ownerGamePerson?.personId) {
+        return (
+            <div className="gift-card">
+                <h2 className="gift-winner" style={{ margin: '0px' }}>Hai vinto il regalo {gift.number} !</h2>
+                <p>L'ha scelto {gift.ownerPersonId}, quindi se non ti piace prenditela con lui 😜</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="gift-card">
+        <>{<div className="gift-card">
             <div className="flex-row" style={{ flexWrap: 'wrap' }}>
                 <h2 style={{ margin: '0px' }}>{gift.number ? gift.number + ' - ' : ''}{gift.name}</h2>
-                {!promptDeleteConfirmation &&
+                {!promptDeleteConfirmation && ownerGamePerson?.personId === gift.ownerPersonId && (gift.number ?? 0) === 0 &&
                     <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
                 }
                 {promptDeleteConfirmation &&
@@ -64,14 +96,17 @@ function Gift({ gift, onDelete }: {
                         }}>Annulla</button>
                     </>
                 }
-
             </div>
 
             <p>{gift.attribute_1}</p>
             <p>{gift.attribute_2}</p>
             <p>{gift.attribute_3}</p>
-            {giftWinner && <p className="gift-winner">Il tuo regalo è stato vinto da {giftWinner}!</p>}
-        </div>
+            {gift.isSelected && gift.ownerPersonId === ownerGamePerson?.personId &&
+                <h4 className="gift-winner">Il tuo regalo è stato pescato!</h4>
+            }
+            {giftWinner && <h4 className="gift-winner">Il tuo regalo è stato vinto da {giftWinner}</h4>}
+        </div >}
+        </>
     );
 }
 
