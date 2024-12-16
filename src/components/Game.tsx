@@ -186,13 +186,15 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         const selectedGiftSub = client.models.Gift.observeQuery({
             filter: {
                 ownerGameId: { eq: dynamicGame.id },
-                isSelected: { eq: true },
             }
         }).subscribe({
             next: ({ items: gifts }) => {
-                if (gifts && gifts.length > 0) {
-                    console.info("Game.SelectedGiftSubscription.Next", gifts);
-                    setSelectedGift(gifts[0]);
+                const foundSelectedGift = gifts.find(gift => gift.isSelected);
+                if (foundSelectedGift) {
+                    console.info("Game.SelectedGiftSubscription.Next", foundSelectedGift);
+                    setSelectedGift(foundSelectedGift);
+                } else {
+                    setSelectedGift(undefined);
                 }
             }
         });
