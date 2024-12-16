@@ -10,6 +10,7 @@ function GameGiftControl({ game, gamePeople, userRole }: {
     readonly gamePeople: Schema["GamePerson"]["type"][],
     readonly userRole: Schema["GamePerson"]["type"]["role"]
 }) {
+    const [gamePeopleWithotOwnedGift, setGamePeopleWithotOwnedGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePeopleWithUnregisteredGift, setGamePeopleWithUnregisteredGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePeopleWithoutWonGift, setGamePeopleWithoutWonGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [GiftNotWonYet, setGiftNotWonYet] = useState<Schema["Gift"]["type"][]>([]);
@@ -34,6 +35,12 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         }).subscribe({
             next: async ({ items: gifts }) => {
                 console.log("GameGiftControl.Gifts", gifts);
+
+                const unownedGiftGamePeoples = gamePeople.filter(gamePerson => {
+                    return !gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+                });
+                setGamePeopleWithotOwnedGift(unownedGiftGamePeoples);
+                console.log("GameGiftControl.unownedGiftGamePeoples", unownedGiftGamePeoples);
 
                 const unregisteredGiftGamePeoples = gamePeople.filter(gamePerson => {
                     const gift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
@@ -84,8 +91,10 @@ function GameGiftControl({ game, gamePeople, userRole }: {
     }
 
     async function pickGiftWinner(gift: Schema["Gift"]["type"]) {
-        const filteredGamePeople = gamePeopleWithoutWonGift
-            .filter(gamePerson => gamePerson.personId !== gift.ownerPersonId);
+        const filteredGamePeople = gamePeopleWithoutWonGift.filter(gamePerson =>
+            gamePerson.personId !== gift.ownerPersonId &&
+            !gamePeopleWithotOwnedGift.some(gp => gp.personId === gamePerson.personId)
+        );
 
         // const weights = filteredGamePeople
         //     .map(gamePerson => {
