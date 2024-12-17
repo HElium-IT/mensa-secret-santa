@@ -10,6 +10,7 @@ function GameGiftControl({ game, gamePeople, userRole }: {
     readonly gamePeople: Schema["GamePerson"]["type"][],
     readonly userRole: Schema["GamePerson"]["type"]["role"]
 }) {
+    const [gamePeopleWithotOwnedGift, setGamePeopleWithotOwnedGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePeopleWithUnregisteredGift, setGamePeopleWithUnregisteredGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [gamePeopleWithoutWonGift, setGamePeopleWithoutWonGift] = useState<Schema["GamePerson"]["type"][]>([]);
     const [GiftNotWonYet, setGiftNotWonYet] = useState<Schema["Gift"]["type"][]>([]);
@@ -19,7 +20,8 @@ function GameGiftControl({ game, gamePeople, userRole }: {
 
     const [selectedGiftNumber, setSelectedGiftNumber] = useState<string>("");
     const [selectedGiftNumberIsValid, setSelectedGiftNumberIsValid] = useState(false);
-    const [timerStarted, setTimerStarted] = useState(-1);
+    const [selectedGift, setSelectedGift] = useState<Schema["Gift"]["type"]>();
+    const [selectedGiftWinnerPicked, setSelectedGiftWinnerPicked] = useState(false);
 
     if (!game || userRole === "PLAYER") {
         return null;
@@ -34,6 +36,18 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         }).subscribe({
             next: async ({ items: gifts }) => {
                 console.log("GameGiftControl.Gifts", gifts);
+
+                const selectedGift = gifts.find(gift => gift.isSelected);
+                setSelectedGift(selectedGift);
+                setSelectedGiftNumber(selectedGift?.number?.toString() ?? "");
+                setSelectedGiftNumberIsValid(!!selectedGift);
+                console.log("GameGiftControl.SelectedGift", selectedGift);
+
+                const unownedGiftGamePeoples = gamePeople.filter(gamePerson => {
+                    return !gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+                });
+                setGamePeopleWithotOwnedGift(unownedGiftGamePeoples);
+                console.log("GameGiftControl.unownedGiftGamePeoples", unownedGiftGamePeoples);
 
                 const unregisteredGiftGamePeoples = gamePeople.filter(gamePerson => {
                     const gift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
@@ -83,37 +97,60 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         setSelectedGamePersonIdIsValid(false);
     }
 
-    async function pickGiftWinner(gift: Schema["Gift"]["type"]) {
-        const filteredGamePeople = gamePeopleWithoutWonGift
-            .filter(gamePerson => gamePerson.personId !== gift.ownerPersonId);
+    async function pickGiftWinner() {
+        if (!selectedGift) return;
 
-        // const weights = filteredGamePeople
-        //     .map(gamePerson => {
-        //         return gamePerson.role === "ADMIN" ? 3 : 1;
-        //     });
+        const filteredGamePeople = gamePeopleWithoutWonGift.filter(gamePerson =>
+            gamePerson.personId !== selectedGift.ownerPersonId &&
+            !gamePeopleWithotOwnedGift.some(gp => gp.personId === gamePerson.personId)
+        );
 
-        const weights = filteredGamePeople.map(() => 1);
-
-        const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
-        const random = Math.random() * totalWeight;
-        let winnerIndex = 0;
-        let accumulatedWeight = 0;
-        for (let i = 0; i < weights.length; i++) {
-            accumulatedWeight += weights[i];
-            if (random < accumulatedWeight) {
-                winnerIndex = i;
-                break;
-            }
+        if (filteredGamePeople.length === 0) {
+            console.error("GameGiftControl.PickGiftWinnerError", "No people to pick from");
+            return;
         }
-        console.log({ winnerIndex, filteredGamePeople })
-        const winner = filteredGamePeople[winnerIndex];
-        console.debug("GameGiftControl.PickedGamePeople", winner);
+
+        let winner = null;
+        if (filteredGamePeople.length === 1) {
+            winner = filteredGamePeople[0];
+        } else {
+            const peopleThatWantsGift = filteredGamePeople.filter(gamePerson =>
+                gamePerson.wantsGiftPersonId === selectedGift.ownerPersonId
+            );
+
+            if (peopleThatWantsGift.length >= gamePeopleWithoutWonGift.length / 2) {
+                winner = peopleThatWantsGift[Math.floor(Math.random() * peopleThatWantsGift.length)];
+            }
+
+            const weights = filteredGamePeople.map(gamePerson =>
+                gamePerson.wantsGiftPersonId === selectedGift.ownerPersonId ? 3 : 1
+            )
+
+            const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+            const random = Math.random() * totalWeight;
+            let winnerIndex = 0;
+            let accumulatedWeight = 0;
+            for (let i = 0; i < weights.length; i++) {
+                accumulatedWeight += weights[i];
+                if (random < accumulatedWeight) {
+                    winnerIndex = i;
+                    break;
+                }
+            }
+            console.log({ winnerIndex, filteredGamePeople })
+            winner = filteredGamePeople[winnerIndex];
+            if (!winner) {
+                console.error("GameGiftControl.PickGiftWinnerError", "No winner found");
+                return;
+            }
+            console.debug("GameGiftControl.PickedGamePeople", winner);
+        }
 
         const { data: updatedGift, errors } = await client.models.Gift.update({
-            ownerGameId: gift.ownerGameId,
-            ownerPersonId: gift.ownerPersonId,
+            ownerGameId: selectedGift.ownerGameId,
+            ownerPersonId: selectedGift.ownerPersonId,
 
-            winnerGameId: gift.ownerGameId,
+            winnerGameId: selectedGift.ownerGameId,
             winnerPersonId: winner.personId,
         });
         if (errors) {
@@ -121,13 +158,15 @@ function GameGiftControl({ game, gamePeople, userRole }: {
             return;
         }
         console.log("GameGiftControl.PickedGiftWinner", updatedGift);
+        setSelectedGiftWinnerPicked(true);
 
     }
 
     async function selectGift() {
-        if (!selectedGiftNumber) {
+        if (!selectedGiftNumber || !selectedGiftNumberIsValid) {
             return;
         }
+
 
         const gift = GiftNotWonYet.find(gift => gift.number === Number(selectedGiftNumber));
         if (!gift) {
@@ -146,40 +185,24 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         }
         console.log("GameGiftControl.DrawnGift", updatedGift);
 
-        setTimerStarted(10);
-        const timer = setInterval(() => {
-            setTimerStarted(prev => prev - 1);
-        }, 1000);
-
-        setTimeout(async () => {
-            clearInterval(timer);
-            await pickGiftWinner(gift);
-            setTimerStarted(-1);
-            deselectGift(gift);
-        }, 10000);
+        setSelectedGift(gift);
     }
 
-    async function deselectGift(gift: Schema["Gift"]["type"]) {
-        if (!gift) {
-            setSelectedGiftNumberIsValid(false);
-            return;
-        }
+    async function deselectGift() {
+        if (!selectedGift) return;
 
         const { data: updatedGift, errors } = await client.models.Gift.update({
-            ownerGameId: game.id,
-            ownerPersonId: gift.ownerPersonId,
+            ownerGameId: selectedGift.ownerGameId,
+            ownerPersonId: selectedGift.ownerPersonId,
             isSelected: false
         });
         if (errors) {
             console.error("GameGiftControl.DeselectGiftError", errors);
-            return;
+            throw new Error("GameGiftControl.DeselectGiftError");
         }
         console.log("GameGiftControl.DeselectedGift", updatedGift);
-
-        setSelectedGiftNumber("");
-        setSelectedGiftNumberIsValid(false);
+        setSelectedGift(undefined);
     }
-
 
     useEffect(() => {
         if (!selectedGamePersonId) {
@@ -200,7 +223,8 @@ function GameGiftControl({ game, gamePeople, userRole }: {
             setSelectedGiftNumberIsValid(false);
             return;
         }
-        setSelectedGiftNumberIsValid(true);
+
+        setSelectedGiftNumberIsValid(true)
     }, [selectedGiftNumber]);
 
     return (
@@ -233,18 +257,22 @@ function GameGiftControl({ game, gamePeople, userRole }: {
                         label="Pescaggio"
                         placeholder="Pescato il regalo numero ..."
                         value={selectedGiftNumber}
-                        options={GiftNotWonYet.map((gift) => {
-                            return {
-                                label: `${String(gift.number)} - ${gift.ownerPersonId}`,
-                                id: String(gift.number)
-                            }
-                        })}
+                        options={GiftNotWonYet.map((gift) => ({
+                            label: `${gift.number} - ${gift.ownerPersonId}`,
+                            id: String(gift.number),
+                        }))}
                         onClear={() => setSelectedGiftNumber("")}
                         onChange={(e) => setSelectedGiftNumber(e.target.value)}
                         onSelect={(e) => setSelectedGiftNumber(e.id)}
                     />
-                    {selectedGiftNumberIsValid && <button onClick={selectGift}>Seleziona regalo</button>}
-                    {timerStarted > 0 && <p>Tempo rimanente: {timerStarted}</p>}
+                    {selectedGiftNumberIsValid && (!selectedGift || selectedGiftWinnerPicked) && (
+                        <button onClick={selectGift}>Seleziona regalo</button>
+                    )}
+                    {selectedGift && (
+                        <button onClick={selectedGiftWinnerPicked ? deselectGift : pickGiftWinner}>
+                            {selectedGiftWinnerPicked ? "Deseleziona regalo" : "Pesca vincitore"}
+                        </button>
+                    )}
                 </>
             }
         </div>

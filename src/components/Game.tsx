@@ -42,7 +42,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     const [totalGifts, setTotalGifts] = useState<number>(0);
     const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
 
-    const [RegisteredGifts, setRegisteredGifts] = useState<number>(0);
+    const [registeredGifts, setRegisteredGifts] = useState<number>(0);
     const [nonPlayerRegisteredGifts, setNonPlayerRegisteredGifts] = useState<number>(0);
 
     const [wonGifts, setWonGifts] = useState<number>(0);
@@ -81,7 +81,11 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
     useEffect(() => {
         if (!gameMemo) return;
 
+
         const gamePeopleSubscription = client.models.GamePerson.observeQuery({
+            filter: {
+                gameId: { eq: gameMemo.id }
+            }
         }).subscribe({
             next: async ({ items: gamePeople }) => {
                 _setGamePeople(gamePeople.filter(gp => gp.gameId === gameMemo.id));
@@ -89,8 +93,10 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         });
         console.debug("Game.GamePeopleSubscription", gamePeopleSubscription);
 
-        if (compact) return;
+        if (compact)
+            return () => gamePeopleSubscription.unsubscribe();
 
+        // TODO : Move this 2 next subscriptions to one of the parents components
         const gameOnDelete = client.models.Game.onDelete({
             filter: {
                 id: { eq: dynamicGame.id }
@@ -124,86 +130,57 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             gameOnDelete.unsubscribe();
             gameOnUpdate.unsubscribe();
         }
-    }, []);
+    }, [gameMemo]);
 
     useEffect(() => {
-        if (!gamePeople?.length) return;
+        if (!gamePerson || compact) return;
 
-        const subscription = client.models.Gift.observeQuery({
+        const gameGiftsSubscription = client.models.Gift.observeQuery({
             filter: {
                 ownerGameId: { eq: dynamicGame.id }
             }
         }).subscribe({
             next: ({ items: gifts }) => {
+
                 setTotalGifts(gifts.length);
+                console.log("Game.GiftsSubscription.TotalGifts", gifts);
                 setNonPlayerTotalGifts(gifts.filter(gift => gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
+                console.log("Game.GiftsSubscription.NonPlayerTotalGifts", nonPlayerTotalGifts);
 
                 setRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0).length);
+                console.log("Game.GiftsSubscription.RegisteredGifts", registeredGifts);
                 setNonPlayerRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0 && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
 
                 setWonGifts(gifts.filter(gift => !!gift.winnerGameId).length);
+                console.log("Game.GiftsSubscription.WonGifts", wonGifts);
                 setNonPlayerWonGifts(gifts.filter(gift => !!gift.winnerGameId && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
-            }
-        });
+                console.log("Game.GiftsSubscription.NonPlayerWonGifts", nonPlayerWonGifts);
 
-        return () => subscription.unsubscribe();
-
-    }, [gamePeople]);
-
-    useEffect(() => {
-        if (!gamePerson || compact) return;
-
-        const ownedGiftSub = client.models.Gift.observeQuery({
-            filter: {
-                ownerGameId: { eq: dynamicGame.id },
-                ownerPersonId: { eq: gamePerson.personId }
-            }
-        }).subscribe({
-            next: ({ items: gifts }) => {
-                if (gifts && gifts.length > 0) {
-                    console.info("Game.OwnedGiftSubscription.Next", gifts);
-                    setOwnedGift(gifts[0]);
+                const ownedGift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+                if (ownedGift) {
+                    console.debug("Game.GiftsSubscription.OwnedGift", ownedGift);
+                    setOwnedGift(ownedGift);
                 }
-            }
-        })
-        console.debug("Game.OwnedGiftSubscription", ownedGiftSub);
-
-        const wonGiftSub = client.models.Gift.observeQuery({
-            filter: {
-                winnerGameId: { eq: dynamicGame.id },
-                winnerPersonId: { eq: gamePerson.personId }
-            }
-        }).subscribe({
-            next: ({ items: gifts }) => {
-                if (gifts && gifts.length > 0) {
-                    console.info("Game.WonGiftSubscription.Next", gifts);
-                    setWonGift(gifts[0]);
-                }
-            }
-        })
-        console.debug("Game.WonGiftSubscription", wonGiftSub);
-
-        const selectedGiftSub = client.models.Gift.observeQuery({
-            filter: {
-                ownerGameId: { eq: dynamicGame.id },
-            }
-        }).subscribe({
-            next: ({ items: gifts }) => {
-                const foundSelectedGift = gifts.find(gift => gift.isSelected);
-                if (foundSelectedGift) {
-                    console.info("Game.SelectedGiftSubscription.Next", foundSelectedGift);
-                    setSelectedGift(foundSelectedGift);
+                const selectedGift = gifts.find(gift => gift.isSelected);
+                if (selectedGift) {
+                    console.debug("Game.GiftsSubscription.SelectedGift", selectedGift);
+                    setSelectedGift(selectedGift);
                 } else {
                     setSelectedGift(undefined);
                 }
+                const wonGift = gifts.find(gift => gift.winnerPersonId === gamePerson.personId);
+                if (wonGift) {
+                    console.debug("Game.GiftsSubscription.WonGift", wonGift);
+                    setWonGift(wonGift);
+                } else {
+                    setWonGift(undefined);
+                }
             }
         });
+        console.debug("Game.GiftsSubscription", gameGiftsSubscription);
 
-        return () => {
-            ownedGiftSub.unsubscribe();
-            wonGiftSub.unsubscribe();
-            selectedGiftSub.unsubscribe();
-        }
+        return () => gameGiftsSubscription.unsubscribe();
+
     }, [gamePerson]);
 
     useEffect(() => {
@@ -369,16 +346,19 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             {["REGISTRATION_OPEN", "LOBBY"].includes(dynamicGame.phase ?? '') &&
                 <h4>Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali</h4>}
             {dynamicGame.phase === "LOBBY" &&
-                <h4>Regali registrati {RegisteredGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerRegisteredGifts} giocatori totali</h4>}
+                <h4>Regali registrati {registeredGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerRegisteredGifts} giocatori totali</h4>}
             {["STARTED", "PAUSED"].includes(dynamicGame.phase ?? '') &&
                 <h4>Regali vinti {wonGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerWonGifts} giocatori totali</h4>}
-            {dynamicGame.phase === "FINISHED" && gamePerson.role !== "PLAYER" &&
+            {dynamicGame.phase === "FINISHED" &&
                 <ul>
                     {gamePeopleGifts && Object.entries(gamePeopleGifts).map(([personId, gift]) => (
                         <li key={personId}>
-                            <p style={{ margin: '0px' }}>{personId}</p>
-                            <p style={{ margin: '0px' }}>{gift.name}</p>
-                            <p style={{ margin: '0px' }}>{gift.ownerPersonId}</p>
+                            <p style={{ margin: '0px' }}>
+                                {personId.split("@")[0]} ha ricevuto
+                            </p>
+                            <p style={{ margin: '0px' }}>
+                                "{gift.name}" da {gift.ownerPersonId.split("@")[0]}
+                            </p>
                         </li>
                     ))
                     }
@@ -395,6 +375,7 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
                 {ownedGiftDetails}
                 {selectedGiftDetails}
                 {wonGiftDetails}
+                {dynamicGame.phase === "FINISHED" && <h3>Regali vinti</h3>}
                 {giftsDetails}
                 {abandonPrompt}
             </>

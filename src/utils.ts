@@ -25,7 +25,7 @@ export function gamePhaseToText(phase: Schema["Game"]["type"]["phase"], hasGift:
         "LOBBY": (!giftHasNumber)
             ? "Oggi è il giorno! Consegna il tuo regalo a chi di dovere, jamm ja' ca te stamm aspettan!"
             : "La partita sta per iniziare, stamm aspettanno tutta l'ata gente!",
-        "STARTED": "La partita è iniziata, bona furtuna!",
+        "STARTED": "La partita è iniziata, a maronn t'accumpagn!",
         "PAUSED": "La partita è in pausa, aproffittane pe' magnà e, mi raccomando, bbìve!",
         "FINISHED": "La partita è finita, spero che tu sia soddisfatto del tuo regalo; se così non fosse puoi sempre proporre uno scambio a qualcun altro!"
     }
@@ -63,4 +63,44 @@ export function sortGames(a: Schema["Game"]["type"], b: Schema["Game"]["type"]) 
         return phaseComparison;
     }
     return a.name.localeCompare(b.name);
+}
+
+export function sortGamePeople(
+    a: Schema["GamePerson"]["type"],
+    b: Schema["GamePerson"]["type"],
+    ownsGift?: Record<string, boolean>,
+    wonGift?: Record<string, boolean>,
+) {
+    const roleOrder = ["CREATOR", "ADMIN", "PLAYER"];
+
+    const roleComparison =
+        roleOrder.indexOf(a.role as NonNullable<Schema["GamePerson"]["type"]["role"]>)
+        - roleOrder.indexOf(b.role as NonNullable<Schema["GamePerson"]["type"]["role"]>);
+    if (roleComparison !== 0) {
+        return roleComparison;
+    }
+
+    if (ownsGift) {
+        const ownsGiftOrder = [true, false];
+
+        const ownsGiftComparison =
+            ownsGiftOrder.indexOf(ownsGift[a.personId])
+            - ownsGiftOrder.indexOf(ownsGift[b.personId]);
+        if (ownsGiftComparison !== 0) {
+            return ownsGiftComparison;
+        }
+    }
+
+    if (wonGift) {
+        const wonGiftOrder = [true, false];
+        const wonGiftComparison =
+            wonGiftOrder.indexOf(wonGift[a.personId])
+            - wonGiftOrder.indexOf(wonGift[b.personId]);
+        if (wonGiftComparison !== 0) {
+            return wonGiftComparison;
+        }
+    }
+
+    return a.personId.localeCompare(b.personId);
+
 }
