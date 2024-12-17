@@ -45,7 +45,7 @@ function App() {
 			setLoading(false);
 		}, 1000);
 
-	}, [user]);
+	}, []);
 
 	async function handleSignOut() {
 		await signOut()
