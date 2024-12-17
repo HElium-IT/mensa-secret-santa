@@ -43,6 +43,7 @@ const schema = a.schema({
 
       ownedGift: a.hasOne("Gift", ["ownerGameId", "ownerPersonId"]),
       wonGift: a.hasOne("Gift", ["winnerGameId", "winnerPersonId"]),
+      wantsGiftPersonId: a.id(),
     })
     .identifier(["gameId", "personId"])
     .secondaryIndexes((index) => [
