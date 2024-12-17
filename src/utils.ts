@@ -64,3 +64,43 @@ export function sortGames(a: Schema["Game"]["type"], b: Schema["Game"]["type"]) 
     }
     return a.name.localeCompare(b.name);
 }
+
+export function sortGamePeople(
+    a: Schema["GamePerson"]["type"],
+    b: Schema["GamePerson"]["type"],
+    ownsGift?: Record<string, boolean>,
+    wonGift?: Record<string, boolean>,
+) {
+    const roleOrder = ["CREATOR", "ADMIN", "PLAYER"];
+
+    const roleComparison =
+        roleOrder.indexOf(a.role as NonNullable<Schema["GamePerson"]["type"]["role"]>)
+        - roleOrder.indexOf(b.role as NonNullable<Schema["GamePerson"]["type"]["role"]>);
+    if (roleComparison !== 0) {
+        return roleComparison;
+    }
+
+    if (ownsGift) {
+        const ownsGiftOrder = [true, false];
+
+        const ownsGiftComparison =
+            ownsGiftOrder.indexOf(ownsGift[a.personId])
+            - ownsGiftOrder.indexOf(ownsGift[b.personId]);
+        if (ownsGiftComparison !== 0) {
+            return ownsGiftComparison;
+        }
+    }
+
+    if (wonGift) {
+        const wonGiftOrder = [true, false];
+        const wonGiftComparison =
+            wonGiftOrder.indexOf(wonGift[a.personId])
+            - wonGiftOrder.indexOf(wonGift[b.personId]);
+        if (wonGiftComparison !== 0) {
+            return wonGiftComparison;
+        }
+    }
+
+    return a.personId.localeCompare(b.personId);
+
+}
