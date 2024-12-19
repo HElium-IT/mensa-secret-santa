@@ -11,13 +11,20 @@ import GiftCreate from "./GiftCreate";
 import GamePhaseUpdater from "./GamePhaseUpdater";
 import InviteGamePerson from "./InviteGamePerson";
 import GameGiftControl from "./GameGiftController";
+import GameBaseDetails from './GameBaseDetails';
+import OwnedGiftDetails from './OwnedGiftDetails';
+import SelectedGiftDetails from './SelectedGiftDetails';
+import WonGiftDetails from './WonGiftDetails';
+import AbandonPrompt from './AbandonPrompt';
+import DeletePrompt from './DeletePrompt';
+import GiftsDetails from './GiftsDetails';
 
 // TODO: everything should be reactive, so we should use the subscription to update the UI.
 
-function Game({ game, compact = false, onDelete, isAdmin = false }: {
+function Game({ game, compact = false, onDelete = () => { }, isAdmin = false }: {
     readonly game: Schema["Game"]["type"],
     readonly compact?: boolean
-    readonly onDelete?: () => void
+    readonly onDelete: () => void
     readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
@@ -277,118 +284,37 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
         );
     }
 
-    const gameBaseDetails = (
-        <>
-            <h2><button style={{ margin: "1rem" }} onClick={onDelete}>{"<"}</button><span>{gamePersonRoleText}</span>{dynamicGame.name}</h2>
-            <p>Descrizione: {dynamicGame.description}</p>
-            <p><span>{phaseIcon}</span> {phaseText}</p>
-        </>
-    )
-
-    const ownedGiftDetails = (
-        <>
-            {ownedGift ?
-                <Gift gift={ownedGift} onDelete={() => setOwnedGift(undefined)} ownerGamePerson={gamePerson} />
-                :
-                <GiftCreate gamePerson={gamePerson} />
-            }
-        </>
-    )
-
-    const selectedGiftDetails = (
-        <>
-            {selectedGift && <Gift gift={selectedGift} ownerGamePerson={gamePerson} selected />}
-        </>
-    )
-
-    const wonGiftDetails = (
-        <>
-            {wonGift && <Gift gift={wonGift} ownerGamePerson={gamePerson} />}
-        </>
-    )
-
-    const abandonPrompt = (
-        <>
-            {!promptAbandonConfirmation
-                && gamePerson.role !== "CREATOR" &&
-                <button style={{ background: 'red' }} onClick={() => setPromptAbandonConfirmation(true)}>Abbandona</button>
-            }
-            {promptAbandonConfirmation &&
-                <button style={{ background: 'red' }} onClick={abandonGame}>Conferma</button>
-            }
-            {promptAbandonConfirmation &&
-                <button style={{ background: 'lightcoral' }} onClick={() => {
-                    setPromptAbandonConfirmation(false);
-                }}>Annulla</button>
-            }
-        </>
-    )
-
-    const deletePrompt = (
-        <>
-            {!promptDeleteConfirmation
-                && (gamePerson.role === "CREATOR" || isAdmin) &&
-                <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
-            }
-            {promptDeleteConfirmation &&
-                <button style={{ background: 'red' }} onClick={deleteGame}>Conferma</button >
-            }
-            {promptDeleteConfirmation &&
-                <button style={{ background: 'lightcoral' }} onClick={() => {
-                    setPromptDeleteConfirmation(false);
-                }}>Annulla</button>
-            }
-        </>
-    )
-
-    const giftsDetails = (
-        <>
-            {["REGISTRATION_OPEN", "LOBBY"].includes(dynamicGame.phase ?? '') &&
-                <h4>Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali</h4>}
-            {dynamicGame.phase === "LOBBY" &&
-                <h4>Regali registrati {registeredGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerRegisteredGifts} giocatori totali</h4>}
-            {["STARTED", "PAUSED"].includes(dynamicGame.phase ?? '') &&
-                <h4>Regali vinti {wonGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerWonGifts} giocatori totali</h4>}
-            {dynamicGame.phase === "FINISHED" &&
-                <ul>
-                    {gamePeopleGifts && Object.entries(gamePeopleGifts).map(([personId, gift]) => (
-                        <li key={personId}>
-                            <p style={{ margin: '0px' }}>
-                                {personId.split("@")[0]} ha ricevuto
-                            </p>
-                            <p style={{ margin: '0px' }}>
-                                "{gift.name}" da {gift.ownerPersonId.split("@")[0]}
-                            </p>
-                        </li>
-                    ))
-                    }
-                </ul>
-            }
-        </>
-
-    )
-
-    if (gamePerson.role === "PLAYER") {
-        return (
-            <>
-                {gameBaseDetails}
-                {ownedGiftDetails}
-                {selectedGiftDetails}
-                {wonGiftDetails}
-                {dynamicGame.phase === "FINISHED" && <h3>Regali vinti</h3>}
-                {giftsDetails}
-                {abandonPrompt}
-            </>
-        )
-    }
-
     return (
         <>
-            {gameBaseDetails}
-            {ownedGiftDetails}
-            {selectedGiftDetails}
-            {wonGiftDetails}
-
+            <GameBaseDetails game={dynamicGame} phaseIcon={phaseIcon} onBack={onDelete} />
+            <OwnedGiftDetails ownedGift={ownedGift} gamePerson={gamePerson} onDelete={() => setOwnedGift(undefined)} />
+            <WonGiftDetails wonGift={wonGift} gamePerson={gamePerson} />
+            <SelectedGiftDetails selectedGift={selectedGift} gamePerson={gamePerson} />
+            {dynamicGame.phase === "FINISHED" && <h3>Regali vinti</h3>}
+            <GiftsDetails
+                dynamicGame={dynamicGame}
+                totalGifts={totalGifts}
+                gamePeople={gamePeople}
+                registeredGifts={registeredGifts}
+                wonGifts={wonGifts}
+                gamePeopleGifts={gamePeopleGifts}
+                nonPlayerTotalGifts={nonPlayerTotalGifts}
+                nonPlayerRegisteredGifts={nonPlayerRegisteredGifts}
+                nonPlayerWonGifts={nonPlayerWonGifts}
+            />
+            <AbandonPrompt
+                promptAbandonConfirmation={promptAbandonConfirmation}
+                setPromptAbandonConfirmation={setPromptAbandonConfirmation}
+                abandonGame={abandonGame}
+                role={gamePerson.role ?? "PLAYER"}
+            />
+            <DeletePrompt
+                promptDeleteConfirmation={promptDeleteConfirmation}
+                setPromptDeleteConfirmation={setPromptDeleteConfirmation}
+                deleteGame={deleteGame}
+                role={gamePerson.role ?? "PLAYER"}
+                isAdmin={isAdmin}
+            />
             <h3>Creatori</h3>
             <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
             <div className="flex-row" style={{ justifyContent: "space-between", flexWrap: 'wrap' }}>
@@ -411,14 +337,10 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
             <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
 
             <h3>Regali </h3>
-            {giftsDetails}
             <GameGiftControl game={dynamicGame} gamePeople={gamePeople} userRole={gamePerson.role} />
 
             <h3>Controlli del gioco</h3>
             <div className="flex-row">
-                {deletePrompt}
-                {abandonPrompt}
-                |
                 <GamePhaseUpdater
                     game={gameMemo}
                     gamePerson={gamePerson}
@@ -426,8 +348,6 @@ function Game({ game, compact = false, onDelete, isAdmin = false }: {
                     setPhase={(phase: Schema["Game"]["type"]["phase"]) => setDynamicGame({ ...dynamicGame, phase })}
                 />
             </div>
-
-
         </>
     );
 }
