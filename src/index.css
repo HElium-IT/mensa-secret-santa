@@ -86,7 +86,7 @@ a {
   margin: 1rem;
   text-align: left;
   overflow-y: auto;
-  max-height: 80vh;
+  max-height: 80dvh;
   /* overflow-x: hidden; */
   /* scrollbar-width: none; */
 }
