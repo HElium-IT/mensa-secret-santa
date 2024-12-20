@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { Badge, Card, Flex } from "@aws-amplify/ui-react";
 
 const client = generateClient<Schema>();
 
@@ -13,7 +14,8 @@ function Gift({ gift, ownerGamePerson, onDelete, selected = false }: {
     const [giftWinner, setGiftWinner] = useState<Schema["GamePerson"]["type"]["personId"]>();
     const [giftWanters, setGiftWanters] = useState<Schema["GamePerson"]["type"][]>();
     const [promptDeleteConfirmation, setPromptDeleteConfirmation] = useState(false);
-    const [personWantsGift, setPersonWantsGift] = useState(ownerGamePerson?.wantsGiftPersonId !== null);
+    const [personWantsGift, setPersonWantsGift] = useState(ownerGamePerson?.wantsGiftPersonId === gift.ownerPersonId);
+    const [gamePersonHasGift, setGamePersonHasGift] = useState(false);
 
     useEffect(() => {
         if (!gift) return;
@@ -51,6 +53,14 @@ function Gift({ gift, ownerGamePerson, onDelete, selected = false }: {
 
     }, [gift]);
 
+
+    useEffect(() => {
+        ownerGamePerson?.wonGift().then(({ data: wonGift }) => {
+            setGamePersonHasGift(!!wonGift);
+
+        });
+    }, [ownerGamePerson]);
+
     async function deleteGift() {
         if (!gift) return;
         const { data: resultGift, errors } = await client.models.Gift.delete({
@@ -86,67 +96,72 @@ function Gift({ gift, ownerGamePerson, onDelete, selected = false }: {
     if (gift.isSelected && selected && gift.ownerPersonId === ownerGamePerson?.personId)
         return null;
 
-
-    if (gift.isSelected && gift.ownerPersonId !== ownerGamePerson?.personId) {
-        return (
-            <div className="gift-card">
-                <div className="flex-row">
-                    <h2 style={{ margin: '0px' }}>{gift.number} |</h2>
-                    {!personWantsGift ?
-                        <button onClick={() => setGiftAsWanted()}>Lo voglio!</button>
-                        :
-                        <button style={{ background: 'red' }}
-                            onClick={() => setGiftAsWanted(false)}>Non lo voglio</button>
-                    }
-                </div>
-                <p>{gift.attribute_1}</p>
-                <p>{gift.attribute_2}</p>
-                <p>{gift.attribute_3}</p>
-            </div>
-        );
-    }
-
-    if (gift.winnerPersonId === ownerGamePerson?.personId) {
-        return (
-            <div className="gift-card">
-                <h2 className="gift-winner" style={{ margin: '0px' }}>Hai vinto il regalo {gift.number} !</h2>
-                <p>L'ha scelto "{gift.ownerPersonId.split("@")[0]}".</p>
-                <p>Se non ti piace sai chi maledire!😜</p>
-            </div>
-        );
-    }
-
     return (
-        <>{<div className="gift-card">
-            <div className="flex-row" style={{ flexWrap: 'wrap' }}>
-                <h2 style={{ margin: '0px' }}>{gift.number ? gift.number + ' - ' : ''}{gift.name}</h2>
-                {!promptDeleteConfirmation && ownerGamePerson?.personId === gift.ownerPersonId && (gift.number ?? 0) === 0 &&
-                    <button style={{ background: 'red' }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
-                }
-                {promptDeleteConfirmation &&
-                    <>
-                        <button style={{ background: 'red' }} onClick={deleteGift}>Conferma</button >
-                        <button onClick={() => {
-                            setPromptDeleteConfirmation(false);
-                        }}>Annulla</button>
+        <Card
+            // variation="outlined"
+            padding={10}
+            backgroundColor="rgba(255, 255, 255, 0)"
+            style={{
+                border: "2px solid",
+                borderRadius: "8px",
+                boxShadow: gift.isSelected && gift.ownerPersonId !== ownerGamePerson?.personId
+                    ? 'inset 0 0 10px rgb(100, 100, 100)'
+                    : gift.winnerPersonId === ownerGamePerson?.personId
+                        ? 'inset 0 0 10px #FFD700'
+                        : 'none'
+            }}
+        >
+            <Flex direction="column" alignItems="flex-start" >
+                <Flex direction="row" alignItems="space-between" justifyContent={"center"} wrap="wrap" >
+                    <h2 style={{ margin: '0px' }}>
+                        {gift.number ?? ""}
+                        {gift.number && (!gift.isSelected || gift.ownerPersonId === ownerGamePerson?.personId) && gift.winnerPersonId !== ownerGamePerson?.personId ? '-' : ''}
+                        {gift.winnerPersonId === ownerGamePerson?.personId ? '🎁' : ''}
+                        {gift.ownerPersonId !== ownerGamePerson?.personId ? (gift.winnerPersonId ? gift.ownerPersonId.split("@")[0] : "") : gift.name}
+                    </h2>
+                    {!promptDeleteConfirmation && ownerGamePerson?.personId === gift.ownerPersonId && (gift.number ?? 0) === 0 &&
+                        <button style={{ background: 'red', padding: "5px" }} onClick={() => setPromptDeleteConfirmation(true)}>Elimina</button>
+                    }
+                    {promptDeleteConfirmation && ownerGamePerson?.personId === gift.ownerPersonId && (gift.number ?? 0) === 0 &&
+                        <>
+                            <button style={{ background: 'red', padding: "5px" }} onClick={deleteGift}>Si</button >
+                            <button style={{ padding: "5px" }} onClick={() => {
+                                setPromptDeleteConfirmation(false);
+                            }}>No</button>
+                        </>
+                    }
+                    {gift.isSelected && !gift.winnerPersonId && gift.ownerPersonId !== ownerGamePerson?.personId && !gamePersonHasGift ?
+                        !personWantsGift ? <button style={{ padding: "5px", background: "green" }} onClick={() => setGiftAsWanted()}>Lo voglio!</button>
+                            :
+                            <button style={{ background: 'red', padding: "5px" }}
+                                onClick={() => setGiftAsWanted(false)}>Non lo voglio</button>
+                        : <></>
+                    }
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" wrap="wrap" gap="0.2rem" >
+                    <Badge size="large" variation="success">{gift.attribute_1} </Badge>
+                    <Badge size="large" variation="success">{gift.attribute_2}</Badge>
+                    <Badge size="large" variation="success">{gift.attribute_3}</Badge>
+                </Flex>
+                {gift.winnerPersonId !== ownerGamePerson?.personId
+                    && <>
+                        {!giftWinner && gift.isSelected && gift.ownerPersonId === ownerGamePerson?.personId &&
+                            <h4 className="gift-winner">Il tuo regalo è stato pescato!</h4>
+                        }
+                        {!giftWinner && gift.isSelected && giftWanters && (giftWanters.length > 0) &&
+                            <h4>Voluto da {giftWanters.length} person{giftWanters.length === 1 ? 'a' : 'e'}
+                            </h4>
+                        }
+
+                        {giftWinner && <h4 className="gift-winner">Il tuo regalo è stato vinto da {giftWinner}</h4>}
                     </>
                 }
-            </div>
-
-            <p>{gift.attribute_1}</p>
-            <p>{gift.attribute_2}</p>
-            <p>{gift.attribute_3}</p>
-            {!giftWinner && gift.isSelected && gift.ownerPersonId === ownerGamePerson?.personId &&
-                <h4 className="gift-winner">Il tuo regalo è stato pescato!</h4>
-            }
-            {!giftWinner && gift.isSelected && giftWanters && (giftWanters.length > 0) &&
-                <h4>Voluto da {giftWanters.length} person{giftWanters.length === 1 ? 'a' : 'e'}
-                </h4>
-            }
-
-            {giftWinner && <h4 className="gift-winner">Il tuo regalo è stato vinto da {giftWinner}</h4>}
-        </div >}
-        </>
+                {
+                    gift.winnerPersonId === ownerGamePerson?.personId &&
+                    <h4>Ricordati di ritirare il regalo!</h4>
+                }
+            </Flex>
+        </Card>
     );
 }
 

@@ -8,7 +8,7 @@ function SelectedGiftDetails({ selectedGift, gamePerson }: {
 }) {
     return (
         <>
-            {selectedGift && (
+            {selectedGift && !selectedGift.winnerPersonId && (
                 <Gift gift={selectedGift} ownerGamePerson={gamePerson} selected />
             )}
         </>

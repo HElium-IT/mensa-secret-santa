@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { Flex, useAuthenticator } from '@aws-amplify/ui-react';
 import { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 
-import { Game, GameSelector, GameCreate, GamesList, UserDetails } from ".";
+import { Game, GameSelector, GameCreate, GamesList } from ".";
 
 const client = generateClient<Schema>();
 
 
 function RoutingView() {
-    const { user, signOut } = useAuthenticator((context) => [context.user]);
+    const { user } = useAuthenticator((context) => [context.user]);
     const [person, setPerson] = useState<Schema["Person"]["type"]>();
     const [selectedGame, setSelectedGame] = useState<Schema["Game"]["type"]>();
 
@@ -41,10 +41,6 @@ function RoutingView() {
         getOrCreatePerson()
     }, []);
 
-    async function handleSignOut() {
-        await signOut()
-    }
-
     async function selectGame(game?: Schema["Game"]["type"]) {
         setSelectedGame(game);
         if (game)
@@ -52,17 +48,16 @@ function RoutingView() {
     }
 
     return (
-        <main style={{ maxHeight: "95vh" }}>
+        <Flex direction="column" alignItems="stretch" alignContent="stretch">
             {selectedGame
                 ? <Game game={selectedGame} onDelete={() => selectGame()} isAdmin={!!person?.isAdmin} />
                 : <>
-                    <UserDetails user={user} signOut={handleSignOut} />
                     {person?.isAdmin && !isSelectingGame && <GameCreate setIsCreatingGame={setIsCreatingGame} setGame={selectGame} />}
                     {!isCreatingGame && <GameSelector setGame={selectGame} setIsSelectingGame={setIsSelectingGame} isAdmin={!!person?.isAdmin} />}
                     {!isCreatingGame && !isSelectingGame && <GamesList setGame={selectGame} isAdmin={!!person?.isAdmin} />}
-                </>
-            }
-        </main>
+                </>}
+        </Flex>
+
     );
 }
 

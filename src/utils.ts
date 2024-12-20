@@ -104,3 +104,10 @@ export function sortGamePeople(
     return a.personId.localeCompare(b.personId);
 
 }
+
+export function sortGamePeopleGifts(
+    a: Schema["Gift"]["type"],
+    b: Schema["Gift"]["type"],
+) {
+    return a.ownerPersonId.localeCompare(b.ownerPersonId);
+}

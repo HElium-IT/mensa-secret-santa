@@ -9,6 +9,7 @@
   max-height: 100dvh;
 }
 
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -71,4 +72,10 @@
 .input-container span {
   color: red;
   font-size: 0.875rem;
+}
+
+h2,
+h3,
+h4 {
+  margin: 0px 0px;
 }

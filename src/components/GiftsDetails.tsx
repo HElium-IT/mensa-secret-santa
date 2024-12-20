@@ -1,35 +1,33 @@
 
 import type { Schema } from "../../amplify/data/resource";
 
-function GiftsDetails({ dynamicGame, totalGifts, gamePeople, registeredGifts, wonGifts, gamePeopleGifts, nonPlayerTotalGifts, nonPlayerRegisteredGifts, nonPlayerWonGifts }: {
+function GiftsDetails({ dynamicGame, totalGifts, gamePeople, gamePerson, registeredGifts, wonGifts, gamePeopleGifts }: {
     readonly dynamicGame: Schema["Game"]["type"];
     readonly totalGifts: number;
     readonly gamePeople: Schema["GamePerson"]["type"][];
+    readonly gamePerson: Schema["GamePerson"]["type"];
     readonly registeredGifts: number;
     readonly wonGifts: number;
     readonly gamePeopleGifts: Record<string, Schema["Gift"]["type"]>;
-    readonly nonPlayerTotalGifts: number;
-    readonly nonPlayerRegisteredGifts: number;
-    readonly nonPlayerWonGifts: number;
 }) {
     return (
         <>
             {["REGISTRATION_OPEN", "LOBBY"].includes(dynamicGame.phase ?? '') && (
                 <h4>
-                    Regali totali {totalGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerTotalGifts} giocatori totali
+                    Regali totali {totalGifts} / {gamePeople.length} giocatori totali
                 </h4>
             )}
             {dynamicGame.phase === "LOBBY" && (
                 <h4>
-                    Regali registrati {registeredGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerRegisteredGifts} giocatori totali
+                    Regali registrati {registeredGifts} / {totalGifts} giocatori totali
                 </h4>
             )}
             {["STARTED", "PAUSED"].includes(dynamicGame.phase ?? '') && (
                 <h4>
-                    Regali vinti {wonGifts} / {gamePeople.filter(gp => gp.role === "PLAYER").length + nonPlayerWonGifts} giocatori totali
+                    Regali vinti {wonGifts} / {totalGifts} giocatori totali
                 </h4>
             )}
-            {dynamicGame.phase === "FINISHED" && (
+            {dynamicGame.phase === "FINISHED" && gamePerson.role !== "PLAYER" && (
                 <ul>
                     {gamePeopleGifts && Object.entries(gamePeopleGifts).map(([personId, gift]) => (
                         <li key={personId}>

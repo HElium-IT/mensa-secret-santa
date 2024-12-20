@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useOrientation, useWindowSize } from 'react-use';
+import { Flex, useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from "aws-amplify/data";
 
 import type { Schema } from "../../amplify/data/resource";
 import { gamePhaseToIcon, gamePersonRoleToIcon, gamePhaseToText } from "../utils";
 
 import GamePeople from './GamePeople';
-import Gift from "./Gift";
-import GiftCreate from "./GiftCreate";
+
 import GamePhaseUpdater from "./GamePhaseUpdater";
 import InviteGamePerson from "./InviteGamePerson";
 import GameGiftControl from "./GameGiftController";
@@ -24,13 +24,13 @@ import GiftsDetails from './GiftsDetails';
 function Game({ game, compact = false, onDelete = () => { }, isAdmin = false }: {
     readonly game: Schema["Game"]["type"],
     readonly compact?: boolean
-    readonly onDelete: () => void
+    readonly onDelete?: () => void
     readonly isAdmin?: boolean
 }) {
     const { user } = useAuthenticator((context) => [context.user]);
     const gameMemo = useMemo(() => game, [game]);
     const [dynamicGame, setDynamicGame] = useState<Schema["Game"]["type"]>(gameMemo);
-    const [phaseText, setPhaseText] = useState<string>(gamePhaseToText(gameMemo.phase));
+    const [_, setPhaseText] = useState<string>(gamePhaseToText(gameMemo.phase));
     const [phaseIcon, setPhaseIcon] = useState<string>(gamePhaseToIcon(gameMemo.phase));
 
     const [gamePeople, setGamePeople] = useState<Schema["GamePerson"]["type"][]>([]);
@@ -47,13 +47,15 @@ function Game({ game, compact = false, onDelete = () => { }, isAdmin = false }: 
     const client = generateClient<Schema>();
 
     const [totalGifts, setTotalGifts] = useState<number>(0);
-    const [nonPlayerTotalGifts, setNonPlayerTotalGifts] = useState<number>(0);
-
     const [registeredGifts, setRegisteredGifts] = useState<number>(0);
-    const [nonPlayerRegisteredGifts, setNonPlayerRegisteredGifts] = useState<number>(0);
-
     const [wonGifts, setWonGifts] = useState<number>(0);
-    const [nonPlayerWonGifts, setNonPlayerWonGifts] = useState<number>(0);
+
+    const { type } = useOrientation();
+    const { width, height } = useWindowSize();
+
+    useEffect(() => {
+        console.debug("type", type);
+    }, [type]);
 
     async function _setGamePeople(gamePeople?: Schema["GamePerson"]["type"][]) {
         if (!gamePeople) {
@@ -139,49 +141,59 @@ function Game({ game, compact = false, onDelete = () => { }, isAdmin = false }: 
         }
     }, [gameMemo]);
 
-    useEffect(() => {
+    function updateGiftsData(gifts: Schema["Gift"]["type"][]) {
         if (!gamePerson || compact) return;
+        setTotalGifts(gifts.length);
+        console.log("Game.GiftsSubscription.TotalGifts", gifts);
 
-        const gameGiftsSubscription = client.models.Gift.observeQuery({
+        setRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0).length);
+        console.log("Game.GiftsSubscription.RegisteredGifts", registeredGifts);
+
+        setWonGifts(gifts.filter(gift => !!gift.winnerGameId).length);
+        console.log("Game.GiftsSubscription.WonGifts", wonGifts);
+
+        const ownedGift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+        if (ownedGift) {
+            console.debug("Game.GiftsSubscription.OwnedGift", ownedGift);
+            setOwnedGift(ownedGift);
+        }
+        const selectedGift = gifts.find(gift => gift.isSelected);
+        if (selectedGift) {
+            console.debug("Game.GiftsSubscription.SelectedGift", selectedGift);
+            setSelectedGift(selectedGift);
+        } else {
+            setSelectedGift(undefined);
+        }
+        const wonGift = gifts.find(gift => gift.winnerPersonId === gamePerson.personId);
+        if (wonGift) {
+            console.debug("Game.GiftsSubscription.WonGift", wonGift);
+            setWonGift(wonGift);
+        } else {
+            setWonGift(undefined);
+        }
+    }
+
+    useEffect(() => {
+
+        client.models.Gift.list({
             filter: {
                 ownerGameId: { eq: dynamicGame.id }
             }
+        }).then(({ data: gifts, errors }) => {
+            if (errors) {
+                console.error("Game.Gifts", errors);
+                return;
+            }
+            updateGiftsData(gifts);
+        });
+
+        const gameGiftsSubscription = client.models.Gift.observeQuery({
+            filter: {
+                ownerGameId: { eq: dynamicGame.id },
+            }
         }).subscribe({
             next: ({ items: gifts }) => {
-
-                setTotalGifts(gifts.length);
-                console.log("Game.GiftsSubscription.TotalGifts", gifts);
-                setNonPlayerTotalGifts(gifts.filter(gift => gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
-                console.log("Game.GiftsSubscription.NonPlayerTotalGifts", nonPlayerTotalGifts);
-
-                setRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0).length);
-                console.log("Game.GiftsSubscription.RegisteredGifts", registeredGifts);
-                setNonPlayerRegisteredGifts(gifts.filter(gift => (gift.number ?? 0) > 0 && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
-
-                setWonGifts(gifts.filter(gift => !!gift.winnerGameId).length);
-                console.log("Game.GiftsSubscription.WonGifts", wonGifts);
-                setNonPlayerWonGifts(gifts.filter(gift => !!gift.winnerGameId && gamePeople.find(gp => gp.personId === gift.ownerPersonId)?.role !== "PLAYER").length);
-                console.log("Game.GiftsSubscription.NonPlayerWonGifts", nonPlayerWonGifts);
-
-                const ownedGift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
-                if (ownedGift) {
-                    console.debug("Game.GiftsSubscription.OwnedGift", ownedGift);
-                    setOwnedGift(ownedGift);
-                }
-                const selectedGift = gifts.find(gift => gift.isSelected);
-                if (selectedGift) {
-                    console.debug("Game.GiftsSubscription.SelectedGift", selectedGift);
-                    setSelectedGift(selectedGift);
-                } else {
-                    setSelectedGift(undefined);
-                }
-                const wonGift = gifts.find(gift => gift.winnerPersonId === gamePerson.personId);
-                if (wonGift) {
-                    console.debug("Game.GiftsSubscription.WonGift", wonGift);
-                    setWonGift(wonGift);
-                } else {
-                    setWonGift(undefined);
-                }
+                updateGiftsData(gifts);
             }
         });
         console.debug("Game.GiftsSubscription", gameGiftsSubscription);
@@ -287,67 +299,95 @@ function Game({ game, compact = false, onDelete = () => { }, isAdmin = false }: 
     return (
         <>
             <GameBaseDetails game={dynamicGame} phaseIcon={phaseIcon} onBack={onDelete} />
-            <OwnedGiftDetails ownedGift={ownedGift} gamePerson={gamePerson} onDelete={() => setOwnedGift(undefined)} />
-            <WonGiftDetails wonGift={wonGift} gamePerson={gamePerson} />
-            <SelectedGiftDetails selectedGift={selectedGift} gamePerson={gamePerson} />
-            {dynamicGame.phase === "FINISHED" && <h3>Regali vinti</h3>}
-            <GiftsDetails
-                dynamicGame={dynamicGame}
-                totalGifts={totalGifts}
-                gamePeople={gamePeople}
-                registeredGifts={registeredGifts}
-                wonGifts={wonGifts}
-                gamePeopleGifts={gamePeopleGifts}
-                nonPlayerTotalGifts={nonPlayerTotalGifts}
-                nonPlayerRegisteredGifts={nonPlayerRegisteredGifts}
-                nonPlayerWonGifts={nonPlayerWonGifts}
-            />
+            <Flex direction={(
+                width > height
+            ) ? "row" : "column"}
+                justifyContent={(
+                    width > height
+                ) ? "unset" : "space-between"}
+                style={{ width: "100%" }}
+            >
+                <OwnedGiftDetails ownedGift={ownedGift} gamePerson={gamePerson} onDelete={() => setOwnedGift(undefined)} />
+                <SelectedGiftDetails selectedGift={selectedGift} gamePerson={gamePerson} />
+                <WonGiftDetails wonGift={wonGift} gamePerson={gamePerson} />
+            </Flex>
+
+
+            {gamePerson.role === "PLAYER"
+                && game.phase !== "FINISHED" && <>
+                    <h3>Regali</h3>
+                    <GiftsDetails
+                        dynamicGame={dynamicGame}
+                        totalGifts={totalGifts}
+                        gamePeople={gamePeople}
+                        gamePerson={gamePerson}
+                        registeredGifts={registeredGifts}
+                        wonGifts={wonGifts}
+                        gamePeopleGifts={gamePeopleGifts}
+                    />
+                </>
+            }
             <AbandonPrompt
                 promptAbandonConfirmation={promptAbandonConfirmation}
                 setPromptAbandonConfirmation={setPromptAbandonConfirmation}
                 abandonGame={abandonGame}
                 role={gamePerson.role ?? "PLAYER"}
             />
-            <DeletePrompt
-                promptDeleteConfirmation={promptDeleteConfirmation}
-                setPromptDeleteConfirmation={setPromptDeleteConfirmation}
-                deleteGame={deleteGame}
-                role={gamePerson.role ?? "PLAYER"}
-                isAdmin={isAdmin}
-            />
-            <h3>Creatori</h3>
-            <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
-            <div className="flex-row" style={{ justifyContent: "space-between", flexWrap: 'wrap' }}>
-                <h3>Admin </h3>
-                {(gamePerson.role === "CREATOR") && (
-                    <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role}
-                        invitationRole={"ADMIN"}
-                    />
-                )}
-            </div>
-            <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
-            <div className="flex-row" style={{ justifyContent: "space-between", flexWrap: 'wrap' }}>
-                <h3>Giocatori </h3>
-                {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
-                    <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role}
-                        invitationRole={"PLAYER"}
-                    />
-                )}
-            </div>
-            <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
+            {
+                gamePerson.role != "PLAYER"
+                && <>
 
-            <h3>Regali </h3>
-            <GameGiftControl game={dynamicGame} gamePeople={gamePeople} userRole={gamePerson.role} />
+                    <h3>Creatori</h3>
+                    <GamePeople gamePeople={gamePeople} filterRole="CREATOR" userRole={gamePerson.role} />
+                    <div className="flex-row" style={{ justifyContent: "space-between", flexWrap: 'wrap' }}>
+                        <h3>Admin </h3>
+                        {(gamePerson.role === "CREATOR") && (
+                            <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role}
+                                invitationRole={"ADMIN"}
+                            />
+                        )}
+                    </div>
+                    <GamePeople gamePeople={gamePeople} filterRole="ADMIN" userRole={gamePerson.role} />
+                    <div className="flex-row" style={{ justifyContent: "space-between", flexWrap: 'wrap' }}>
+                        <h3>Giocatori </h3>
+                        {(gamePerson.role === "CREATOR" || gamePerson.role === "ADMIN") && (
+                            <InviteGamePerson gameId={dynamicGame.id} userRole={gamePerson.role}
+                                invitationRole={"PLAYER"}
+                            />
+                        )}
+                    </div>
+                    <GamePeople gamePeople={gamePeople} filterRole="PLAYER" userRole={gamePerson.role} />
 
-            <h3>Controlli del gioco</h3>
-            <div className="flex-row">
-                <GamePhaseUpdater
-                    game={gameMemo}
-                    gamePerson={gamePerson}
-                    phase={dynamicGame.phase}
-                    setPhase={(phase: Schema["Game"]["type"]["phase"]) => setDynamicGame({ ...dynamicGame, phase })}
-                />
-            </div>
+                    <h3>Regali </h3>
+                    <GiftsDetails
+                        dynamicGame={dynamicGame}
+                        totalGifts={totalGifts}
+                        gamePeople={gamePeople}
+                        gamePerson={gamePerson}
+                        registeredGifts={registeredGifts}
+                        wonGifts={wonGifts}
+                        gamePeopleGifts={gamePeopleGifts}
+                    />
+                    <GameGiftControl game={dynamicGame} gamePeople={gamePeople} gamePerson={gamePerson} userRole={gamePerson.role} />
+
+                    <h3>Controlli del gioco</h3>
+                    <div className="flex-row">
+                        <GamePhaseUpdater
+                            game={gameMemo}
+                            gamePerson={gamePerson}
+                            phase={dynamicGame.phase}
+                            setPhase={(phase: Schema["Game"]["type"]["phase"]) => setDynamicGame({ ...dynamicGame, phase })}
+                        />
+                    </div>
+                    <DeletePrompt
+                        promptDeleteConfirmation={promptDeleteConfirmation}
+                        setPromptDeleteConfirmation={setPromptDeleteConfirmation}
+                        deleteGame={deleteGame}
+                        role={gamePerson.role ?? "PLAYER"}
+                        isAdmin={isAdmin}
+                    />
+                </>
+            }
         </>
     );
 }
