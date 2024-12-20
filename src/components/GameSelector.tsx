@@ -121,6 +121,7 @@ function GameSelector({
                 placeholder="Secret Santa 2024"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ margin: "2px" }}
             />
             <ul className='over'>
                 {games.map(game => (

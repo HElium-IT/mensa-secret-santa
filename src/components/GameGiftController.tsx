@@ -5,9 +5,10 @@ import { Autocomplete } from '@aws-amplify/ui-react';
 
 const client = generateClient<Schema>();
 
-function GameGiftControl({ game, gamePeople, userRole }: {
+function GameGiftControl({ game, gamePeople, gamePerson, userRole }: {
     readonly game: Schema["Game"]["type"],
     readonly gamePeople: Schema["GamePerson"]["type"][],
+    readonly gamePerson: Schema["GamePerson"]["type"],
     readonly userRole: Schema["GamePerson"]["type"]["role"]
 }) {
     const [gamePeopleWithotOwnedGift, setGamePeopleWithotOwnedGift] = useState<Schema["GamePerson"]["type"][]>([]);
@@ -27,7 +28,52 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         return null;
     }
 
+    async function updateData(gifts: Schema["Gift"]["type"][]) {
+        console.log("GameGiftControl.Gifts", gifts);
+
+        const selectedGift = gifts.find(gift => gift.isSelected);
+        setSelectedGift(selectedGift);
+        if (selectedGift && selectedGift.winnerPersonId) {
+            setSelectedGiftWinnerPicked(true);
+        }
+        setSelectedGiftNumber(selectedGift?.number?.toString() ?? "");
+        setSelectedGiftNumberIsValid(!!selectedGift);
+        console.log("GameGiftControl.SelectedGift", selectedGift);
+
+        const unownedGiftGamePeoples = gamePeople.filter(gamePerson => {
+            return !gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+        });
+        setGamePeopleWithotOwnedGift(unownedGiftGamePeoples);
+        console.log("GameGiftControl.unownedGiftGamePeoples", unownedGiftGamePeoples);
+
+        const unregisteredGiftGamePeoples = gamePeople.filter(gamePerson => {
+            const gift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
+            console.debug("GameGiftControl.unregisteredGiftGamePeoples.Gift", gift);
+            return gift && (gift.number ?? 0) === 0;
+        })
+        setGamePeopleWithUnregisteredGift(unregisteredGiftGamePeoples);
+        console.log("GameGiftControl.unregisteredGiftGamePeoples", unregisteredGiftGamePeoples);
+
+        const gamePeopleWithoutWonGift = gamePeople.filter(gamePerson => {
+            return !gifts.find(gift => gift.winnerPersonId === gamePerson.personId);
+        });
+        setGamePeopleWithoutWonGift(gamePeopleWithoutWonGift);
+        console.log("GameGiftControl.gamePeopleWithoutWonGift", gamePeopleWithoutWonGift);
+
+        const giftNowWonYet = gifts.filter(gift => !gift.winnerGameId);
+        setGiftNotWonYet(giftNowWonYet);
+        console.log("GameGiftControl.GiftNowWonYet", giftNowWonYet);
+    }
+
     useEffect(() => {
+
+        client.models.Gift.list({
+            filter: {
+                ownerGameId: { eq: game.id }
+            }
+        }).then(({ data: gifts }) => {
+            updateData(gifts);
+        });
 
         const subscription = client.models.Gift.observeQuery({
             filter: {
@@ -35,38 +81,7 @@ function GameGiftControl({ game, gamePeople, userRole }: {
             }
         }).subscribe({
             next: async ({ items: gifts }) => {
-                console.log("GameGiftControl.Gifts", gifts);
-
-                const selectedGift = gifts.find(gift => gift.isSelected);
-                setSelectedGift(selectedGift);
-                setSelectedGiftNumber(selectedGift?.number?.toString() ?? "");
-                setSelectedGiftNumberIsValid(!!selectedGift);
-                console.log("GameGiftControl.SelectedGift", selectedGift);
-
-                const unownedGiftGamePeoples = gamePeople.filter(gamePerson => {
-                    return !gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
-                });
-                setGamePeopleWithotOwnedGift(unownedGiftGamePeoples);
-                console.log("GameGiftControl.unownedGiftGamePeoples", unownedGiftGamePeoples);
-
-                const unregisteredGiftGamePeoples = gamePeople.filter(gamePerson => {
-                    const gift = gifts.find(gift => gift.ownerPersonId === gamePerson.personId);
-                    console.debug("GameGiftControl.unregisteredGiftGamePeoples.Gift", gift);
-                    return gift && (gift.number ?? 0) === 0;
-                })
-                setGamePeopleWithUnregisteredGift(unregisteredGiftGamePeoples);
-                console.log("GameGiftControl.unregisteredGiftGamePeoples", unregisteredGiftGamePeoples);
-
-                const gamePeopleWithoutWonGift = gamePeople.filter(gamePerson => {
-                    return !gifts.find(gift => gift.winnerPersonId === gamePerson.personId);
-                });
-                setGamePeopleWithoutWonGift(gamePeopleWithoutWonGift);
-                console.log("GameGiftControl.gamePeopleWithoutWonGift", gamePeopleWithoutWonGift);
-
-                const giftNowWonYet = gifts.filter(gift => !gift.winnerGameId);
-                setGiftNotWonYet(giftNowWonYet);
-                console.log("GameGiftControl.GiftNowWonYet", giftNowWonYet);
-
+                await updateData(gifts);
             }
         });
 
@@ -111,6 +126,14 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         }
 
         let winner = null;
+
+        if (filteredGamePeople.length === 2
+            && gamePeopleWithoutWonGift.find(gp => gp.personId === gamePerson.personId)
+            && selectedGift.ownerPersonId !== gamePerson.personId
+        ) {
+            winner = gamePerson;
+        }
+
         if (filteredGamePeople.length === 1) {
             winner = filteredGamePeople[0];
         } else {
@@ -202,6 +225,7 @@ function GameGiftControl({ game, gamePeople, userRole }: {
         }
         console.log("GameGiftControl.DeselectedGift", updatedGift);
         setSelectedGift(undefined);
+        setSelectedGiftWinnerPicked(false);
     }
 
     useEffect(() => {
@@ -265,7 +289,7 @@ function GameGiftControl({ game, gamePeople, userRole }: {
                         onChange={(e) => setSelectedGiftNumber(e.target.value)}
                         onSelect={(e) => setSelectedGiftNumber(e.id)}
                     />
-                    {selectedGiftNumberIsValid && (!selectedGift || selectedGiftWinnerPicked) && (
+                    {selectedGiftNumberIsValid && !selectedGift && !selectedGiftWinnerPicked && (
                         <button onClick={selectGift}>Seleziona regalo</button>
                     )}
                     {selectedGift && (

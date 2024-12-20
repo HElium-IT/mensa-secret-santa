@@ -38,9 +38,10 @@ function GameCreate({
                 setGame(game);
             }
         });
+        console.debug("GameCreate.GameOnCreateSubscription", "subscribed");
 
-        return () => subscription.unsubscribe();
-    }, [user]);
+        return () => { subscription.unsubscribe(); }
+    }, []);
 
     useEffect(() => {
         setIsCreatingGame(showCreateForm);

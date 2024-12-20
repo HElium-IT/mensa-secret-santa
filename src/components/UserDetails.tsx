@@ -1,16 +1,14 @@
-function UserDetails({ user, signOut }: {
+import { Flex } from "@aws-amplify/ui-react";
+
+function UserDetails({ user }: {
     readonly user: any,
-    readonly signOut: () => Promise<void>
 }) {
     return (
-        <div className="flex-row" style={{ justifyContent: "center" }}>
-            <h2 style={{ textAlign: "center", textOverflow: "ellipsis", overflow: "hidden" }}>
+        <Flex direction="row" justifyContent="center" alignItems="center">
+            <h2 style={{ margin: "0px", textAlign: "center", textOverflow: "ellipsis", overflow: "hidden" }}>
                 {user?.signInDetails?.loginId?.split('@')[0]}
             </h2>
-            <button type="button" onClick={signOut}>
-                LogOut
-            </button>
-        </div>
+        </Flex>
     )
 }
 
